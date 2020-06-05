@@ -9,8 +9,8 @@ function litecoinFullnodeNotifyer(conf){
     subscribeToTransactions();
 }
 
-function connectToSocket(conf){
-    sock.connect(`tcp://${conf.host}:${conf.port}`);
+async function connectToSocket(conf){
+    await sock.connect(`tcp://${conf.host}:${conf.port}`);
     console.log(`Litecoin worker connected to port ${conf.port}`);
 }
 
