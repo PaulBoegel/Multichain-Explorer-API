@@ -1,15 +1,31 @@
-const litecoinFullnodeNotifyer = require('./node_notifyer/litecoinFullnodeNotifyer')
+const LitecoinNotifyer = require('./notifyer/litecoinNotifyer');
 
-function notificationManager(configIn){
+function NotificationManager(configIn){
+
     const config = configIn;
+    const notifyerArray = new Array();
 
-    function activateLitecoinNotifyer(){
-        litecoinFullnodeNotifyer(config.litecoin);
-        litecoinFullnodeNotifyer.connectToSocket();
-        litecoinFullnodeNotifyer.subscribeToTransactions();
+    initNotifyer();
+
+    function initNotifyer(){
+      const litecoinNotifyer = {blockchain: "litecoin",  notifyer: new LitecoinNotifyer(config)};
+      notifyerArray.push(litecoinNotifyer);
     }
 
-    return { activateLitecoinNotifyer }
+    function activateAllNotifyer(){
+      notifyerArray.forEach((item) => {
+        item.notifyer.connectToSocket();
+        item.notifyer.subscribeToTransactions();
+      });
+    }
+
+    function activateNotifyer(blockchainName){
+        const notifyerItem = notifyerArray.find(item => item.blockchain == blockchainName);
+        notifyerItem.notifyer.connectToSocket();
+        notifyerItem.notifyer.subscribeToTransactions();
+    }
+
+    return { activateAllNotifyer, activateNotifyer }
 }
 
-module.exports = notificationManager();
+module.exports = NotificationManager;

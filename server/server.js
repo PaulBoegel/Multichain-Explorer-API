@@ -1,9 +1,8 @@
 const express = require('express');
-const mongoose = require('mongoose');
-const configHandler = require('../handler/configurationHandler');
-const notificationManager = require('./notificationManager');
-
+//const mongoose = require('mongoose');
 const app = express();
+const NotificationManager = require('./notificationManager')
+const ConfigurationHandler = require('./handler/configurationHandler');
 
 // if (process.env.ENV === 'Test') {
 //     console.log('This is a test');
@@ -13,9 +12,10 @@ const app = express();
 //     const db = mongoose.connect('mongodb://localhost/blockchainDB');
 // }
 
+const configHandler = new ConfigurationHandler();
 const config = configHandler.getFullnodeConfiguration('./fullnode-config.json');
+const notificationManager = new NotificationManager(config);
 
-notificationManager(config);
-notificationManager.activateLitecoinNotifyer();
+notificationManager.activateAllNotifyer();
 
 module.exports = app;
