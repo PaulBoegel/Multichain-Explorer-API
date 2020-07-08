@@ -1,12 +1,13 @@
-const fs = require('fs');
+function ConfigurationHandler(fs) {
 
-function ConfigurationHandler(){
+  function readAndParseJsonFile(path) {
+    if(typeof path === undefined || path == null)
+      throw new ReferenceError('Path to file is not defined.');
 
-    function getFullnodeConfiguration(path){
-        return JSON.parse(fs.readFileSync(path));
-    }
+      return JSON.parse(fs.readFileSync(path));
+  }
 
-    return { getFullnodeConfiguration }
+  return { readAndParseJsonFile }
 }
 
 module.exports = ConfigurationHandler;
