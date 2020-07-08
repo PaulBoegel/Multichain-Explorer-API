@@ -1,21 +1,27 @@
 const express = require('express');
-//const mongoose = require('mongoose');
+const fs = require('fs');
+
 const app = express();
-const NotificationManager = require('./notificationManager')
+const FullnodeApiManager = require('./fullnodeAPIManager');
+const FullnodeApiFactory = require('./fullnodeApiFactory');
 const ConfigurationHandler = require('./handler/configurationHandler');
+const TransactionHandler = require('./handler/transactionHandler');
+const TransactionRepository = require('./repos/transactionRepository');
 
-// if (process.env.ENV === 'Test') {
-//     console.log('This is a test');
-//     const db = mongoose.connect('mongodb://localhost/blockchainDB_Test');
-// } else {
-//     console.log('This is productive');
-//     const db = mongoose.connect('mongodb://localhost/blockchainDB');
-// }
+try {
+  const configHandler = new ConfigurationHandler(fs);
+  const config = configHandler.readAndParseJsonFile('./explorer-config.json');
+  const transactionRepo = new TransactionRepository(config.dbConfig.test);
+  const transactionHandler = new TransactionHandler(transactionRepo);
+  const fullnodeApiFactory = new FullnodeApiFactory(config.blockchainConfig);
+  const fullnodeApiManager = new FullnodeApiManager();
 
-const configHandler = new ConfigurationHandler();
-const config = configHandler.getFullnodeConfiguration('./fullnode-config.json');
-const notificationManager = new NotificationManager(config);
+  fullnodeApiManager.setApi(fullnodeApiFactory.createApi("litecoin"));
+  fullnodeApiManager.events.addListener('onNewTransaction', transactionHandler.saveTransaction);
+  fullnodeApiManager.activateAllNotifyer();
 
-notificationManager.activateAllNotifyer();
+} catch (err) {
+  console.log(err);
+}
 
 module.exports = app;
