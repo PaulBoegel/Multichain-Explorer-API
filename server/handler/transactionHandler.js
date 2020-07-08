@@ -4,21 +4,19 @@ function transactionHandler(transactionRepo) {
 
   const startTime = Date.now();
 
-  async function saveTransaction(transaction, service) {
+  async function saveTransaction(rawTransaction, service) {
     try {
-      transaction = await service.decodeTransaction(transaction);
-
-      if (await checkIfSaved(transaction.txid) == false) {
+      const transaction = await service.decodeTransaction(rawTransaction);
+      const id = transaction.txid;
+      if (await checkIfSaved(id) == false) {
         await transactionRepo.add(transaction);
-        console.log(`Added ${transaction.txid} to database`);
+        console.log(`Added ${id} to database`);
       }
 
       const relations = await service.getRelations(transaction);
 
-       if(relations)
-          await saveRelations(relations, service);
-
-      transaction = null;
+        if(relations)
+           await saveRelations(relations, service);
 
     } catch (err) {
       throw err;
@@ -30,11 +28,9 @@ function transactionHandler(transactionRepo) {
     for (let index = 0; index < relations.length; index++) {
       saveTasks.push(saveTransaction(relations[index], service));
     }
-    Promise.all(saveTasks).catch((err) => {
+    await Promise.all(saveTasks).catch((err) => {
        console.log(err);
     });
-
-    relations = null;
   }
 
   async function checkIfSaved(transactionId) {
