@@ -1,0 +1,31 @@
+{
+  "dbConfig": {
+    "prod": {
+      "host": "127.0.0.1",
+      "port": "",
+      "dbName": "blockchainDB_Prod",
+      "poolSize": "10"
+    },
+    "test": {
+      "host": "127.0.0.1",
+      "port": "",
+      "dbName": "blockchainDB_Tests",
+      "poolSize": "10"
+    }
+  },
+  "blockchainConfig": {
+    "litecoin": {
+      "rpc": {
+        "protocol": "http",
+        "user": "pboegelsack",
+        "pass": "test",
+        "host": "127.0.0.1",
+        "port": "8332"
+      },
+      "worker": {
+        "host": "127.0.0.1",
+        "port": "29000"
+      }
+    }
+  }
+}
