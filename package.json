@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:server": "nodemon server/server.js",
-    "test": "mocha tests/**/*spec.js"
+    "start:server": "node --inspect server/server.js",
+    "test": "mocha tests/**/*spec.js",
+    "test:transrepo": "nodemon tests/repos/transactionRepoHarness.js",
+    "test:litecoinService": "nodemon tests/services/litecoinNodeServiceHarness"
   },
   "keywords": [],
   "author": "",
@@ -13,7 +15,7 @@
   "dependencies": {
     "bitcoind-rpc": "^0.8.1",
     "express": "^4.17.1",
-    "mongoose": "^5.9.17",
+    "mongodb": "^3.5.8",
     "zeromq": "^6.0.0-beta.6"
   },
   "devDependencies": {
