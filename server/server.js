@@ -1,5 +1,8 @@
+"use strict";
+
 const express = require('express');
 const fs = require('fs');
+const numeral = require('numeral');
 
 const app = express();
 const FullnodeApiManager = require('./fullnodeAPIManager');
@@ -19,6 +22,14 @@ try {
   fullnodeApiManager.setApi(fullnodeApiFactory.createApi("litecoin"));
   fullnodeApiManager.events.addListener('onNewTransaction', transactionHandler.saveTransaction);
   fullnodeApiManager.activateAllNotifyer();
+
+
+  //check for memory leak
+  //  setInterval(() => {
+  //    const {rss, heapTotal} = process.memoryUsage();
+  //    console.log('rss', numeral(rss).format('0.0 ib'),
+  //                'heapTotal', numeral(heapTotal).format('0.0 ib'));
+  //  }, 5000);
 
 } catch (err) {
   console.log(err);

@@ -1,8 +1,10 @@
+"use strict";
+
 function LitecoinNodeService(rpc) {
 
   function decodeTransaction(transaction) {
+    const transHex = transaction.toString('hex');
     return new Promise((resolve, reject) => {
-      const transHex = transaction.toString('hex');
       rpc.decodeRawTransaction(transHex, (err, resp) => {
         if (err) {
           reject(err);
@@ -27,15 +29,13 @@ function LitecoinNodeService(rpc) {
 
   async function getRelations(transaction) {
     try {
+      const transactionArray = [];
 
       if (coinbaseCheck(transaction))
         return null;
 
-      const transactionArray = [];
-
       for (let index = 0; index < transaction.vin.length; index++) {
-        const oldTransaction = await getTransaction(transaction.vin[index].txid)
-        transactionArray.push(oldTransaction);
+        transactionArray.push(await getTransaction(transaction.vin[index].txid));
       }
 
       return transactionArray;

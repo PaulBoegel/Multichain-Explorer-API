@@ -1,3 +1,5 @@
+"use strict";
+
 const EventEmitter = require('events');
 
 function LitecoinNotifyer(workerConf, sock) {

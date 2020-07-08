@@ -1,3 +1,5 @@
+"use strict";
+
 const { MongoClient } = require('mongodb');
 
 function TransactionRepository(dbConfig) {

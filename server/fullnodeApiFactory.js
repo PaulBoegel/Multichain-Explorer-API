@@ -1,3 +1,5 @@
+"use strict";
+
 const LitecoinNotifyer = require('./notifyer/litecoinNotifyer');
 const LitecoinNodeService = require('./services/litecoinNodeService');
 const RpcClient = require('bitcoind-rpc');
