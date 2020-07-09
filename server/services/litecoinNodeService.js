@@ -1,6 +1,10 @@
 "use strict";
 
+const EventEmitter = require('events');
+
 function LitecoinNodeService(rpc) {
+
+  const events = new EventEmitter();
 
   function decodeTransaction(transaction) {
     const transHex = transaction.toString('hex');
@@ -15,7 +19,7 @@ function LitecoinNodeService(rpc) {
     });
   }
 
-  async function getTransaction(transactionId) {
+  function getTransaction(transactionId) {
     return new Promise((resolve, reject) => {
       rpc.getRawTransaction(transactionId, 0, (err, resp) => {
         if (err) {
@@ -27,18 +31,16 @@ function LitecoinNodeService(rpc) {
     });
   }
 
-  async function getRelations(transaction) {
+  async function handleRelations(transaction) {
     try {
-      const transactionArray = [];
 
       if (coinbaseCheck(transaction))
         return null;
 
       for (let index = 0; index < transaction.vin.length; index++) {
-        transactionArray.push(await getTransaction(transaction.vin[index].txid));
+        const relation = await getTransaction(transaction.vin[index].txid);
+        events.emit('onNewRelation', relation, "litecoin");
       }
-
-      return transactionArray;
 
     } catch (err) {
       throw err;
@@ -52,7 +54,7 @@ function LitecoinNodeService(rpc) {
     return true;
   }
 
-  return { decodeTransaction, getTransaction, getRelations }
+  return { decodeTransaction, getTransaction, handleRelations, events }
 }
 
 module.exports = LitecoinNodeService;

@@ -19,6 +19,7 @@ function FullnodeApiManager(config) {
       throw 'Service array is empty.';
 
     apiArray.forEach((api) => {
+      api.service.events.addListener('onNewRelation', onNewTransaction);
       api.notifyer.events.addListener('onNewTransaction', onNewTransaction);
       api.notifyer.connectToSocket();
       api.notifyer.subscribeToTransactions();
@@ -30,6 +31,7 @@ function FullnodeApiManager(config) {
       throw 'Notifyer array is empty.';
 
     const api = apiArray.find(item => item.blockchain == blockchainName);
+    api.service.events.addListener('onNewRelation', onNewTransaction);
     api.notifyer.events.addListener('onNewTransaction', onNewTransaction);
     api.notifyer.connectToSocket();
     api.notifyer.subscribeToTransactions();
