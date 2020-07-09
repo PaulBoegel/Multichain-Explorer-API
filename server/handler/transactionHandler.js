@@ -10,7 +10,7 @@ function transactionHandler(transactionRepo) {
       const id = transaction.txid;
       if (await checkIfSaved(id) == false) {
         await transactionRepo.add(transaction);
-        //console.log(`Added ${id} to database`);
+        console.log(`Added ${id} to database`);
       }
 
       const relations = await service.getRelations(transaction);
@@ -25,23 +25,15 @@ function transactionHandler(transactionRepo) {
 
   async function saveRelations(relations, service) {
 
-    // const saveTasks = [];
+    const saveTasks = [];
 
-    // for (let index = 0; index < relations.length; index++) {
-    //   saveTasks.push(saveTransaction(relations[index], service));
-    // }
-
-     for (let i = 0; i < relations.length; i += 10) {
-      setTimeout(async () => {
-        const saveTasks = relations.slice(i, i + 10).map((relation) => {
-           return saveTransaction(relation, service);
-        });
-
-        await Promise.all(saveTasks).catch((err) => {
-          throw err;
-        });
-      }, 1000);
+    for (let index = 0; index < relations.length; index++) {
+      saveTasks.push(saveTransaction(relations[index], service));
     }
+
+    await Promise.all(saveTasks).catch((err) => {
+      throw err;
+    });
   }
 
   async function checkIfSaved(transactionId) {
