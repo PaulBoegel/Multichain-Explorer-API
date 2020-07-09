@@ -30,6 +30,7 @@ function FullnodeApiManager(config) {
       throw 'Notifyer array is empty.';
 
     const api = apiArray.find(item => item.blockchain == blockchainName);
+    api.notifyer.events.addListener('onNewTransaction', onNewTransaction);
     api.notifyer.connectToSocket();
     api.notifyer.subscribeToTransactions();
   }
