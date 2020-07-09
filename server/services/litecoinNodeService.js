@@ -35,10 +35,10 @@ function LitecoinNodeService(rpc) {
         return null;
 
       for (let index = 0; index < transaction.vin.length; index++) {
-        transactionArray.push(await getTransaction(transaction.vin[index].txid));
+        transactionArray.push(getTransaction(transaction.vin[index].txid));
       }
 
-      return transactionArray;
+      return Promise.all(transactionArray);
 
     } catch (err) {
       throw err;
