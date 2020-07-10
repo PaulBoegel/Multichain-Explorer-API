@@ -2,8 +2,6 @@
 
 function transactionHandler(transactionRepo) {
 
-  const startTime = Date.now();
-
   async function saveTransaction(rawTransaction, service) {
     try {
       let transaction = await service.decodeTransaction(rawTransaction);
@@ -12,6 +10,7 @@ function transactionHandler(transactionRepo) {
       if (await checkIfSaved(id) == false) {
         await transactionRepo.add(transaction);
         await service.handleRelations(transaction);
+        console.log(`Added ${id} to database.`);
       }
 
       transaction = null;
