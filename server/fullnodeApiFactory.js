@@ -2,7 +2,7 @@
 
 const LitecoinNotifyer = require('./notifyer/litecoinNotifyer');
 const LitecoinNodeService = require('./services/litecoinNodeService');
-const RpcClient = require('bitcoind-rpc');
+const { RPCClient } = require("rpc-bitcoin");
 const zmq = require('zeromq');
 
 function FullnodeApiFactory(config){
@@ -29,7 +29,8 @@ function FullnodeApiFactory(config){
 
   function createLitecoinAPI(){
     const litecoinSock = new zmq.Subscriber;
-    const litecoinRpc = new RpcClient(config.litecoin.rpc);
+    const conf = config.litecoin.rpc;
+    const litecoinRpc = new RPCClient({url: conf.url, user: conf.user, pass: conf.pass, port: conf.port});
     const notifyer = new LitecoinNotifyer(config.litecoin.worker, litecoinSock);
     const service = new LitecoinNodeService(litecoinRpc);
 

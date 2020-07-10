@@ -6,41 +6,39 @@ function LitecoinNodeService(rpc) {
 
   const events = new EventEmitter();
 
-  function decodeTransaction(transaction) {
-    const transHex = transaction.toString('hex');
-    return new Promise((resolve, reject) => {
-      rpc.decodeRawTransaction(transHex, (err, resp) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        resolve(resp.result);
-      });
-    });
+  async function decodeTransaction(byteArray) {
+    try {
+      const transHex = byteArray.toString('hex');
+      const decoded = await rpc.decoderawtransaction({hexstring: transHex});
+
+      if(coinbaseCheck(decoded)){
+        decoded.vin = [];
+
+        return decoded;
+      }
+
+      return decoded;
+
+    } catch (err) {
+      throw err;
+    }
   }
 
-  function getTransaction(transactionId) {
-    return new Promise((resolve, reject) => {
-      rpc.getRawTransaction(transactionId, 0, (err, resp) => {
-        if (err) {
-          reject(err);
-          return;
-        }
-        resolve(resp.result);
-      });
-    });
+  async function getTransaction(transactionId) {
+    try {
+      return await rpc.getrawtransaction({txid: transactionId, verbose: false})
+    } catch (err) {
+      throw err;
+    }
   }
 
   async function handleRelations(transaction) {
     try {
 
-      if (coinbaseCheck(transaction))
-        return null;
-
-      for (let index = 0; index < transaction.vin.length; index++) {
-        const relation = await getTransaction(transaction.vin[index].txid);
+      transaction.vin.forEach(async (input) => {
+        const relation = await getTransaction(input.txid);
         events.emit('onNewRelation', relation, "litecoin");
-      }
+      });
 
     } catch (err) {
       throw err;

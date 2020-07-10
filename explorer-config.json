@@ -16,10 +16,9 @@
   "blockchainConfig": {
     "litecoin": {
       "rpc": {
-        "protocol": "http",
+        "url": "http://127.0.0.1",
         "user": "pboegelsack",
         "pass": "test",
-        "host": "127.0.0.1",
         "port": "8332"
       },
       "worker": {
