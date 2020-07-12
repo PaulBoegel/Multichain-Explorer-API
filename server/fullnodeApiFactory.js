@@ -17,7 +17,7 @@ function FullnodeApiFactory(config){
       throw new ReferenceError('No blockchain name defined.');
 
     switch(blockchainName){
-      case "litecoin":
+      case config.litecoin.chainname:
         return createLitecoinAPI();
         break;
     }
@@ -32,7 +32,7 @@ function FullnodeApiFactory(config){
     const conf = config.litecoin.rpc;
     const litecoinRpc = new RPCClient({url: conf.url, user: conf.user, pass: conf.pass, port: conf.port});
     const notifyer = new LitecoinNotifyer(config.litecoin, litecoinSock);
-    const service = new LitecoinNodeService(litecoinRpc);
+    const service = new LitecoinNodeService(litecoinRpc, config.litecoin.chainname);
 
     return { blockchain: "litecoin", notifyer:  notifyer, service: service};
   }

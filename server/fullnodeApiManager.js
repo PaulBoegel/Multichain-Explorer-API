@@ -38,8 +38,8 @@ function FullnodeApiManager(config) {
     await api.notifyer.subscribeToTransactions();
   }
 
-  function onNewTransaction(transaction, relationDepth, blockchainName) {
-    const api = apiArray.find(item => item.blockchain == blockchainName);
+  function onNewTransaction(transaction, relationDepth, chainname) {
+    const api = apiArray.find(item => item.blockchain == chainname);
     events.emit('onNewTransaction', transaction, relationDepth, api.service);
   }
 

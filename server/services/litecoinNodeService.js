@@ -2,7 +2,7 @@
 
 const EventEmitter = require('events');
 
-function LitecoinNodeService(rpc) {
+function LitecoinNodeService(rpc, chainname) {
 
   const events = new EventEmitter();
 
@@ -41,7 +41,7 @@ function LitecoinNodeService(rpc) {
       depth--;
       transaction.vin.forEach(async (input) => {
         const relation = await getTransaction(input.txid);
-        events.emit('onNewRelation', relation, depth, "litecoin");
+        events.emit('onNewRelation', relation, depth, chainname);
       });
 
     } catch (err) {
@@ -56,7 +56,7 @@ function LitecoinNodeService(rpc) {
     return true;
   }
 
-  return { decodeTransaction, getTransaction, handleRelations, events }
+  return { decodeTransaction, getTransaction, handleRelations, chainname, events }
 }
 
 module.exports = LitecoinNodeService;

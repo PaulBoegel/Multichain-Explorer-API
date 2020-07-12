@@ -20,7 +20,7 @@ function LitecoinNotifyer(conf, sock) {
     try {
       sock.subscribe("rawtx")
       for await (const [topic, msg] of sock) {
-        events.emit('onNewTransaction', msg, relationDepth, "litecoin");
+        events.emit('onNewTransaction', msg, relationDepth, conf.chainname);
       }
     } catch (e) {
       throw e;

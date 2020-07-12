@@ -15,6 +15,7 @@
   },
   "blockchainConfig": {
     "litecoin": {
+      "chainname": "litecoin",
       "transactions": {
         "notifyerRelationDepth": "5"
       },

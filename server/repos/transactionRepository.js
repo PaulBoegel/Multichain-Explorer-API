@@ -36,9 +36,9 @@ function TransactionRepository(dbConfig) {
     }
   }
 
-  async function getById(id) {
+  async function getById(id, chainname) {
     try {
-      const transaction = await db.collection('transactions').findOne({txid: id});
+      const transaction = await db.collection('transactions').findOne({txid: id, chainname: chainname});
 
       return transaction;
 
