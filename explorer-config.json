@@ -15,6 +15,9 @@
   },
   "blockchainConfig": {
     "litecoin": {
+      "transactions": {
+        "notifyerRelationDepth": "5"
+      },
       "rpc": {
         "url": "http://127.0.0.1",
         "user": "pboegelsack",

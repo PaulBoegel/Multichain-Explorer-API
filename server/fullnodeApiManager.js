@@ -7,42 +7,43 @@ function FullnodeApiManager(config) {
   const apiArray = []
   const events = new EventEmitter();
 
-  function setApi(api){
-    if(typeof api === undefined || api == null)
+  function setApi(api) {
+    if (typeof api === undefined || api == null)
       throw new ReferenceError('api array is not defined.');
 
     apiArray.push(api);
   }
 
-  function activateAllNotifyer() {
-    if(apiArray.length == 0)
+  function activateAllAPIs() {
+    if (apiArray.length == 0)
       throw 'Service array is empty.';
 
-    apiArray.forEach((api) => {
-      api.service.events.addListener('onNewRelation', onNewTransaction);
-      api.notifyer.events.addListener('onNewTransaction', onNewTransaction);
-      api.notifyer.connectToSocket();
-      api.notifyer.subscribeToTransactions();
+    apiArray.forEach(async (api) => {
+      await initAPI(api);
     });
   }
 
-  function activateNotifyer(blockchainName) {
-    if(notifyerArray.length == 0)
+  async function activateAPI(blockchainName) {
+    if (notifyerArray.length == 0)
       throw 'Notifyer array is empty.';
 
     const api = apiArray.find(item => item.blockchain == blockchainName);
+    await initAPI(api);
+  }
+
+  async function initAPI(api) {
     api.service.events.addListener('onNewRelation', onNewTransaction);
     api.notifyer.events.addListener('onNewTransaction', onNewTransaction);
-    api.notifyer.connectToSocket();
-    api.notifyer.subscribeToTransactions();
+    await api.notifyer.connectToSocket();
+    await api.notifyer.subscribeToTransactions();
   }
 
-  function onNewTransaction(transaction, blockchainName){
+  function onNewTransaction(transaction, relationDepth, blockchainName) {
     const api = apiArray.find(item => item.blockchain == blockchainName);
-    events.emit('onNewTransaction', transaction, api.service);
+    events.emit('onNewTransaction', transaction, relationDepth, api.service);
   }
 
-  return { activateAllNotifyer, activateNotifyer, setApi, events }
+  return { activateAllAPIs, activateAPI, setApi, events }
 }
 
 module.exports = FullnodeApiManager;

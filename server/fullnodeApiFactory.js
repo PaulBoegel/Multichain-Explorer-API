@@ -31,7 +31,7 @@ function FullnodeApiFactory(config){
     const litecoinSock = new zmq.Subscriber;
     const conf = config.litecoin.rpc;
     const litecoinRpc = new RPCClient({url: conf.url, user: conf.user, pass: conf.pass, port: conf.port});
-    const notifyer = new LitecoinNotifyer(config.litecoin.worker, litecoinSock);
+    const notifyer = new LitecoinNotifyer(config.litecoin, litecoinSock);
     const service = new LitecoinNodeService(litecoinRpc);
 
     return { blockchain: "litecoin", notifyer:  notifyer, service: service};

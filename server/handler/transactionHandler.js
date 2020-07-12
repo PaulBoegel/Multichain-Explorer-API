@@ -2,14 +2,14 @@
 
 function transactionHandler(transactionRepo) {
 
-  async function saveTransaction(rawTransaction, service) {
+  async function saveTransaction(rawTransaction, relationDepth, service) {
     try {
       let transaction = await service.decodeTransaction(rawTransaction);
       const id = transaction.txid;
 
       if (await checkIfSaved(id) == false) {
         await transactionRepo.add(transaction);
-        await service.handleRelations(transaction);
+        await service.handleRelations(transaction, relationDepth);
         console.log(`Added ${id} to database.`);
       }
 

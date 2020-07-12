@@ -32,12 +32,16 @@ function LitecoinNodeService(rpc) {
     }
   }
 
-  async function handleRelations(transaction) {
+  async function handleRelations(transaction, depth) {
     try {
 
+      if(depth <= 0)
+        return;
+
+      depth--;
       transaction.vin.forEach(async (input) => {
         const relation = await getTransaction(input.txid);
-        events.emit('onNewRelation', relation, "litecoin");
+        events.emit('onNewRelation', relation, depth, "litecoin");
       });
 
     } catch (err) {
