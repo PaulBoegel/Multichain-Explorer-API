@@ -24,9 +24,9 @@ function LitecoinNodeService(rpc, chainname) {
     }
   }
 
-  async function getTransaction(transactionId) {
+  async function getTransaction(transactionId, verbose = false) {
     try {
-      return await rpc.getrawtransaction({txid: transactionId, verbose: false})
+      return await rpc.getrawtransaction({txid: transactionId, verbose: verbose})
     } catch (err) {
       throw err;
     }
