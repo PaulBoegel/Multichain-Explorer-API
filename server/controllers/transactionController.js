@@ -1,18 +1,28 @@
 "use strict"
 
-function TransactionController(transRepo) {
+function TransactionController(transRepo, fullnodeApiManager) {
 
   async function getByTxId(req, res) {
     try {
       const chainname = req.params.chainname;
       const txid = req.params.txid;
 
-      const result = await transRepo.getById(txid, chainname);
+      let result = await transRepo.getById(txid, chainname);
 
-      return res.json(result);
+      if(result)
+        return res.json(result);
+
+      result = await fullnodeApiManager.getTransactionFromNode(chainname, txid);
+
+      if(result){
+        await transRepo.add(result);
+        return res.json(result);
+      }
+
+      return res.code(404);
 
     } catch(err){
-      res.send(err);
+      res.send(err.message);
     }
   }
 
