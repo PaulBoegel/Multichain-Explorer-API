@@ -24,18 +24,35 @@ function FullnodeApiManager(config) {
   }
 
   async function activateAPI(blockchainName) {
-    if (notifyerArray.length == 0)
-      throw 'Notifyer array is empty.';
+    try {
+      if (notifyerArray.length == 0)
+        throw 'Notifyer array is empty.';
 
-    const api = apiArray.find(item => item.blockchain == blockchainName);
-    await initAPI(api);
+      const api = apiArray.find(item => item.blockchain == blockchainName);
+      await initAPI(api);
+    } catch (err) {
+      throw err;
+    }
   }
 
   async function initAPI(api) {
-    api.service.events.addListener('onNewRelation', onNewTransaction);
-    api.notifyer.events.addListener('onNewTransaction', onNewTransaction);
-    await api.notifyer.connectToSocket();
-    await api.notifyer.subscribeToTransactions();
+    try {
+      api.service.events.addListener('onNewRelation', onNewTransaction);
+      api.notifyer.events.addListener('onNewTransaction', onNewTransaction);
+      await api.notifyer.connectToSocket();
+      await api.notifyer.subscribeToTransactions();
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async function getTransactionFromNode(blockchainName, txid) {
+    try {
+      const api = apiArray.find(item => item.blockchain == blockchainName);
+      return await api.service.getTransaction(txid, true);
+    } catch (err) {
+      throw err;
+    }
   }
 
   function onNewTransaction(transaction, relationDepth, chainname) {
@@ -43,7 +60,7 @@ function FullnodeApiManager(config) {
     events.emit('onNewTransaction', transaction, relationDepth, api.service);
   }
 
-  return { activateAllAPIs, activateAPI, setApi, events }
+  return { activateAllAPIs, activateAPI, setApi, getTransactionFromNode, events }
 }
 
 module.exports = FullnodeApiManager;
