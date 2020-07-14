@@ -17,7 +17,7 @@ try {
   const transactionHandler = new TransactionHandler(transactionRepo);
   const fullnodeApiFactory = new FullnodeApiFactory(config.blockchainConfig);
   const fullnodeApiManager = new FullnodeApiManager();
-  const fullnodeRestApi = new FullnodeRestApi(transactionRepo);
+  const fullnodeRestApi = new FullnodeRestApi(transactionRepo, fullnodeApiManager);
 
   fullnodeApiManager.setApi(fullnodeApiFactory.createApi("litecoin"));
   fullnodeApiManager.events.addListener('onNewTransaction', transactionHandler.saveTransaction);
