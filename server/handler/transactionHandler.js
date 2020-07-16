@@ -23,6 +23,29 @@ function transactionHandler(transactionRepo) {
     }
   }
 
+  async function getTransaction(txid, service) {
+    try {
+      let transaction = await transactionRepo.getById(txid, service.chainname);
+
+      if (transaction)
+          return transaction;
+
+
+      transaction = await service.getTransaction(txid, true);
+
+      if (transaction) {
+        await transactionRepo.add(transaction);
+        return transaction;
+      }
+
+      return null;
+
+    } catch (err) {
+      throw err;
+    }
+
+  }
+
   async function checkIfSaved(transactionId, chainname) {
     try {
       const result = await transactionRepo.getById(transactionId, chainname);
@@ -35,7 +58,7 @@ function transactionHandler(transactionRepo) {
     }
   }
 
-  return { saveTransaction }
+  return { getTransaction, saveTransaction }
 
 }
 
