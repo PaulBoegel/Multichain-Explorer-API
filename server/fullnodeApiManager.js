@@ -46,13 +46,9 @@ function FullnodeApiManager(config) {
     }
   }
 
-  async function getTransactionFromNode(blockchainName, txid) {
-    try {
-      const api = apiArray.find(item => item.blockchain == blockchainName);
-      return await api.service.getTransaction(txid, true);
-    } catch (err) {
-      throw err;
-    }
+  function getService(blockchainName){
+    const api = apiArray.find(item => item.blockchain == blockchainName);
+    return api.service;
   }
 
   function onNewTransaction(transaction, relationDepth, chainname) {
@@ -60,7 +56,7 @@ function FullnodeApiManager(config) {
     events.emit('onNewTransaction', transaction, relationDepth, api.service);
   }
 
-  return { activateAllAPIs, activateAPI, setApi, getTransactionFromNode, events }
+  return { activateAllAPIs, activateAPI, setApi, getService, events }
 }
 
 module.exports = FullnodeApiManager;
