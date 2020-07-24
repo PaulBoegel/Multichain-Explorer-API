@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon --inspect server/server.js",
+    "start:fullnode-dev": "nodemon --inspect src/server.js",
+    "start:rest-dev": "nodemon --inspect src/api/server.js",
     "test": "mocha tests/**/*spec.js",
     "test:transrepo": "nodemon tests/repos/transactionRepoHarness.js",
     "test:litecoinService": "nodemon tests/services/litecoinNodeServiceHarness"
