@@ -4,13 +4,13 @@
       "host": "127.0.0.1",
       "port": "",
       "dbName": "blockchainDB_Prod",
-      "poolSize": "10"
+      "poolSize": "5"
     },
     "test": {
       "host": "127.0.0.1",
       "port": "",
       "dbName": "blockchainDB_Tests",
-      "poolSize": "10"
+      "poolSize": "5"
     }
   },
   "blockchainConfig": {
