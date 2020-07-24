@@ -1,13 +1,12 @@
 function ConfigurationHandler(fs) {
-
   function readAndParseJsonFile(path) {
-    if(typeof path === undefined || path == null)
-      throw new ReferenceError('Path to file is not defined.');
+    if (typeof path === undefined || path == null)
+      throw new ReferenceError("Path to file is not defined.");
 
-      return JSON.parse(fs.readFileSync(path));
+    return JSON.parse(fs.readFileSync(path));
   }
 
-  return { readAndParseJsonFile }
+  return { readAndParseJsonFile };
 }
 
 module.exports = ConfigurationHandler;

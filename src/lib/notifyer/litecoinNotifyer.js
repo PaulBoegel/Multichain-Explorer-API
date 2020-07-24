@@ -1,9 +1,8 @@
 "use strict";
 
-const EventEmitter = require('events');
+const EventEmitter = require("events");
 
 function LitecoinNotifyer(conf, sock) {
-
   const events = new EventEmitter();
   const relationDepth = conf.transactions.notifyerRelationDepth;
 
@@ -18,16 +17,16 @@ function LitecoinNotifyer(conf, sock) {
 
   async function subscribeToTransactions() {
     try {
-      sock.subscribe("rawtx")
+      sock.subscribe("rawtx");
       for await (const [topic, msg] of sock) {
-        events.emit('onNewTransaction', msg, relationDepth, conf.chainname);
+        events.emit("onNewTransaction", msg, relationDepth, conf.chainname);
       }
     } catch (e) {
       throw e;
     }
   }
 
-  return { connectToSocket, subscribeToTransactions, events }
+  return { connectToSocket, subscribeToTransactions, events };
 }
 
 module.exports = LitecoinNotifyer;

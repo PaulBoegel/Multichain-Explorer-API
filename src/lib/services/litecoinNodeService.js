@@ -1,24 +1,22 @@
 "use strict";
 
-const EventEmitter = require('events');
+const EventEmitter = require("events");
 
 function LitecoinNodeService(rpc, chainname) {
-
   const events = new EventEmitter();
 
   async function decodeTransaction(byteArray) {
     try {
-      const transHex = byteArray.toString('hex');
-      const decoded = await rpc.decoderawtransaction({hexstring: transHex});
+      const transHex = byteArray.toString("hex");
+      const decoded = await rpc.decoderawtransaction({ hexstring: transHex });
 
-      if(coinbaseCheck(decoded)){
+      if (coinbaseCheck(decoded)) {
         decoded.vin = [];
 
         return decoded;
       }
 
       return decoded;
-
     } catch (err) {
       throw err;
     }
@@ -26,7 +24,10 @@ function LitecoinNodeService(rpc, chainname) {
 
   async function getTransaction(transactionId, verbose = false) {
     try {
-      return await rpc.getrawtransaction({txid: transactionId, verbose: verbose})
+      return await rpc.getrawtransaction({
+        txid: transactionId,
+        verbose: verbose,
+      });
     } catch (err) {
       throw err;
     }
@@ -37,33 +38,35 @@ function LitecoinNodeService(rpc, chainname) {
       const inputs = [];
       const vin = transaction.vin;
 
-      if(vin.length == 0)
-        return;
+      if (vin.length == 0) return;
 
-      if(depth == 0)
-        return;
+      if (depth == 0) return;
 
       depth--;
 
-      for(let i=0; i<vin.length; i++){
+      for (let i = 0; i < vin.length; i++) {
         inputs.push(await getTransaction(vin[i].txid, true));
       }
 
-      events.emit('onNewInputs', inputs, depth, chainname);
-
+      events.emit("onNewInputs", inputs, depth, chainname);
     } catch (err) {
       throw err;
     }
   }
 
   function coinbaseCheck(transaction) {
-    if (transaction.vin[0].coinbase == undefined)
-      return false;
+    if (transaction.vin[0].coinbase == undefined) return false;
 
     return true;
   }
 
-  return { decodeTransaction, getTransaction, handleTransactionInputs, chainname, events }
+  return {
+    decodeTransaction,
+    getTransaction,
+    handleTransactionInputs,
+    chainname,
+    events,
+  };
 }
 
 module.exports = LitecoinNodeService;

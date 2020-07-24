@@ -1,28 +1,34 @@
-"use strict"
+"use strict";
 
-const express = require('express');
-const TransactionRouter = require('./routes/transactionRouter');
-const TransactionController = require('./controllers/transactionController');
+const express = require("express");
+const TransactionRouter = require("./routes/transactionRouter");
+const TransactionController = require("./controllers/transactionController");
 
-function FullnodeRestApi(transactionHandler, fullnodeServiceManager){
+function FullnodeRestApi(transactionHandler, fullnodeServiceManager) {
   const app = express();
   const port = process.env.PORT || 3000;
 
-  function start(){
+  function start() {
     initAPI();
     app.listen(port, () => {
-      console.log(`Fullnode REST API runnning on port ${port}`)
-    })
+      console.log(`Fullnode REST API runnning on port ${port}`);
+    });
   }
 
-  function initAPI(){
-    const transactionController = new TransactionController(transactionHandler, fullnodeServiceManager);
-    const transactionRouter = new TransactionRouter(express.Router(), transactionController);
+  function initAPI() {
+    const transactionController = new TransactionController(
+      transactionHandler,
+      fullnodeServiceManager
+    );
+    const transactionRouter = new TransactionRouter(
+      express.Router(),
+      transactionController
+    );
 
-    app.use('/api', transactionRouter);
+    app.use("/api", transactionRouter);
   }
 
-  return {start}
+  return { start };
 }
 
 module.exports = FullnodeRestApi;
