@@ -4,7 +4,7 @@ const express = require('express');
 const TransactionRouter = require('./routes/transactionRouter');
 const TransactionController = require('./controllers/transactionController');
 
-function FullnodeRestApi(transactionHandler, fullnodeApiManager){
+function FullnodeRestApi(transactionHandler, fullnodeServiceManager){
   const app = express();
   const port = process.env.PORT || 3000;
 
@@ -16,7 +16,7 @@ function FullnodeRestApi(transactionHandler, fullnodeApiManager){
   }
 
   function initAPI(){
-    const transactionController = new TransactionController(transactionHandler, fullnodeApiManager);
+    const transactionController = new TransactionController(transactionHandler, fullnodeServiceManager);
     const transactionRouter = new TransactionRouter(express.Router(), transactionController);
 
     app.use('/api', transactionRouter);

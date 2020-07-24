@@ -38,9 +38,9 @@ function TransactionRepository(dbConfig) {
 
   async function getById(id, chainname) {
     try {
-      const transaction = await db.collection('transactions').findOne({txid: id, chainname: chainname});
+      const transaction = await db.collection('transactions').find({txid: id, chainname: chainname}).limit(1);
 
-      return transaction;
+      return await transaction.toArray()[0];
 
     } catch(err){
       throw err;
@@ -57,21 +57,17 @@ function TransactionRepository(dbConfig) {
     }
   }
 
-  async function loadData(data) {
-    if (typeof data === undefined || data == null)
-      throw new ReferenceError('No data object param defined.');
-
+  async function addMany(transactions) {
     try {
-      const result = await db.collection('transactions').insertMany(data);
-
-      return result;
+      transactions.forEach((transaction) => transaction.timestamp = Date.now());
+      await db.collection('transactions').insertMany(transactions);
 
     } catch(err){
       throw err;
     }
   }
 
-  return { loadData, get, getById, add }
+  return { addMany, get, getById, add }
 }
 
 module.exports = TransactionRepository;

@@ -32,17 +32,24 @@ function LitecoinNodeService(rpc, chainname) {
     }
   }
 
-  async function handleRelations(transaction, depth) {
+  async function handleTransactionInputs(transaction, depth) {
     try {
+      const inputs = [];
+      const vin = transaction.vin;
 
-      if(depth <= 0)
+      if(vin.length == 0)
+        return;
+
+      if(depth == 0)
         return;
 
       depth--;
-      transaction.vin.forEach(async (input) => {
-        const relation = await getTransaction(input.txid);
-        events.emit('onNewRelation', relation, depth, chainname);
-      });
+
+      for(let i=0; i<vin.length; i++){
+        inputs.push(await getTransaction(vin[i].txid, true));
+      }
+
+      events.emit('onNewInputs', inputs, depth, chainname);
 
     } catch (err) {
       throw err;
@@ -56,7 +63,7 @@ function LitecoinNodeService(rpc, chainname) {
     return true;
   }
 
-  return { decodeTransaction, getTransaction, handleRelations, chainname, events }
+  return { decodeTransaction, getTransaction, handleTransactionInputs, chainname, events }
 }
 
 module.exports = LitecoinNodeService;

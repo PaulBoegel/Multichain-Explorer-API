@@ -2,14 +2,14 @@
 
 const fs = require('fs');
 
-const FullnodeServiceManager = require('./fullnodeServiceManager');
-const FullnodeServiceFactory = require('./fullnodeServiceFactory');
-const FullnodeNotifyerManager = require('./fullnodeNotifyerManager.js');
-const FullnodeNotifyerFactory = require('./fullnodeNotifyerFactory');
+const FullnodeServiceManager = require('./lib/fullnodeServiceManager');
+const FullnodeServiceFactory = require('./lib/fullnodeServiceFactory');
+const FullnodeNotifyerManager = require('./lib/fullnodeNotifyerManager.js');
+const FullnodeNotifyerFactory = require('./lib/fullnodeNotifyerFactory');
 
-const ConfigurationHandler = require('./handler/configurationHandler');
-const TransactionHandler = require('./handler/transactionHandler');
-const TransactionRepository = require('./repos/transactionRepository');
+const ConfigurationHandler = require('./lib/handler/configurationHandler');
+const TransactionHandler = require('./lib/handler/transactionHandler');
+const TransactionRepository = require('./lib/repos/transactionRepository');
 
 const configHandler = new ConfigurationHandler(fs);
 const config = configHandler.readAndParseJsonFile('./explorer-config.json');

@@ -1,12 +1,12 @@
 "use strict"
 
-function TransactionController(transactionHandler, fullnodeApiManager) {
+function TransactionController(transactionHandler, fullnodeServiceManager) {
 
   async function getByTxId(req, res) {
     try {
       const chainname = req.params.chainname;
       const txid = req.params.txid;
-      const service = fullnodeApiManager.getService(chainname);
+      const service = fullnodeServiceManager.getService(chainname);
 
       let result = await transactionHandler.getTransaction(txid, service)
 
