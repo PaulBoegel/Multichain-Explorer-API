@@ -10,7 +10,8 @@ function TransactionController(transactionHandler, fullnodeServiceManager) {
       let result = await transactionHandler.getTransaction(txid, service);
 
       if (result) {
-        res.json(result);
+        res.setHeader("Content-Type", "application/json");
+        res.send(JSON.stringify(result, null, 4));
         return;
       }
 
