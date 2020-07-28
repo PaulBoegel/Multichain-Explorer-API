@@ -4,20 +4,20 @@
       "host": "127.0.0.1",
       "port": "",
       "dbName": "blockchainDB_Prod",
-      "poolSize": "5"
+      "poolSize": "100"
     },
     "test": {
       "host": "127.0.0.1",
       "port": "",
       "dbName": "blockchainDB_Tests",
-      "poolSize": "5"
+      "poolSize": "100"
     }
   },
   "blockchainConfig": {
     "litecoin": {
       "chainname": "litecoin",
       "transactions": {
-        "notifyerRelationDepth": "5"
+        "notifyerRelationDepth": "1"
       },
       "rpc": {
         "url": "http://127.0.0.1",
