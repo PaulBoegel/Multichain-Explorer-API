@@ -13,6 +13,7 @@ function TransactionRepository(dbConfig) {
   MongoClient.connect(
     url,
     {
+      useUnifiedTopology: true,
       poolSize: dbConfig.poolSize,
     },
     function (err, client) {
