@@ -1,11 +1,11 @@
 import React from "react";
 import { Route } from "react-router-dom";
-import PaymentPage from "./Payment/PaymentPage";
+import TransactionPage from "./Transaction/TransactionPage";
 
 const App = () => {
   return (
     <div className="container-fluid">
-      <Route exact path="/" component={PaymentPage} />
+      <Route exact path="/" component={TransactionPage} />
     </div>
   );
 };

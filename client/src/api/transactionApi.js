@@ -1,5 +1,5 @@
 import { handleResponse, handleError } from "./apiUtils";
-const baseUrl = process.env.API_URL + "/transactions/";
+const baseUrl = "http://localhost:3000/api/transactions";
 
 export function getTransaction(chainname, txid) {
   return fetch(baseUrl + `/${chainname}/` + txid)

@@ -3,18 +3,21 @@ import PropTypes from "prop-types";
 
 const SearchForm = (props) => {
   return (
-    <input
-      className="form-control"
-      type="text"
-      placeholder={props.placeholder}
-      aria-label={props.ariaLabel}
-      onClick={props.onClick}
-    />
+    <form onSubmit={props.onSubmit}>
+      <input
+        className="form-control"
+        type="text"
+        placeholder={props.placeholder}
+        aria-label={props.ariaLabel}
+        onChange={props.onChange}
+      />
+    </form>
   );
 };
 
 SearchForm.propTypes = {
-  onClick: PropTypes.func.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
   placeholder: PropTypes.string,
   ariaLabel: PropTypes.string,
 };
