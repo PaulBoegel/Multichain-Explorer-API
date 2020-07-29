@@ -1,12 +1,15 @@
 "use strict";
 
 const express = require("express");
+const cors = require("cors");
 const TransactionRouter = require("./routes/transactionRouter");
 const TransactionController = require("./controllers/transactionController");
 
 function FullnodeRestApi(transactionHandler, fullnodeServiceManager) {
   const app = express();
   const port = process.env.PORT || 3000;
+
+  app.use(cors());
 
   function start() {
     initAPI();
