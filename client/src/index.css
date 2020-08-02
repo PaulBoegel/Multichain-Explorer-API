@@ -6,3 +6,23 @@
 nav {
   padding: 20px 0 20px 0;
 }
+.search-panel {
+  background-color: #517a92;
+  color: #fff;
+  box-shadow: 0 0.25rem 0.75rem #ccc;
+}
+.information-panel {
+  background-color: #bc5332;
+  color: #fff;
+  box-shadow: 0 0.25rem 0.75rem #ccc;
+}
+
+.information-panel.show {
+  transition: opacity 0.5s;
+  opacity: 1;
+}
+
+.information-panel.hide {
+  opacity: 0;
+  pointer-events: none;
+}
