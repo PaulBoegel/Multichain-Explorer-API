@@ -5,8 +5,6 @@
   "main": "index.js",
   "scripts": {
     "start": "npm-run-all --parallel start:fullnode start:rest",
-    "start:fullnode-dev": "nodemon --inspect src/server.js",
-    "start:rest-dev": "nodemon --inspect src/api/server.js",
     "start:fullnode": "node src/server.js",
     "start:rest": "node src/api/server.js",
     "test": "mocha tests/**/*spec.js",
