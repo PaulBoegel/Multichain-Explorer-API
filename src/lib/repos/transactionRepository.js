@@ -10,17 +10,22 @@ function TransactionRepository(dbConfig) {
   const dbName = dbConfig.dbName;
   let db;
 
-  MongoClient.connect(
-    url,
-    {
-      useUnifiedTopology: true,
-      poolSize: dbConfig.poolSize,
-    },
-    function (err, client) {
-      if (err) throw err;
-      db = client.db(dbName);
-    }
-  );
+  function connect() {
+    return new Promise((resolve, reject) => {
+      MongoClient.connect(
+        url,
+        {
+          useUnifiedTopology: true,
+          poolSize: dbConfig.poolSize,
+        },
+        function (err, client) {
+          if (err) reject(err);
+          db = client.db(dbName);
+          resolve(true);
+        }
+      );
+    });
+  }
 
   async function get(query, limit) {
     try {
@@ -38,14 +43,15 @@ function TransactionRepository(dbConfig) {
     }
   }
 
-  async function getById(id, chainname) {
+  async function getByIds(txid, chainname) {
     try {
       const transaction = await db
         .collection("transactions")
-        .find({ txid: id, chainname: chainname })
+        .find({ txid, chainname })
         .limit(1);
 
-      return await transaction.toArray()[0];
+      const result = await transaction.toArray();
+      return result[0];
     } catch (err) {
       throw err;
     }
@@ -53,8 +59,12 @@ function TransactionRepository(dbConfig) {
 
   async function add(newTransaction) {
     try {
-      newTransaction.timestamp = Date.now();
-      await db.collection("transactions").insertOne(newTransaction);
+      const { txid, chainname, ...data } = newTransaction;
+      const keys = { txid, chainname };
+      data.timestamp = Date.now();
+      await db
+        .collection("transactions")
+        .updateOne(keys, { $set: { ...data } }, { upsert: true });
     } catch (err) {
       throw err;
     }
@@ -71,7 +81,7 @@ function TransactionRepository(dbConfig) {
     }
   }
 
-  return { addMany, get, getById, add };
+  return { connect, addMany, get, getByIds, add };
 }
 
 module.exports = TransactionRepository;

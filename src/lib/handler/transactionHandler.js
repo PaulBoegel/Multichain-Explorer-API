@@ -1,6 +1,8 @@
 "use strict";
 
 function transactionHandler(transactionRepo) {
+  transactionRepo.connect();
+
   async function saveTransaction(inTransaction, inputDepth, service, verbose) {
     try {
       let transaction = verbose
@@ -9,12 +11,10 @@ function transactionHandler(transactionRepo) {
       const chainname = service.chainname;
       const id = transaction.txid;
 
-      if ((await checkIfSaved(id, chainname)) == false) {
-        transaction.chainname = chainname;
-        await transactionRepo.add(transaction);
-        await service.handleTransactionInputs(transaction, inputDepth);
-        console.log(`Added ${id} to database.`);
-      }
+      transaction.chainname = chainname;
+      await transactionRepo.add(transaction);
+      await service.handleTransactionInputs(transaction, inputDepth);
+      console.log(`Added ${id} to database.`);
     } catch (err) {
       throw err;
     }
@@ -22,10 +22,7 @@ function transactionHandler(transactionRepo) {
 
   async function saveManyTransactions(inputs, inputDepth, service) {
     for (let i = 0; i > inputs.length; i++) {
-      const exists = await checkIfSaved(input[i].txid, service.chainname);
-      if (exists) {
-        inputs.splice(i, 1);
-      }
+      inputs.splice(i, 1);
     }
 
     await transactionRepo.addMany(inputs);
@@ -49,15 +46,6 @@ function transactionHandler(transactionRepo) {
       }
 
       return null;
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  async function checkIfSaved(transactionId, chainname) {
-    try {
-      const result = await transactionRepo.getById(transactionId, chainname);
-      return result ? true : false;
     } catch (err) {
       throw err;
     }

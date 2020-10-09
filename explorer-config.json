@@ -20,13 +20,13 @@
         "notifyerRelationDepth": "1"
       },
       "rpc": {
-        "url": "http://127.0.0.1",
+        "url": "http://192.168.178.22",
         "user": "pboegelsack",
         "pass": "test",
         "port": "8332"
       },
       "worker": {
-        "host": "127.0.0.1",
+        "host": "192.168.178.22",
         "port": "29000"
       }
     }
