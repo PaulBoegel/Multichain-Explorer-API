@@ -1,17 +1,29 @@
 import React, { useState, useEffect } from "react";
 import TransactionSearch from "./TransactionSearch";
 import TransactionInfo from "./TransactionInfo";
+import TransactionGraph from "./TransactionGraph";
 import * as transactionApi from "../../api/transactionApi";
 
 const TransactionPage = () => {
   const [txid, setTxid] = useState("");
   const [blockchain, setBlockchain] = useState("");
   const [displayInfo, setDisplayInfo] = useState("hide");
+  const [nodes, setNodes] = useState([]);
+  const [links, setLinks] = useState([]);
+  const [transform, setTransform] = useState({});
+  const [activeNode, setActiveNode] = useState({
+    id: 0,
+    name: "",
+    vx: 0,
+    vy: 0,
+    x: 0,
+    y: 0
+  });
   const [transaction, setTransaction] = useState({
     txid: "",
     size: 0,
     locktime: 0,
-    vin: [],
+    vin: [{txid: ""}],
     vout: [],
   });
 
@@ -34,35 +46,84 @@ const TransactionPage = () => {
     setBlockchain("litecoin");
   }, []);
 
+  const pushTransactionInputs = (inputs, links, nodes, targetId) => {
+    let nodesIndex = nodes.length;
+    inputs.forEach((input) => {
+      const i = nodesIndex++
+      links.push({source: i, target: targetId})
+      nodes.push({id: i, name: input.txid});
+    });
+  }
+
+  const transactionSearch = () => {
+    transactionApi.getTransaction(blockchain, txid).then((_transaction) => {
+      _transaction.vin = filterInput(_transaction.vin);
+      _transaction.vout = filterOutput(_transaction.vout);
+
+      nodes.length = 0;
+      links.length = 0;
+
+      console.log(links);
+      const activeNode = {id: 0, name: _transaction.txid, x: 0, y: 0, k: 0};
+      nodes.push(activeNode);
+      pushTransactionInputs(_transaction.vin, links, nodes, 0);
+
+      setActiveNode(activeNode);
+      setNodes(nodes);
+      setLinks(links);
+      setTransaction(_transaction);
+      setDisplayInfo("show");
+    });
+  }
+
   const handleTxIdChanged = ({ target }) => {
     setTxid(target.value);
   };
 
   const handleSearch = (event) => {
     event.preventDefault();
-
-    transactionApi.getTransaction(blockchain, txid).then((_transaction) => {
-      let index = 0;
-      _transaction.vin = _transaction.vin.map((input) => {
-        input = { index: index, txid: input.txid, output: input.vout };
-        index++;
-        return input;
-      });
-      index = 0;
-      _transaction.vout = _transaction.vout.map((output) => {
-        output = { index: index, value: output.value };
-        index++;
-        return output;
-      });
-
-      setTransaction(_transaction);
-      setDisplayInfo("show");
-    });
+    transactionSearch();
   };
+
+  const handleNodeMouseClick = (event, data) => {
+    event.preventDefault();
+    transactionApi.getTransaction(blockchain, data.name).then((_transaction) => {
+      _transaction.vin = filterInput(_transaction.vin);
+      _transaction.vout = filterOutput(_transaction.vout);
+      pushTransactionInputs(_transaction.vin, links, nodes, data.id);
+
+      setActiveNode(data)
+      setNodes(nodes);
+      setLinks(links);
+      setTransaction(_transaction);
+    });
+  }
+
+  const handleZoom = (transform) => {
+    setTransform(transform);
+  }
 
   const handleBlockchainChanged = ({ target }) => {
     setBlockchain(target.value);
   };
+
+  const filterInput = (inputs) => {
+      let index = 0;
+    return inputs.map((input) => {
+        input = { index: index, txid: input.txid, output: input.vout };
+        index++;
+        return input;
+      });
+  }
+
+  const filterOutput = (outputs) => {
+    let index = 0;
+    return outputs.map((output) => {
+        output = { index: index, value: output.value };
+        index++;
+        return output;
+      });
+  }
 
   return (
     <div className="md-form mt-0">
@@ -75,6 +136,13 @@ const TransactionPage = () => {
           blockchainList={blockchainList}
         />
       </div>
+      <TransactionGraph
+        activeNode={activeNode}
+        nodes={nodes}
+        links={links}
+        transform={transform}
+        onNodeMouseClick={handleNodeMouseClick}
+        onHandleZoom={handleZoom} />
       <TransactionInfo className={displayInfo} transaction={transaction} />
     </div>
   );
