@@ -106,4 +106,17 @@ nav {
 .list-object {
   padding-left: 1.4rem;
   padding-top: 0.8rem;
+  height: 100%;
+}
+.node-tooltip {
+  height: 4vh;
+  width: 52vh;
+  background-color: rgb(81, 122, 146, 0.8);
+  position: absolute;
+  top: 0px;
+  font-size: 1.2vh;
+  font-weight: bold;
+  letter-spacing: 0.1vh;
+  color: #eee;
+  padding: 1vh;
 }

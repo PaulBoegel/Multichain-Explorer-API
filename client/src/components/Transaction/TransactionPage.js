@@ -15,6 +15,7 @@ const TransactionPage = () => {
   const [activeNode, setActiveNode] = useState({
     id: 0,
     name: "",
+    parent: "",
     vx: 0,
     vy: 0,
     x: 0,
@@ -52,7 +53,7 @@ const TransactionPage = () => {
     inputs.forEach((input) => {
       const i = nodesIndex++
       links.push({source: i, target: targetId})
-      nodes.push({id: i, name: input.txid});
+      nodes.push({id: i, name: input.txid, active: false});
     });
   }
 
@@ -64,15 +65,34 @@ const TransactionPage = () => {
       nodes.length = 0;
       links.length = 0;
 
-      const activeNode = {id: 0, name: _transaction.txid, x: 0, y: 0, k: 0, expand: true};
+      const activeNode = {id: 0, name: _transaction.txid, x: 0, y: 0, k: 0, expand: true, active: true};
       nodes.push(activeNode);
       pushTransactionInputs(_transaction.vin, links, nodes, 0);
 
       setActiveNode(activeNode);
-      setNodes(nodes);
-      setLinks(links);
       setTransaction(_transaction);
       setDisplayInfo("show");
+    });
+  }
+
+  const getTransaction = ({name, id}) => {
+    transactionApi.getTransaction(blockchain, name).then((_transaction) => {
+      _transaction.vin = filterInput(_transaction.vin);
+      _transaction.vout = filterOutput(_transaction.vout);
+
+      nodes.map(node => Object.assign(node, {active: false}))
+      links.map(link => Object.assign(link, {active: false}))
+      const currentNode = nodes.find(node => node.name == name)
+
+      currentNode.active = true;
+      if(currentNode.expand == true) {
+        setTransaction(_transaction);
+        return;
+      }
+
+      currentNode.expand = true;
+      pushTransactionInputs(_transaction.vin, links, nodes, id);
+      setTransaction(_transaction);
     });
   }
 
@@ -94,21 +114,17 @@ const TransactionPage = () => {
   const handleNodeMouseClick = (event, data) => {
     event.preventDefault();
     setActiveNode(data)
-    const currentNode = nodes.find(node => node.name == data.name)
+    getTransaction(data);
+  }
 
-    if(currentNode.expand == true) return;
-
-    currentNode.expand = true;
-
-    transactionApi.getTransaction(blockchain, data.name).then((_transaction) => {
-      _transaction.vin = filterInput(_transaction.vin);
-      _transaction.vout = filterOutput(_transaction.vout);
-      pushTransactionInputs(_transaction.vin, links, nodes, data.id);
-
-      setNodes(nodes);
-      setLinks(links);
-      setTransaction(_transaction);
-    });
+  const handleObjectOnClick = (event) => {
+    event.preventDefault();
+    const data = {
+      id: event.target.getAttribute('data-id'),
+      name: event.target.getAttribute('data-name')
+    }
+    setActiveNode(data)
+    getTransaction(data);
   }
 
   const handleZoom = (transform) => {
@@ -154,7 +170,9 @@ const TransactionPage = () => {
         />
         </div>
         <div className="object-list">
-          <TransactionList nodes={nodes} />
+          <TransactionList
+            nodes={nodes}
+            onClick={handleObjectOnClick}/>
         </div>
       </div>
       <div className="grid-left">
