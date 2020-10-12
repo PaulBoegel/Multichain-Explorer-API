@@ -78,3 +78,32 @@ nav {
   grid-row: 1 / 2;
   padding-right: 1rem;
 }
+.object-list {
+  grid-row: 3 / 4;
+  width: 100%;
+}
+.object-list ul {
+  margin: 0;
+  padding: 0;
+  position: relative;
+  left: -1.4rem;
+}
+.object-list li {
+  list-style: none;
+  height: 4vw;
+  background-color: rgb(188, 83, 50, 0.5);
+  margin-bottom: 3px;
+  position: relative;
+  width: 109%;
+  cursor: pointer;
+}
+.object-list li.active {
+  background-color: rgb(81, 122, 146, 0.5);
+}
+.object-list li:hover {
+  background-color: rgb(81, 122, 146, 0.5);
+}
+.list-object {
+  padding-left: 1.4rem;
+  padding-top: 0.8rem;
+}

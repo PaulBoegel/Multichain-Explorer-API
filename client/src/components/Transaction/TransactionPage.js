@@ -147,6 +147,10 @@ const TransactionPage = () => {
           blockchainList={blockchainList}
         />
       </div>
+        <div className="object-list">
+          <TransactionList nodes={nodes} />
+        </div>
+      </div>
       <div className="grid-left">
         <div className="analysis-nav"></div>
         <div className="widget">
