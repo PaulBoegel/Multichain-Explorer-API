@@ -35,7 +35,7 @@ function transactionHandler(transactionRepo) {
 
   async function getTransaction(txid, service) {
     try {
-      let transaction = await transactionRepo.getById(txid, service.chainname);
+      let transaction = await transactionRepo.getByIds(txid, service.chainname);
       if (transaction) return transaction;
 
       transaction = await service.getTransaction(txid, true);
