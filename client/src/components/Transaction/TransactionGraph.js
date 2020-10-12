@@ -17,9 +17,9 @@ const TransactionGraph = (props) => {
   function createSVG(svg){
       const parent = select(".transaction-graph").node();
       const parentWidth = parent.getBoundingClientRect().width;
-      const margin = { top: 10, right: 30, bottom: 30, left: 40 };
-      let height = 400 - margin.top - margin.bottom;
-      let width = parentWidth - margin.left - margin.right;
+      const parentHeight = parent.getBoundingClientRect().height;
+      let height = parentHeight;
+      let width = parentWidth;
 
       g = select(svg)
       .attr("width", width)

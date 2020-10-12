@@ -132,9 +132,9 @@ const TransactionPage = () => {
   }
 
   return (
-    <div className="md-form mt-0">
-      <div className="search-panel my-3 p-3 rounded">
-        <h2>Transaction Search</h2>
+    <div className="md-form mt-0 grid">
+      <div className="search-panel my-3 p-3 rounded grid-right">
+        {/* <h2>Transaction Search</h2> */}
         <TransactionSearch
           onSearchTextChange={handleTxIdChanged}
           onBlockchainChanged={handleBlockchainChanged}
@@ -143,14 +143,23 @@ const TransactionPage = () => {
           blockchainList={blockchainList}
         />
       </div>
-      <TransactionGraph
-        activeNode={activeNode}
-        nodes={nodes}
-        links={links}
-        transform={transform}
-        onNodeMouseClick={handleNodeMouseClick}
-        onHandleZoom={handleZoom} />
-      <TransactionInfo className={displayInfo} transaction={transaction} />
+      <div className="grid-left">
+        <div className="analysis-nav"></div>
+        <div className="widget">
+          <TransactionGraph
+            activeNode={activeNode}
+            nodes={nodes}
+            links={links}
+            transform={transform}
+            onNodeMouseClick={handleNodeMouseClick}
+            onHandleZoom={handleZoom} />
+        </div>
+        <div className="widget-info">
+          <TransactionInfo
+            className={displayInfo}
+            transaction={transaction} />
+        </div>
+      </div>
     </div>
   );
 };

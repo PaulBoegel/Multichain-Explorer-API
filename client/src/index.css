@@ -1,5 +1,12 @@
+html,
+body,
+#app,
+#app > div {
+  height: 100%;
+}
 #app {
-  max-width: 850px;
+  height: 100%;
+  max-width: 100%;
   margin: 0 auto;
 }
 nav {
@@ -24,4 +31,36 @@ nav {
 .information-panel.hide {
   opacity: 0;
   pointer-events: none;
+}
+
+.grid {
+  display: grid;
+  height: 100%;
+  width: 100%;
+  grid-template-columns: 0.8fr 0.02fr 0.2fr;
+  grid-template-rows: 1fr;
+}
+
+.grid-left {
+  height: 100%;
+  grid-column: 1 / 2;
+  grid-row: 1;
+  display: grid;
+  grid-template-rows: 60% 40%;
+}
+.grid-right {
+  grid-column: 3 / 4;
+  grid-row: 1;
+}
+/* .analysis-nav {
+  grid-row: 1 / 2;
+} */
+.widget {
+  grid-row: 1 / 2;
+}
+.widget-info {
+  grid-row: 2 / 3;
+}
+.transaction-graph {
+  height: 100%;
 }
