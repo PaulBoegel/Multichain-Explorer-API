@@ -124,17 +124,21 @@ const TransactionPage = () => {
 
   const filterOutput = (outputs) => {
     let index = 0;
-    return outputs.map((output) => {
+    let totalValue = 0;
+    const newOutput = outputs.map((output) => {
       output = { index: index, value: output.value };
+      totalValue += output.value;
       index++;
       return output;
     });
+    newOutput.totalValue = totalValue;
+    return newOutput;
   }
 
   return (
     <div className="md-form mt-0 grid">
       <div className="search-panel my-3 p-3 rounded grid-right">
-        {/* <h2>Transaction Search</h2> */}
+        <div className="search">
         <TransactionSearch
           onSearchTextChange={handleTxIdChanged}
           onBlockchainChanged={handleBlockchainChanged}

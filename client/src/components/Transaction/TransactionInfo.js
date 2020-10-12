@@ -21,6 +21,12 @@ const TransactionInfo = (props) => {
           </span>
         </div>
         <div className="media text-muted">
+          <strong className="text-white medium">TOTAL VALUE:</strong>
+          <span className="pl-2 text-white small">
+            {props.transaction.vout.totalValue}
+          </span>
+        </div>
+        <div className="media text-muted">
           <strong className="text-white medium">LOCKTIME:</strong>
           <span className="pl-2 pb-4 text-white small">
             {props.transaction.locktime}
@@ -31,10 +37,10 @@ const TransactionInfo = (props) => {
         <h4 className="text-white medium">INPUTS:</h4>
         <InputTable inputs={props.transaction.vin} />
       </div> */}
-      <div className={`information-panel my-1 p-3 rounded ${props.className}`}>
+      {/* <div className={`information-panel my-1 p-3 rounded ${props.className}`}>
         <h4 className="text-white medium">OUTPUTS:</h4>
         <OutputTable outputs={props.transaction.vout} />
-      </div>
+      </div> */}
     </>
   );
 };
