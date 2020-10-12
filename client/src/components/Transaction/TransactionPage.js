@@ -3,6 +3,7 @@ import TransactionSearch from "./TransactionSearch";
 import TransactionInfo from "./TransactionInfo";
 import TransactionGraph from "./TransactionGraph";
 import * as transactionApi from "../../api/transactionApi";
+import TransactionList from "./TransactionList";
 
 const TransactionPage = () => {
   const [txid, setTxid] = useState("");
@@ -63,8 +64,7 @@ const TransactionPage = () => {
       nodes.length = 0;
       links.length = 0;
 
-      console.log(links);
-      const activeNode = {id: 0, name: _transaction.txid, x: 0, y: 0, k: 0};
+      const activeNode = {id: 0, name: _transaction.txid, x: 0, y: 0, k: 0, expand: true};
       nodes.push(activeNode);
       pushTransactionInputs(_transaction.vin, links, nodes, 0);
 
@@ -93,12 +93,18 @@ const TransactionPage = () => {
 
   const handleNodeMouseClick = (event, data) => {
     event.preventDefault();
+    setActiveNode(data)
+    const currentNode = nodes.find(node => node.name == data.name)
+
+    if(currentNode.expand == true) return;
+
+    currentNode.expand = true;
+
     transactionApi.getTransaction(blockchain, data.name).then((_transaction) => {
       _transaction.vin = filterInput(_transaction.vin);
       _transaction.vout = filterOutput(_transaction.vout);
       pushTransactionInputs(_transaction.vin, links, nodes, data.id);
 
-      setActiveNode(data)
       setNodes(nodes);
       setLinks(links);
       setTransaction(_transaction);
@@ -146,7 +152,7 @@ const TransactionPage = () => {
           onKeyUp={handleKeyUp}
           blockchainList={blockchainList}
         />
-      </div>
+        </div>
         <div className="object-list">
           <TransactionList nodes={nodes} />
         </div>
