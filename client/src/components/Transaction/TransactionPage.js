@@ -85,6 +85,12 @@ const TransactionPage = () => {
     transactionSearch();
   };
 
+  const handleKeyUp = (event) => {
+    event.preventDefault()
+    if(event.key === 'ENTER' || event.keyCode === 13)
+    transactionSearch();
+  }
+
   const handleNodeMouseClick = (event, data) => {
     event.preventDefault();
     transactionApi.getTransaction(blockchain, data.name).then((_transaction) => {
@@ -108,21 +114,21 @@ const TransactionPage = () => {
   };
 
   const filterInput = (inputs) => {
-      let index = 0;
+    let index = 0;
     return inputs.map((input) => {
-        input = { index: index, txid: input.txid, output: input.vout };
-        index++;
-        return input;
-      });
+      input = { index: index, txid: input.txid, output: input.vout };
+      index++;
+      return input;
+    });
   }
 
   const filterOutput = (outputs) => {
     let index = 0;
     return outputs.map((output) => {
-        output = { index: index, value: output.value };
-        index++;
-        return output;
-      });
+      output = { index: index, value: output.value };
+      index++;
+      return output;
+    });
   }
 
   return (
@@ -133,6 +139,7 @@ const TransactionPage = () => {
           onSearchTextChange={handleTxIdChanged}
           onBlockchainChanged={handleBlockchainChanged}
           onSubmit={handleSearch}
+          onKeyUp={handleKeyUp}
           blockchainList={blockchainList}
         />
       </div>

@@ -18,11 +18,12 @@ const TransactionSearch = (props) => {
           ariaLabel="search"
           placeholder="Search for transaction"
           onChange={props.onSearchTextChange}
+          onKeyUp={props.onKeyUp}
         />
       </div>
-      <button type="submit" className="btn btn-light">
+      {/* <button type="submit" className="btn btn-light">
         Search
-      </button>
+      </button> */}
     </form>
   );
 };
@@ -30,6 +31,7 @@ const TransactionSearch = (props) => {
 TransactionSearch.propTypes = {
   onSearchTextChange: PropTypes.func.isRequired,
   onBlockchainChanged: PropTypes.func.isRequired,
+  onKeyUp: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   blockchainList: PropTypes.arrayOf(
     PropTypes.shape({

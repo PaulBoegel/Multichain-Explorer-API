@@ -9,12 +9,14 @@ const TextInput = (props) => {
       placeholder={props.placeholder}
       aria-label={props.ariaLabel}
       onChange={props.onChange}
+      onKeyUp={props.onKeyUp}
     />
   );
 };
 
 TextInput.propTypes = {
   onChange: PropTypes.func,
+  onKeyUp: PropTypes.func,
   placeholder: PropTypes.string,
   ariaLabel: PropTypes.string,
 };

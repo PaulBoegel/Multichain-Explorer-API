@@ -27,10 +27,10 @@ const TransactionInfo = (props) => {
           </span>
         </div>
       </div>
-      <div className={`information-panel my-1 p-3 rounded ${props.className}`}>
+      {/* <div className={`information-panel my-1 p-3 rounded ${props.className}`}>
         <h4 className="text-white medium">INPUTS:</h4>
         <InputTable inputs={props.transaction.vin} />
-      </div>
+      </div> */}
       <div className={`information-panel my-1 p-3 rounded ${props.className}`}>
         <h4 className="text-white medium">OUTPUTS:</h4>
         <OutputTable outputs={props.transaction.vout} />
