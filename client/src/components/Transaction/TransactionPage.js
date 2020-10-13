@@ -161,14 +161,15 @@ const TransactionPage = () => {
     <div className="md-form mt-0 grid">
       <div className="search-panel my-3 p-3 rounded grid-right">
         <div className="search">
-        <TransactionSearch
-          onSearchTextChange={handleTxIdChanged}
-          onBlockchainChanged={handleBlockchainChanged}
-          onSubmit={handleSearch}
-          onKeyUp={handleKeyUp}
-          blockchainList={blockchainList}
-        />
+          <TransactionSearch
+            onSearchTextChange={handleTxIdChanged}
+            onBlockchainChanged={handleBlockchainChanged}
+            onSubmit={handleSearch}
+            onKeyUp={handleKeyUp}
+            blockchainList={blockchainList}
+          />
         </div>
+
         <div className="object-list">
           <TransactionList
             nodes={nodes}

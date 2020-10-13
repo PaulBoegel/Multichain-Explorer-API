@@ -4,6 +4,13 @@ body,
 #app > div {
   height: 100%;
 }
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+/* ::-webkit-scrollbar-thumb {
+  background: #ff0000;
+} */
 #app {
   height: 100%;
   max-width: 100%;
@@ -13,13 +20,21 @@ nav {
   padding: 20px 0 20px 0;
 }
 .search-panel {
+  width: 100%;
+  height: 100%;
   background-color: #e59379;
   color: #fff;
   /* box-shadow: 0 0.25rem 0.75rem #ccc; */
   border-radius: 0 !important;
-  overflow-y: scroll;
-  overflow-x: hidden;
 }
+
+/* .scroll-wraper {
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  padding-right: 17px;
+  box-sizing: content-box;
+} */
 .information-panel {
   background-color: rgb(81, 122, 146);
   color: #fff;
@@ -55,11 +70,12 @@ nav {
 .grid-right {
   height: 97%;
   padding-right: 0px !important;
+  padding-left: 0px !important;
   max-width: 20vw;
   grid-column: 3 / 4;
   grid-row: 1;
   display: grid;
-  grid-template-rows: 10% 2% 88%;
+  grid-template-rows: 100px 20px 1fr;
 }
 /* .analysis-nav {
   grid-row: 1 / 2;
@@ -77,16 +93,20 @@ nav {
 .search {
   grid-row: 1 / 2;
   padding-right: 1rem;
+  padding-left: 1rem;
 }
 .object-list {
   grid-row: 3 / 4;
   width: 100%;
+  height: 82vh;
+  overflow: scroll;
+  position: relative;
+  /* left: -0.3rem; */
+  vertical-align: middle;
 }
 .object-list ul {
   margin: 0;
   padding: 0;
-  position: relative;
-  left: -1.4rem;
 }
 .object-list li {
   list-style: none;
@@ -94,8 +114,9 @@ nav {
   background-color: rgb(188, 83, 50, 0.5);
   margin-bottom: 3px;
   position: relative;
-  width: 109%;
+  width: 100%;
   cursor: pointer;
+  display: table;
 }
 .object-list li.active {
   background-color: rgb(81, 122, 146, 0.5);
@@ -104,9 +125,11 @@ nav {
   background-color: rgb(81, 122, 146, 0.5);
 }
 .list-object {
-  padding-left: 1.4rem;
-  padding-top: 0.8rem;
   height: 100%;
+  display: table-cell;
+  overflow: hidden;
+  vertical-align: middle;
+  text-align: center;
 }
 .node-tooltip {
   height: 4vh;
