@@ -1,6 +1,7 @@
 "user-strict";
 
 const LitecoinNodeService = require("./services/litecoinNodeService");
+const BitcoinNodeService = require("./services/bitcoinNodeService");
 const { RPCClient } = require("rpc-bitcoin");
 
 function FullnodeServiceFactory(config) {
@@ -8,6 +9,9 @@ function FullnodeServiceFactory(config) {
     switch (blockchainName) {
       case config.litecoin.chainname:
         return createLitecoinService();
+        break;
+      case config.bitcoin.chainname:
+        return createBitcoinService();
         break;
     }
   }
@@ -21,6 +25,17 @@ function FullnodeServiceFactory(config) {
       port: conf.port,
     });
     return new LitecoinNodeService(litecoinRpc, config.litecoin.chainname);
+  }
+
+  function createBitcoinService(){
+    const conf = config.bitcoin.rpc;
+    const bitcoinRpc = new RPCClient({
+      url: conf.url,
+      user: conf.user,
+      pass: conf.pass,
+      port: conf.port
+    });
+    return new BitcoinNodeService(bitcoinRpc, config.bitcoin.chainname);
   }
 
   return { createService };
