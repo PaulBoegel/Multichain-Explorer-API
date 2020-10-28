@@ -33,6 +33,13 @@ fullnodeNotifyerManager.setNotifyer(
   fullnodeNotifyerFactory.createNotifyer("litecoin")
 );
 
+fullnodeServiceManager.setService(
+  fullnodeServiceFactory.createService("bitcoin")
+);
+fullnodeNotifyerManager.setNotifyer(
+  fullnodeNotifyerFactory.createNotifyer("bitcoin")
+);
+
 fullnodeNotifyerManager.events.addListener(
   "onNewTransaction",
   async (transaction, inputDepth, chainname) => {
