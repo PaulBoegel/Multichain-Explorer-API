@@ -148,7 +148,7 @@ const TransactionPage = () => {
     let index = 0;
     let totalValue = 0;
     const newOutput = outputs.map((output) => {
-      output = { index: index, value: output.value };
+      output = { index: index, value: output.value, addresses: output.scriptPubKey.addresses };
       totalValue += output.value;
       index++;
       return output;
