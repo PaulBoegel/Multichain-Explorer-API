@@ -187,6 +187,11 @@ const TransactionGraph = (props) => {
 TransactionGraph.propTypes = {
   className: PropTypes.string,
   onNodeMouseClick: PropTypes.func.isRequired,
+  transform: PropTypes.shape({
+    x: PropTypes.number,
+    y: PropTypes.number,
+    k: PropTypes.number
+  }),
   nodes: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number,
