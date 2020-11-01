@@ -199,12 +199,7 @@ TransactionGraph.propTypes = {
       name: PropTypes.string,
     })
   ).isRequired,
-  links: PropTypes.arrayOf(
-    PropTypes.shape({
-      source: number,
-      target: number
-    })
-  )
+  links: PropTypes.array.isRequired
 };
 
 export default TransactionGraph;
