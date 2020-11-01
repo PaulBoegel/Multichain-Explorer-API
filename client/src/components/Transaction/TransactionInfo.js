@@ -57,7 +57,15 @@ TransactionInfo.propTypes = {
         output: PropTypes.number,
       })
     ),
-    vout: PropTypes.arrayOf(PropTypes.number),
+    vout: PropTypes.arrayOf(
+      PropTypes.shape({
+        index: PropTypes.number,
+        value: PropTypes.number,
+        addresses: PropTypes.arrayOf(
+          PropTypes.string
+        )
+      })
+    ),
   }).isRequired,
 };
 
