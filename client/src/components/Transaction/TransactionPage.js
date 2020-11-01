@@ -11,7 +11,7 @@ const TransactionPage = () => {
   const [displayInfo, setDisplayInfo] = useState("hide");
   const [nodes, setNodes] = useState([]);
   const [links, setLinks] = useState([]);
-  const [transform, setTransform] = useState({});
+  const [transform, setTransform] = useState({k: 1, x: 0, y: 0});
   const [activeNode, setActiveNode] = useState({
     id: 0,
     name: "",
