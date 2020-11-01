@@ -19,6 +19,7 @@ const TransactionGraph = (props) => {
       const parent = select(".transaction-graph").node();
       const parentWidth = parent.getBoundingClientRect().width;
       const parentHeight = parent.getBoundingClientRect().height;
+      const {x, y, k} = props.transform;
       let height = parentHeight;
       let width = parentWidth;
 
@@ -35,7 +36,7 @@ const TransactionGraph = (props) => {
       .call(zoom().on("zoom", handleZoom))
       .on("dblclick.zoom", null)
       .select(".plot-area")
-      .attr("transform", props.transform);
+      .attr("transform", `translate(${x}, ${y}) scale(${k})`);
 
       g.html("");
 
