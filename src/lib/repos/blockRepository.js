@@ -3,7 +3,7 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
   const url = `mongodb://${host}:${port}`;
   let db = {};
 
-  function Connect() {
+  function connect() {
     return new Promise((resolve, reject) => {
       MongoClient.connect(
         url,
@@ -25,7 +25,7 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
       throw new Error("no database connection established");
   }
 
-  async function Get({ query = {}, projection = {}, sort = {}, limit = 0 }) {
+  async function get({ query = {}, projection = {}, sort = {}, limit = 0 }) {
     try {
       _checkConnection();
       let blocks = await db
@@ -43,7 +43,7 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
     }
   }
 
-  async function Add(newBlock) {
+  async function add(newBlock) {
     _checkConnection();
     const { height, hash, ...data } = newBlock;
     const keys = { height, hash };
@@ -54,7 +54,7 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
     return true;
   }
 
-  return { Connect, Add, Get };
+  return { connect, add, get };
 }
 
 module.exports = BlockRepository;

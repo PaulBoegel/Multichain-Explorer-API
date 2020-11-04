@@ -7,13 +7,13 @@ function LitecoinSync({ service, transRepo, blockRepo }) {
     let inserted = 0;
     let next = blockhash;
     do {
-      const { height, hash, tx, nextblockhash } = await service.GetBlock({
+      const { height, hash, tx, nextblockhash } = await service.getBlock({
         blockhash: next,
         verbose: true,
       });
       next = nextblockhash;
       loopHeight = height;
-      await blockRepo.Add({
+      await blockRepo.add({
         height,
         hash,
         //tx,
@@ -21,7 +21,7 @@ function LitecoinSync({ service, transRepo, blockRepo }) {
           return transaction.txid;
         }),
       });
-      inserted += await transRepo.AddMany(tx);
+      inserted += await transRepo.addMany(tx);
       console.log(`syncronized block: ${height}`);
     } while (next);
     events.emit("blockchainSynchronized", "litecoin");
@@ -30,14 +30,14 @@ function LitecoinSync({ service, transRepo, blockRepo }) {
 
   async function _getHighestBlockHash() {
     let height = 0;
-    let blocks = await blockRepo.Get({
+    let blocks = await blockRepo.get({
       sort: { height: -1 },
       limit: 1,
     });
     if (blocks.length > 0) {
       height = blocks[0].height + 1;
     }
-    return await service.GetBlockHash({ height, verbose: true });
+    return await service.getBlockHash({ height, verbose: true });
   }
 
   async function _checkHeight(endHeight) {
@@ -45,16 +45,16 @@ function LitecoinSync({ service, transRepo, blockRepo }) {
     return ({ blocks } = await service.getBlockchainInfo());
   }
 
-  async function Blockrange(endHeight = null) {
-    await transRepo.Connect();
-    await blockRepo.Connect();
+  async function blockrange(endHeight = null) {
+    await transRepo.connect();
+    await blockRepo.connect();
     const blockhash = await _getHighestBlockHash();
     endHeight = await _checkHeight(endHeight);
     inserted = await _insertTransactions(blockhash);
     return inserted;
   }
 
-  return { Blockrange, events };
+  return { blockrange, events };
 }
 
 module.exports = LitecoinSync;

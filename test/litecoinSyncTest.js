@@ -10,29 +10,29 @@ describe("LitecoinSync Blockrange", () => {
       getBlockchainInfo: function () {
         return 10;
       },
-      GetBlockHash: function ({ height }) {
+      getBlockHash: function ({ height }) {
         return blockMock.hash;
       },
-      GetBlock: function ({ hash }) {
+      getBlock: function ({ hash }) {
         return blockMock;
       },
     };
     transRepo = {
-      Connect: function () {
+      connect: function () {
         return true;
       },
-      AddMany: function (transactions) {
+      addMany: function (transactions) {
         return transactions.length;
       },
     };
     blockRepo = {
-      Connect: function () {
+      connect: function () {
         return true;
       },
-      Add: function (block) {
+      add: function (block) {
         return true;
       },
-      Get: function (blockParam) {
+      get: function (blockParam) {
         return [
           {
             height: 0,
@@ -46,11 +46,11 @@ describe("LitecoinSync Blockrange", () => {
   });
 
   it("should synchronize a block", async () => {
-    const result = await sync.Blockrange({ endHeight: 0 });
+    const result = await sync.blockrange({ endHeight: 0 });
     assert.strictEqual(result, 1);
   });
   it("should sync the entire blockchain if endHeight is not set", async () => {
-    const result = await sync.Blockrange();
+    const result = await sync.blockrange();
     assert.strict(result, null);
   });
 });
