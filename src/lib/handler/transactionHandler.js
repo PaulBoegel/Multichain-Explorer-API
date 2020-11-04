@@ -1,7 +1,8 @@
 "use strict";
 
-function transactionHandler(transactionRepo) {
+function TransactionHandler(transactionRepo, blockRepo) {
   transactionRepo.connect();
+  blockRepo.connect();
 
   async function saveTransaction(inTransaction, inputDepth, service, verbose) {
     try {
@@ -54,4 +55,4 @@ function transactionHandler(transactionRepo) {
   return { getTransaction, saveTransaction, saveManyTransactions };
 }
 
-module.exports = transactionHandler;
+module.exports = TransactionHandler;

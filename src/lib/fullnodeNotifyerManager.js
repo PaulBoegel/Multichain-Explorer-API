@@ -24,7 +24,7 @@ function FullnodeNotifyerManager() {
       const notifyer = notifyerArray.find(
         (item) => item.blockchain == blockchainName
       );
-      await notifyerAPI(notifyer);
+      await initNotifyer(notifyer);
     } catch (err) {
       throw err;
     }

@@ -6,7 +6,6 @@ function FullnodeSyncManager(notifyManager) {
   }
 
   function activateAllSynchronizer() {
-    console.log(syncArray);
     syncArray.forEach(async (sync) => {
       sync.events.addListener(
         "blockchainSynchronized",
@@ -17,7 +16,7 @@ function FullnodeSyncManager(notifyManager) {
   }
 
   function _onBlockchainSynchronized(chainname) {
-    notifyManager.activateNotifyer(chainname);
+    notifyManager.activateNotifyer(chainname).then();
   }
 
   return { setSynchronizer, activateAllSynchronizer };

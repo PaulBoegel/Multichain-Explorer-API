@@ -18,7 +18,7 @@ const configHandler = new ConfigurationHandler(fs);
 const config = configHandler.readAndParseJsonFile("./explorer-config.json");
 const transactionRepo = new TransactionRepository(config.dbConfig.test);
 const blockRepo = new BlockRepository(config.dbConfig.test);
-const transactionHandler = new TransactionHandler(transactionRepo);
+const transactionHandler = new TransactionHandler(transactionRepo, blockRepo);
 
 const fullnodeServiceFactory = new FullnodeServiceFactory(
   config.blockchainConfig
@@ -42,30 +42,19 @@ const fullnodeSyncFactory = new FullnodeSyncFactory({
   blockRepo,
 });
 
-const fullnodeSyncManager = new FullnodeSyncManager({
-  fullnodeServiceManager,
-  transactionRepo,
-  blockRepo,
-});
+const fullnodeSyncManager = new FullnodeSyncManager(fullnodeNotifyerManager);
 
 fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("litecoin"));
 
 fullnodeNotifyerManager.events.addListener(
-  "onNewTransaction",
-  async (transaction, inputDepth, chainname) => {
-    await transactionHandler.saveTransaction(
-      transaction,
-      inputDepth,
-      fullnodeServiceManager.getService(chainname),
-      false
-    );
-  }
-);
-
-fullnodeServiceManager.events.addListener(
-  "onNewInputs",
-  async (inputs, inputDepth, service) => {
-    await transactionHandler.saveManyTransactions(inputs, inputDepth, service);
+  "onNewBlock",
+  (blockHash, chainname) => {
+    transactionHandler
+      .saveBlockTransactions(
+        blockHash,
+        fullnodeServiceManager.getService(chainname)
+      )
+      .then();
   }
 );
 

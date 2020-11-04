@@ -2,7 +2,6 @@ const assert = require("assert");
 const { MongoClient } = require("mongodb");
 const TransactionRepository = require("../src/lib/repos/transactionRepository");
 const transactions = require("./mocks/transactionsMock.json");
-
 function getDbConfig() {
   return {
     host: "127.0.0.1",

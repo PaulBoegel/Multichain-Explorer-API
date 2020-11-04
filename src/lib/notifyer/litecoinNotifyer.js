@@ -5,6 +5,7 @@ const EventEmitter = require("events");
 function LitecoinNotifyer(conf, sock) {
   const events = new EventEmitter();
   const relationDepth = conf.transactions.notifyerRelationDepth;
+  const blockchain = "litecoin";
 
   async function connectToSocket() {
     try {
@@ -22,7 +23,7 @@ function LitecoinNotifyer(conf, sock) {
   async function subscribeToBlocks() {
     sock.subscribe("hashblock");
     for await (const [topic, msg] of sock) {
-      events.emit("onNewBlock", msg, conf.chainname);
+      events.emit("onNewBlock", msg.toString("hex"), conf.chainname);
     }
   }
 
@@ -42,6 +43,7 @@ function LitecoinNotifyer(conf, sock) {
     closeConnection,
     subscribeToTransactions,
     subscribeToBlocks,
+    blockchain,
     events,
   };
 }
