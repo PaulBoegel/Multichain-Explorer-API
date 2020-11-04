@@ -11,6 +11,8 @@ function LitecoinSync({ service, transRepo, blockRepo }) {
         blockhash: nextHash,
         verbose: true,
       });
+      console.log(endHeight);
+      if (height > endHeight) break;
       currentBlockHeight = height;
       nextHash = nextblockhash;
       await blockRepo.add({
@@ -23,7 +25,7 @@ function LitecoinSync({ service, transRepo, blockRepo }) {
       });
       inserted += await transRepo.addMany(tx);
       // console.log(`syncronized block: ${height}`);
-    } while (currentBlockHeight < endHeight);
+    } while (nextHash);
     events.emit("blockchainSynchronized", "litecoin");
     return inserted;
   }
@@ -37,6 +39,7 @@ function LitecoinSync({ service, transRepo, blockRepo }) {
     if (blocks.length > 0) {
       height = blocks[0].height + 1;
     }
+
     return await service.getBlockHash({ height, verbose: true });
   }
 
