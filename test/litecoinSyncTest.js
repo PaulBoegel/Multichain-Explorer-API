@@ -48,12 +48,16 @@ describe("LitecoinSync Blockrange", () => {
   });
 
   it("should synchronize a block", async () => {
-    const result = await sync.blockrange({ endHeight: 0 });
+    const result = await sync.blockrange(0);
     assert.strictEqual(result, 1);
   });
-  it("should check the blockchain info, if endHeight is not defined", async () => {
-    const result = await sync.blockrange();
+  it("should check the blockchain info, if endHeight has not been defined", async () => {
+    await sync.blockrange();
     assert(getBlockchainInfo.calledOnce);
+  });
+  it("should not check block info, if endHeight has been defined", async () => {
+    await sync.blockrange(0);
+    assert(getBlockchainInfo.called === false);
   });
   it("should fire blockchainSynchronized event, after end height was reached", (done) => {
     sync.events.addListener("blockchainSynchronized", (chainname) => {
