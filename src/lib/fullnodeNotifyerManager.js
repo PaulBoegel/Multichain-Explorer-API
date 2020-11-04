@@ -32,12 +32,18 @@ function FullnodeNotifyerManager() {
 
   async function initNotifyer(notifyer) {
     try {
-      notifyer.events.addListener("onNewTransaction", onNewTransaction);
+      //notifyer.events.addListener("onNewTransaction", onNewTransaction);
+      notifyer.events.addListener("onNewBlock", onNewBlock);
       await notifyer.connectToSocket();
-      await notifyer.subscribeToTransactions();
+      //await notifyer.subscribeToTransactions();
+      await notifyer.subscribeToBlocks();
     } catch (err) {
       throw err;
     }
+  }
+
+  function onNewBlock(block, chainname) {
+    events.emit("onNewBlock", block, chainname);
   }
 
   function onNewTransaction(transaction, inputDepth, chainname) {

@@ -15,6 +15,17 @@ function LitecoinNotifyer(conf, sock) {
     }
   }
 
+  async function closeConnection() {
+    return await sock.close();
+  }
+
+  async function subscribeToBlocks() {
+    sock.subscribe("rawblock");
+    for await (const [topic, msg] of sock) {
+      events.emit("onNewBlock", msg, conf.chainname);
+    }
+  }
+
   async function subscribeToTransactions() {
     try {
       sock.subscribe("rawtx");
@@ -26,7 +37,13 @@ function LitecoinNotifyer(conf, sock) {
     }
   }
 
-  return { connectToSocket, subscribeToTransactions, events };
+  return {
+    connectToSocket,
+    closeConnection,
+    subscribeToTransactions,
+    subscribeToBlocks,
+    events,
+  };
 }
 
 module.exports = LitecoinNotifyer;
