@@ -17,13 +17,9 @@ const fullnodeServiceFactory = new FullnodeServiceFactory(
 );
 const fullnodeServiceManager = new FullnodeServiceManager();
 
-fullnodeServiceManager.setService(
-  fullnodeServiceFactory.createService("litecoin")
-);
+fullnodeServiceManager.setService(fullnodeServiceFactory.create("litecoin"));
 
-fullnodeServiceManager.setService(
-  fullnodeServiceFactory.createService("bitcoin")
-);
+fullnodeServiceManager.setService(fullnodeServiceFactory.create("bitcoin"));
 
 const fullnodeRestApi = new FullnodeRestApi(
   transactionHandler,
