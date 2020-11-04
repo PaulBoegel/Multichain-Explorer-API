@@ -1,4 +1,8 @@
+const EventEmitter = require("events");
+
 function LitecoinSync({ service, transRepo, blockRepo }) {
+  const events = new EventEmitter();
+
   async function _insertTransactions(blockhash) {
     let inserted = 0;
     let next = blockhash;
@@ -20,6 +24,7 @@ function LitecoinSync({ service, transRepo, blockRepo }) {
       inserted += await transRepo.AddMany(tx);
       console.log(`syncronized block: ${height}`);
     } while (next);
+    events.emit("blockchainSynchronized", "litecoin");
     return inserted;
   }
 
@@ -43,7 +48,7 @@ function LitecoinSync({ service, transRepo, blockRepo }) {
     return inserted;
   }
 
-  return { Blockrange };
+  return { Blockrange, events };
 }
 
 module.exports = LitecoinSync;
