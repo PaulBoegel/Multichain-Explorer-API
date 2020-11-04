@@ -42,8 +42,8 @@ function FullnodeNotifyerManager() {
     }
   }
 
-  function onNewBlock(block, chainname) {
-    events.emit("onNewBlock", block, chainname);
+  function onNewBlock(blockHash, chainname) {
+    events.emit("onNewBlock", blockHash, chainname);
   }
 
   function onNewTransaction(transaction, inputDepth, chainname) {
