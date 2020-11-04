@@ -23,8 +23,14 @@ function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
     });
   }
 
+  function _checkConnection() {
+    if (Object.keys(db).length === 0)
+      throw new Error("no database connection established");
+  }
+
   async function get(query, limit) {
     try {
+      _checkConnection();
       let transactions = db.collection("transactions").find(query);
 
       if (limit > 0) {
@@ -41,6 +47,7 @@ function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
 
   async function getByIds(txid, chainname) {
     try {
+      _checkConnection();
       const transaction = await db
         .collection("transactions")
         .find({ txid, chainname })
@@ -55,6 +62,7 @@ function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
 
   async function add(newTransaction) {
     try {
+      _checkConnection();
       const { txid, chainname, ...data } = newTransaction;
       const keys = { txid, chainname };
       data.timestamp = Date.now();
@@ -67,14 +75,7 @@ function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
   }
 
   async function addMany(transactions) {
-    try {
-      transactions.forEach(
-        (transaction) => (transaction.timestamp = Date.now())
-      );
-      await db.collection("transactions").insertMany(transactions);
-    } catch (err) {
-      throw err;
-    }
+    _checkConnection();
   }
 
   return { connect, addMany, get, getByIds, add };
