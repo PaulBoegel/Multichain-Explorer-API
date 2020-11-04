@@ -20,7 +20,7 @@ function LitecoinNotifyer(conf, sock) {
   }
 
   async function subscribeToBlocks() {
-    sock.subscribe("rawblock");
+    sock.subscribe("hashblock");
     for await (const [topic, msg] of sock) {
       events.emit("onNewBlock", msg, conf.chainname);
     }
