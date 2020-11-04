@@ -7,7 +7,7 @@
     "start": "npm-run-all --parallel start:fullnode start:rest",
     "start:fullnode": "node src/server.js",
     "start:rest": "node src/api/server.js",
-    "test": "mocha tests/**/*spec.js",
+    "test": "mocha -w",
     "test:transrepo": "nodemon tests/repos/transactionRepoHarness.js",
     "test:litecoinService": "nodemon tests/services/litecoinNodeServiceHarness"
   },
