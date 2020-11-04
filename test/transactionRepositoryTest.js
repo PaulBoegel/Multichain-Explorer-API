@@ -15,7 +15,7 @@ describe("TransactionRepository connect", () => {
   const dbconfig = getDbConfig();
   const repo = new TransactionRepository(dbconfig);
   it("should return a true if connection is established", async () => {
-    const connection = await repo.Connect();
+    const connection = await repo.connect();
     assert.strictEqual(connection, true);
   });
 });
@@ -24,12 +24,12 @@ describe("TransactionRepository AddMany", () => {
   const dbconfig = getDbConfig();
   const repo = new TransactionRepository(dbconfig);
   it("result should be one", async () => {
-    await repo.Connect();
-    const data = await repo.AddMany([{ txid: "1234" }]);
+    await repo.connect();
+    const data = await repo.addMany([{ txid: "1234" }]);
     assert.strictEqual(data, 1);
   });
   it("should save an array of two transactions", async () => {
-    const data = await repo.AddMany(transactions);
+    const data = await repo.addMany(transactions);
     assert.strictEqual(data, 2);
   });
 });
