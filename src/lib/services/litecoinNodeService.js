@@ -22,15 +22,16 @@ function LitecoinNodeService(rpc, chainname) {
     }
   }
 
-  async function getTransaction(transactionId, verbose = false) {
-    try {
-      return await rpc.getrawtransaction({
-        txid: transactionId,
-        verbose: verbose,
-      });
-    } catch (err) {
-      throw err;
-    }
+  async function getBlockHash({ height }) {
+    return await rpc.getblockhash({ height });
+  }
+
+  async function getBlock({ blockhash, verbose }) {
+    return await rpc.getblock({
+      blockhash,
+      verbosity: verbose ? 2 : 1,
+    });
+  }
 
   async function getTransaction({ txid, verbose = false }) {
     return await rpc.getrawtransaction({ txid, verbose });
@@ -66,6 +67,8 @@ function LitecoinNodeService(rpc, chainname) {
   return {
     decodeTransaction,
     getTransaction,
+    getBlock,
+    getBlockHash,
     handleTransactionInputs,
     chainname,
     events,
