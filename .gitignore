@@ -1,6 +1,5 @@
 /node_modules/
 /client/node_modules/
 /.idea/
-fullnode-config.json
 /.vscode/
 explorer-config.json
