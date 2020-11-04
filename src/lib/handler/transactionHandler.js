@@ -38,7 +38,7 @@ function transactionHandler(transactionRepo) {
       let transaction = await transactionRepo.getByIds(txid, service.chainname);
       if (transaction) return transaction;
 
-      transaction = await service.getTransaction(txid, true);
+      transaction = await service.getTransaction({ txid, verbose: true });
 
       if (transaction) {
         await transactionRepo.add(transaction);

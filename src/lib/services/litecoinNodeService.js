@@ -31,6 +31,9 @@ function LitecoinNodeService(rpc, chainname) {
     } catch (err) {
       throw err;
     }
+
+  async function getTransaction({ txid, verbose = false }) {
+    return await rpc.getrawtransaction({ txid, verbose });
   }
 
   async function handleTransactionInputs(transaction, depth) {
