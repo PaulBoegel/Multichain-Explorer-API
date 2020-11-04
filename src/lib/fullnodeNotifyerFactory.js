@@ -5,7 +5,7 @@ const LitecoinNotifyer = require("./notifyer/litecoinNotifyer");
 const BitcoinNotifyer = require("./notifyer/bitcoinNotifyer");
 
 function FullnodeNotifyerFactory(config) {
-  function createNotifyer(blockchainName) {
+  function create(blockchainName) {
     switch (blockchainName) {
       case config.litecoin.chainname:
         return createLitecoinNotifyer();
@@ -20,12 +20,12 @@ function FullnodeNotifyerFactory(config) {
     return new LitecoinNotifyer(config.litecoin, litecoinSock);
   }
 
-  function createBitcoinNotifyer(){
+  function createBitcoinNotifyer() {
     const bitcoinSock = new zmq.Subscriber();
     return new BitcoinNotifyer(config.bitcoin, bitcoinSock);
   }
 
-  return { createNotifyer };
+  return { create };
 }
 
 module.exports = FullnodeNotifyerFactory;

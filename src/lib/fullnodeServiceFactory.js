@@ -5,7 +5,7 @@ const BitcoinNodeService = require("./services/bitcoinNodeService");
 const { RPCClient } = require("rpc-bitcoin");
 
 function FullnodeServiceFactory(config) {
-  function createService(blockchainName) {
+  function create(blockchainName) {
     switch (blockchainName) {
       case config.litecoin.chainname:
         return createLitecoinService();
@@ -27,18 +27,18 @@ function FullnodeServiceFactory(config) {
     return new LitecoinNodeService(litecoinRpc, config.litecoin.chainname);
   }
 
-  function createBitcoinService(){
+  function createBitcoinService() {
     const conf = config.bitcoin.rpc;
     const bitcoinRpc = new RPCClient({
       url: conf.url,
       user: conf.user,
       pass: conf.pass,
-      port: conf.port
+      port: conf.port,
     });
     return new BitcoinNodeService(bitcoinRpc, config.bitcoin.chainname);
   }
 
-  return { createService };
+  return { create };
 }
 
 module.exports = FullnodeServiceFactory;
