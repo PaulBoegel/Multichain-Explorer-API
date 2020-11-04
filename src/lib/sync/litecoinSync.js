@@ -3,16 +3,16 @@ const EventEmitter = require("events");
 function LitecoinSync({ service, transRepo, blockRepo }) {
   const events = new EventEmitter();
 
-  async function _insertTransactions(blockhash) {
+  async function _insertTransactions({ nextHash, endHeight }) {
     let inserted = 0;
-    let next = blockhash;
+    let currentBlockHeight = 0;
     do {
       const { height, hash, tx, nextblockhash } = await service.getBlock({
-        blockhash: next,
+        blockhash: nextHash,
         verbose: true,
       });
-      next = nextblockhash;
-      loopHeight = height;
+      currentBlockHeight = height;
+      nextHash = nextblockhash;
       await blockRepo.add({
         height,
         hash,
@@ -23,7 +23,7 @@ function LitecoinSync({ service, transRepo, blockRepo }) {
       });
       inserted += await transRepo.addMany(tx);
       // console.log(`syncronized block: ${height}`);
-    } while (next);
+    } while (currentBlockHeight < endHeight);
     events.emit("blockchainSynchronized", "litecoin");
     return inserted;
   }
@@ -48,9 +48,9 @@ function LitecoinSync({ service, transRepo, blockRepo }) {
   async function blockrange(endHeight = null) {
     await transRepo.connect();
     await blockRepo.connect();
-    const blockhash = await _getHighestBlockHash();
+    const nextHash = await _getHighestBlockHash();
     endHeight = await _checkHeight(endHeight);
-    inserted = await _insertTransactions(blockhash);
+    inserted = await _insertTransactions({ nextHash, endHeight });
     return inserted;
   }
 
