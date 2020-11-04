@@ -33,6 +33,10 @@ function LitecoinNodeService(rpc, chainname) {
     });
   }
 
+  async function getBlockchainInfo() {
+    return await rpc.getblockchaininfo();
+  }
+
   async function getTransaction({ txid, verbose = false }) {
     return await rpc.getrawtransaction({ txid, verbose });
   }
@@ -67,6 +71,7 @@ function LitecoinNodeService(rpc, chainname) {
   return {
     decodeTransaction,
     getTransaction,
+    getBlockchainInfo,
     getBlock,
     getBlockHash,
     handleTransactionInputs,
