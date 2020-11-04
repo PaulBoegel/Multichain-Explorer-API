@@ -40,10 +40,16 @@ function LitecoinSync({ service, transRepo, blockRepo }) {
     return await service.GetBlockHash({ height, verbose: true });
   }
 
-  async function Blockrange() {
+  async function _checkHeight(endHeight) {
+    if (typeof endHeight === "number") return endHeight;
+    return ({ blocks } = await service.getBlockchainInfo());
+  }
+
+  async function Blockrange(endHeight = null) {
     await transRepo.Connect();
     await blockRepo.Connect();
     const blockhash = await _getHighestBlockHash();
+    endHeight = await _checkHeight(endHeight);
     inserted = await _insertTransactions(blockhash);
     return inserted;
   }

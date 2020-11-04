@@ -48,3 +48,13 @@ describe("LitecoinNodeService GetTransaction", () => {
     );
   });
 });
+
+describe("LitecoinNodeService getBlockchainInfo", () => {
+  const config = GetConfig();
+  const rpc = new RPCClient(config);
+  const service = new LitecoinNodeService(rpc, "litecoin");
+  it("should return the actual blockchain info object", async () => {
+    const { chain } = await service.getBlockchainInfo();
+    assert.strictEqual(chain, "main");
+  });
+});

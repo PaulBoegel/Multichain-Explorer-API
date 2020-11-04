@@ -7,6 +7,9 @@ describe("LitecoinSync Blockrange", () => {
 
   beforeEach(() => {
     service = {
+      getBlockchainInfo: function () {
+        return 10;
+      },
       GetBlockHash: function ({ height }) {
         return blockMock.hash;
       },
@@ -45,5 +48,9 @@ describe("LitecoinSync Blockrange", () => {
   it("should synchronize a block", async () => {
     const result = await sync.Blockrange({ endHeight: 0 });
     assert.strictEqual(result, 1);
+  });
+  it("should sync the entire blockchain if endHeight is not set", async () => {
+    const result = await sync.Blockrange();
+    assert.strict(result, null);
   });
 });

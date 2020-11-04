@@ -60,4 +60,4 @@ fullnodeServiceManager.events.addListener(
 );
 
 fullnodeServiceManager.activateAllListeners();
-fullnodeNotifyerManager.activateAllNotifyers();
+// fullnodeNotifyerManager.activateAllNotifyers();
