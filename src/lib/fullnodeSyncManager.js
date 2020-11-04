@@ -1,25 +1,23 @@
-const EventEmitter = require("events");
-
-function FullnodeSyncManager() {
+function FullnodeSyncManager(notifyManager) {
   const syncArray = [];
-  const events = new EventEmitter();
 
   function setSynchronizer(sync) {
     syncArray.push(sync);
   }
 
   function activateAllSynchronizer() {
-    syncArray.forEach((sync) => {
+    console.log(syncArray);
+    syncArray.forEach(async (sync) => {
       sync.events.addListener(
         "blockchainSynchronized",
         _onBlockchainSynchronized
       );
-      sync.BlockRange();
+      await sync.blockrange(100);
     });
   }
 
   function _onBlockchainSynchronized(chainname) {
-    events.emit("blockchainSynchronized", chainname);
+    notifyManager.activateNotifyer(chainname);
   }
 
   return { setSynchronizer, activateAllSynchronizer };
