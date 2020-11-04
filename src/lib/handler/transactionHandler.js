@@ -34,6 +34,23 @@ function TransactionHandler(transactionRepo, blockRepo) {
     });
   }
 
+  async function saveBlockTransactions(blockhash, service) {
+    const { height, hash, tx } = await service.getBlock({
+      blockhash,
+      verbose: true,
+    });
+
+    await blockRepo.add({
+      height,
+      hash,
+      tx: tx.map((transaction) => {
+        return transaction.txid;
+      }),
+    });
+    console.log(`Saved Block: ${height}`);
+    return await transactionRepo.addMany(tx);
+  }
+
   async function getTransaction(txid, service) {
     try {
       let transaction = await transactionRepo.getByIds(txid, service.chainname);
@@ -52,7 +69,12 @@ function TransactionHandler(transactionRepo, blockRepo) {
     }
   }
 
-  return { getTransaction, saveTransaction, saveManyTransactions };
+  return {
+    getTransaction,
+    saveTransaction,
+    saveManyTransactions,
+    saveBlockTransactions,
+  };
 }
 
 module.exports = TransactionHandler;
