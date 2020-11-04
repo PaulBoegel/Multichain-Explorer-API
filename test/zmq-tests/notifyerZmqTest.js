@@ -26,8 +26,8 @@ describe("LitecoinNotifyer subscribeToTransactions", () => {
     notifyer.events.addListener(
       "onNewTransaction",
       (transaction, depth, chainname) => {
-        assert.strictEqual(chainname, "litecoin");
         if (isDone == false) {
+          assert.strictEqual(chainname, "litecoin");
           done();
           isDone = true;
         }
@@ -72,8 +72,8 @@ describe("LitecoinNotifyer subscribeToBlocks", () => {
   });
   it("should send the block as byte array if a new has been created", (done) => {
     let isDone = false;
-    notifyer.events.addListener("onNewBlock", (block, chainname) => {
-      const isByteArray = block && block.byteLength !== undefined;
+    notifyer.events.addListener("onNewBlock", (blockHash, chainname) => {
+      const isByteArray = blockHash && blockHash.byteLength !== undefined;
       assert.strictEqual(isByteArray, true);
       if (isDone == false) {
         done();
