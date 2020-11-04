@@ -2,13 +2,9 @@
 
 const { MongoClient } = require("mongodb");
 
-function TransactionRepository(dbConfig) {
-  if (typeof dbConfig === undefined || dbConfig == null)
-    throw new ReferenceError("No dbConfig param defined.");
-
-  const url = `mongodb://${dbConfig.host}:${dbConfig.port}`;
-  const dbName = dbConfig.dbName;
-  let db;
+function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
+  const url = `mongodb://${host}:${port}`;
+  let db = {};
 
   function connect() {
     return new Promise((resolve, reject) => {
@@ -16,7 +12,7 @@ function TransactionRepository(dbConfig) {
         url,
         {
           useUnifiedTopology: true,
-          poolSize: dbConfig.poolSize,
+          poolSize,
         },
         function (err, client) {
           if (err) reject(err);
