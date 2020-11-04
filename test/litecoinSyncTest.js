@@ -1,5 +1,6 @@
 const assert = require("assert");
 const LitecoinSync = require("../src/lib/sync/litecoinSync");
+const sinon = require("sinon");
 const blockMock = require("./mocks/blockMock.json");
 
 describe("LitecoinSync Blockrange", () => {
@@ -8,7 +9,7 @@ describe("LitecoinSync Blockrange", () => {
   beforeEach(() => {
     service = {
       getBlockchainInfo: function () {
-        return 10;
+        return 1;
       },
       getBlockHash: function ({ height }) {
         return blockMock.hash;
@@ -42,6 +43,7 @@ describe("LitecoinSync Blockrange", () => {
         ];
       },
     };
+    getBlockchainInfo = sinon.spy(service, "getBlockchainInfo");
     sync = new LitecoinSync({ service, transRepo, blockRepo });
   });
 
@@ -49,8 +51,15 @@ describe("LitecoinSync Blockrange", () => {
     const result = await sync.blockrange({ endHeight: 0 });
     assert.strictEqual(result, 1);
   });
-  it("should sync the entire blockchain if endHeight is not set", async () => {
+  it("should check the blockchain info, if endHeight is not defined", async () => {
     const result = await sync.blockrange();
-    assert.strict(result, null);
+    assert(getBlockchainInfo.calledOnce);
+  });
+  it("should fire blockchainSynchronized event, after end height was reached", (done) => {
+    sync.events.addListener("blockchainSynchronized", (chainname) => {
+      assert(chainname, "litecoin");
+      done();
+    });
+    sync.blockrange().then((result) => {});
   });
 });

@@ -22,7 +22,7 @@ function LitecoinSync({ service, transRepo, blockRepo }) {
         }),
       });
       inserted += await transRepo.addMany(tx);
-      console.log(`syncronized block: ${height}`);
+      // console.log(`syncronized block: ${height}`);
     } while (next);
     events.emit("blockchainSynchronized", "litecoin");
     return inserted;
