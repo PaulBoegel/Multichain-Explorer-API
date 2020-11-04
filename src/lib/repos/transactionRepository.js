@@ -66,7 +66,7 @@ function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
       const { txid, chainname, ...data } = newTransaction;
       const keys = { txid, chainname };
       data.timestamp = Date.now();
-      await db
+      return await db
         .collection("transactions")
         .updateOne(keys, { $set: { ...data } }, { upsert: true });
     } catch (err) {
@@ -76,6 +76,10 @@ function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
 
   async function addMany(transactions) {
     _checkConnection();
+    const result = await db
+      .collection("transactions")
+      .insertMany(transactions, { ordered: false });
+    return result.insertedCount;
   }
 
   return { connect, addMany, get, getByIds, add };
