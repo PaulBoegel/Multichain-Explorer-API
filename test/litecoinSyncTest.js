@@ -47,10 +47,6 @@ describe("LitecoinSync Blockrange", () => {
     sync = new LitecoinSync({ service, transRepo, blockRepo });
   });
 
-  it("should synchronize a block", async () => {
-    const result = await sync.blockrange(0);
-    assert.strictEqual(result, 1);
-  });
   it("should check the blockchain info, if endHeight has not been defined", async () => {
     await sync.blockrange();
     assert(getBlockchainInfo.calledOnce);

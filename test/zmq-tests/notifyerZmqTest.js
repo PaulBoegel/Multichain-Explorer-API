@@ -62,7 +62,6 @@ describe("LitecoinNotifyer subscribeToBlocks", () => {
   it("should send the chainname if the blockchain created a new block", (done) => {
     let isDone = false;
     notifyer.events.addListener("onNewBlock", (block, chainname) => {
-      console.log(block);
       assert.strictEqual(chainname, "litecoin");
       if (isDone == false) {
         done();

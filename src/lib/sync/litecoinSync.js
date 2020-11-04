@@ -11,7 +11,6 @@ function LitecoinSync({ service, transRepo, blockRepo }) {
         blockhash: nextHash,
         verbose: true,
       });
-      console.log(endHeight);
       if (height > endHeight) break;
       currentBlockHeight = height;
       nextHash = nextblockhash;
