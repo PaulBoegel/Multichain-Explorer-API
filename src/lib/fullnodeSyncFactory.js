@@ -1,5 +1,6 @@
 const LitecoinSync = require("./sync/litecoinSync");
 const BitcoinSync = require("./sync/bitcoinSync");
+const DashSync = require("./sync/dashSync");
 
 function FullnodeSyncFactory({
   fullnodeServiceManager,
@@ -16,6 +17,12 @@ function FullnodeSyncFactory({
         });
       case "bitcoin":
         return new BitcoinSync({
+          service: fullnodeServiceManager.getService(chainname),
+          transRepo: transactionRepo,
+          blockRepo,
+        });
+      case "dash":
+        return new DashSync({
           service: fullnodeServiceManager.getService(chainname),
           transRepo: transactionRepo,
           blockRepo,

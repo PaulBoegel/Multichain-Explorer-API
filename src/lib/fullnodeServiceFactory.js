@@ -2,6 +2,7 @@
 
 const LitecoinNodeService = require("./services/litecoinNodeService");
 const BitcoinNodeService = require("./services/bitcoinNodeService");
+const DashNodeService = require("./services/dashNodeService");
 const { RPCClient } = require("rpc-bitcoin");
 
 function FullnodeServiceFactory(config) {
@@ -9,10 +10,10 @@ function FullnodeServiceFactory(config) {
     switch (blockchainName) {
       case config.litecoin.chainname:
         return createLitecoinService();
-        break;
       case config.bitcoin.chainname:
         return createBitcoinService();
-        break;
+      case config.dash.chainname:
+        return createDashService();
     }
   }
 
@@ -36,6 +37,17 @@ function FullnodeServiceFactory(config) {
       port: conf.port,
     });
     return new BitcoinNodeService(bitcoinRpc, config.bitcoin.chainname);
+  }
+
+  function createDashService() {
+    const conf = config.dash.rpc;
+    const dashRpc = new RPCClient({
+      url: conf.url,
+      user: conf.user,
+      pass: conf.pass,
+      port: conf.port,
+    });
+    return new DashNodeService(dashRpc, config.dash.chainname);
   }
 
   return { create };
