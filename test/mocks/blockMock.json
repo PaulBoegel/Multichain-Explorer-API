@@ -8,7 +8,11 @@
   "version": 536870912,
   "versionHex": "20000000",
   "merkleroot": "f84b8575a9b5d3221980b59b162128110cab70c0d6a905d606c067b7b48d602b",
-  "tx": ["5592cb29dce6938f8eb10a05d12bb6762f0f793f1157493439d460cb62393553"],
+  "tx": [
+    {
+      "txid": "5592cb29dce6938f8eb10a05d12bb6762f0f793f1157493439d460cb62393553"
+    }
+  ],
   "time": 1604397386,
   "mediantime": 1604396780,
   "nonce": 1484052786,

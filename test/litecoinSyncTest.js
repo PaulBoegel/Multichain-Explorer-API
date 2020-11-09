@@ -9,6 +9,7 @@ describe("LitecoinSync Blockrange", () => {
 
   beforeEach(() => {
     service = {
+      chainname: "litecoin",
       getBlockchainInfo: function () {
         return 1;
       },
