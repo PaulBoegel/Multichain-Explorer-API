@@ -2,6 +2,7 @@ const EventEmitter = require("events");
 
 function LitecoinSync({ service, transRepo, blockRepo }) {
   const events = new EventEmitter();
+  const CHAINNAME = "litecoin";
 
   async function _insertTransactions({ nextHash, endHeight }) {
     let inserted = 0;
@@ -22,10 +23,11 @@ function LitecoinSync({ service, transRepo, blockRepo }) {
           return transaction.txid;
         }),
       });
+      tx.map((transaction) => (transaction.chainname = CHAINNAME));
       inserted += await transRepo.addMany(tx);
       // console.log(`syncronized block: ${height}`);
     } while (nextHash);
-    events.emit("blockchainSynchronized", "litecoin");
+    events.emit("blockchainSynchronized", CHAINNAME);
     return inserted;
   }
 
