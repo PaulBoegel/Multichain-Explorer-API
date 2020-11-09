@@ -1,6 +1,11 @@
 const EventEmitter = require("events");
 
-function BitcoinSync({ service, transactionHandler, syncHeight = null }) {
+function BitcoinSync({
+  service,
+  transactionHandler,
+  syncHeight = null,
+  syncHeightActive = false,
+}) {
   const events = new EventEmitter();
   const CHAINNAME = "bitcoin";
 
@@ -8,7 +13,24 @@ function BitcoinSync({ service, transactionHandler, syncHeight = null }) {
     syncHeight = height;
   }
 
-  async function _insertTransactions({ nextHash, endHeight }) {
+  async function _syncDataWithHeight({ nextHash }) {
+    let inserted = 0;
+    while (true) {
+      const blockData = await service.getBlock({
+        blockhash: nextHash,
+        verbose: true,
+      });
+      if (blockData.height > syncHeight) break;
+      inserted = await transactionHandler.saveBlockData({
+        blockData,
+        service,
+      });
+      nextHash = blockData.nextblockhash;
+    }
+    return inserted;
+  }
+
+  async function _syncData({ nextHash }) {
     let inserted = 0;
     do {
       const blockData = await service.getBlock({
@@ -20,8 +42,6 @@ function BitcoinSync({ service, transactionHandler, syncHeight = null }) {
         service,
       });
       nextHash = blockData.nextblockhash;
-
-      if (blockData.height > endHeight) break;
     } while (nextHash);
     events.emit("blockchainSynchronized", CHAINNAME);
     return inserted;
@@ -29,14 +49,15 @@ function BitcoinSync({ service, transactionHandler, syncHeight = null }) {
 
   async function blockrange() {
     const nextHash = await transactionHandler.getHighestBlockHash(service);
-    endHeight = await _checkHeight(syncHeight);
-    inserted = await _insertTransactions({ nextHash, endHeight });
-    return inserted;
+    if ((await _checkHeight(syncHeight)) && syncHeightActive) {
+      return await _syncDataWithHeight({ nextHash });
+    }
+    return _syncData({ nextHash });
   }
 
   async function _checkHeight(endHeight) {
-    if (typeof endHeight === "number") return endHeight;
-    return ({ blocks } = await service.getBlockchainInfo());
+    if (typeof endHeight === "number") return true;
+    return false;
   }
 
   return { blockrange, setSyncHeight, events };
