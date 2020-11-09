@@ -1,6 +1,6 @@
 const EventEmitter = require("events");
 
-function LitecoinSync({ service, transRepo, blockRepo }) {
+function LitecoinSync({ service, transactionHandler }) {
   const events = new EventEmitter();
   const CHAINNAME = "litecoin";
 
@@ -32,28 +32,13 @@ function LitecoinSync({ service, transRepo, blockRepo }) {
     return inserted;
   }
 
-  async function _getHighestBlockHash() {
-    let height = 0;
-    let blocks = await blockRepo.get({
-      sort: { height: -1 },
-      limit: 1,
-    });
-    if (blocks.length > 0) {
-      height = blocks[0].height + 1;
-    }
-
-    return await service.getBlockHash({ height, verbose: true });
-  }
-
   async function _checkHeight(endHeight) {
     if (typeof endHeight === "number") return endHeight;
     return ({ blocks } = await service.getBlockchainInfo());
   }
 
   async function blockrange(endHeight = null) {
-    await transRepo.connect();
-    await blockRepo.connect();
-    const nextHash = await _getHighestBlockHash();
+    const nextHash = await transactionHandler.getHighestBlockHash(service);
     endHeight = await _checkHeight(endHeight);
     inserted = await _insertTransactions({ nextHash, endHeight });
     return inserted;
