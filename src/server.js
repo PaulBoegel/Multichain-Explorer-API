@@ -1,7 +1,4 @@
 "use strict";
-
-const fs = require("fs");
-
 const FullnodeServiceFactory = require("./lib/fullnodeServiceFactory");
 const FullnodeNotifyerFactory = require("./lib/fullnodeNotifyerFactory");
 const FullnodeSyncFactory = require("./lib/fullnodeSyncFactory");
@@ -14,49 +11,74 @@ const TransactionHandler = require("./lib/handler/transactionHandler");
 const TransactionRepository = require("./lib/repos/transactionRepository");
 const BlockRepository = require("./lib/repos/blockRepository");
 
-const configHandler = new ConfigurationHandler(fs);
-const config = configHandler.readAndParseJsonFile("./explorer-config.json");
-const transactionRepo = new TransactionRepository(config.dbConfig.test);
-const blockRepo = new BlockRepository(config.dbConfig.test);
-const transactionHandler = new TransactionHandler(transactionRepo, blockRepo);
+const fs = require("fs");
 
-const fullnodeServiceFactory = new FullnodeServiceFactory(
-  config.blockchainConfig
-);
-const fullnodeNotifyerFactory = new FullnodeNotifyerFactory(
-  config.blockchainConfig
-);
+async function main() {
+  try {
+    const configHandler = ConfigurationHandler(fs);
+    const config = configHandler.readAndParseJsonFile("./explorer-config.json");
+    const transactionRepo = TransactionRepository(config.dbConfig.test);
+    const blockRepo = BlockRepository(config.dbConfig.test);
 
-const fullnodeServiceManager = new FullnodeServiceManager();
-const fullnodeNotifyerManager = new FullnodeNotifyerManager();
+    await transactionRepo.connect();
+    await blockRepo.connect();
 
-fullnodeServiceManager.setService(fullnodeServiceFactory.create("litecoin"));
-fullnodeNotifyerManager.setNotifyer(fullnodeNotifyerFactory.create("litecoin"));
+    const transactionHandler = TransactionHandler(transactionRepo, blockRepo);
 
-fullnodeServiceManager.setService(fullnodeServiceFactory.create("bitcoin"));
-fullnodeNotifyerManager.setNotifyer(fullnodeNotifyerFactory.create("bitcoin"));
+    const fullnodeServiceFactory = FullnodeServiceFactory(
+      config.blockchainConfig
+    );
+    const fullnodeNotifyerFactory = FullnodeNotifyerFactory(
+      config.blockchainConfig
+    );
 
-const fullnodeSyncFactory = new FullnodeSyncFactory({
-  fullnodeServiceManager,
-  transactionRepo,
-  blockRepo,
-});
+    const fullnodeServiceManager = FullnodeServiceManager();
+    const fullnodeNotifyerManager = FullnodeNotifyerManager();
 
-const fullnodeSyncManager = new FullnodeSyncManager(fullnodeNotifyerManager);
+    fullnodeServiceManager.setService(
+      fullnodeServiceFactory.create("litecoin")
+    );
+    fullnodeNotifyerManager.setNotifyer(
+      fullnodeNotifyerFactory.create("litecoin")
+    );
 
-fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("litecoin"));
+    // fullnodeServiceManager.setService(fullnodeServiceFactory.create("bitcoin"));
+    // fullnodeNotifyerManager.setNotifyer(
+    //   fullnodeNotifyerFactory.create("bitcoin")
+    // );
 
-fullnodeNotifyerManager.events.addListener(
-  "onNewBlock",
-  (blockHash, chainname) => {
-    transactionHandler
-      .saveBlockTransactions(
-        blockHash,
-        fullnodeServiceManager.getService(chainname)
-      )
-      .then();
+    // fullnodeServiceManager.setService(fullnodeServiceFactory.create("dash"));
+    // fullnodeNotifyerManager.setNotifyer(fullnodeNotifyerFactory.create("dash"));
+
+    const fullnodeSyncFactory = FullnodeSyncFactory({
+      fullnodeServiceManager,
+      transactionHandler,
+      config: config.blockchainConfig,
+    });
+
+    const fullnodeSyncManager = FullnodeSyncManager(fullnodeNotifyerManager);
+
+    fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("litecoin"));
+    // fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("bitcoin"));
+    // fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("dash"));
+
+    fullnodeNotifyerManager.events.addListener(
+      "onNewBlock",
+      (blockhash, chainname) => {
+        transactionHandler
+          .saveBlockDataWithHash({
+            blockhash,
+            service: fullnodeServiceManager.getService(chainname),
+          })
+          .then();
+      }
+    );
+
+    fullnodeServiceManager.activateAllListeners();
+    fullnodeSyncManager.activateAllSynchronizer();
+  } catch (err) {
+    console.log(err);
   }
-);
+}
 
-fullnodeServiceManager.activateAllListeners();
-fullnodeSyncManager.activateAllSynchronizer();
+main();
