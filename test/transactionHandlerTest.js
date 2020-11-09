@@ -34,6 +34,7 @@ describe("TransactionHandler saveBlockTransactions", () => {
         tx: [
           "159cc2d17066824b68b3a182e566476b25d54a184061369cd080b5e25bf5280a",
         ],
+        chainname: "litecoin",
       }).calledOnce
     );
   });
