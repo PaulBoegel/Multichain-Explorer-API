@@ -45,6 +45,7 @@ function TransactionHandler(transactionRepo, blockRepo) {
         return transaction.txid;
       }),
     });
+    tx.map((transaction) => (transaction.chainname = service.chainname));
     return await transactionRepo.addMany(tx);
   }
 
