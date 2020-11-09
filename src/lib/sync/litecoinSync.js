@@ -1,13 +1,20 @@
 const EventEmitter = require("events");
 
-function LitecoinSync({ service, transactionHandler }) {
+function LitecoinSync({ service, transactionHandler, syncHeight = null }) {
   const events = new EventEmitter();
   const CHAINNAME = "litecoin";
+
+  function setSyncHeight(height) {
+    syncHeight = height;
+  }
 
   async function _insertTransactions({ nextHash, endHeight }) {
     let inserted = 0;
     do {
-      const blockData = await _getBlockData(nextHash);
+      const blockData = await service.getBlock({
+        blockhash: nextHash,
+        verbose: true,
+      });
       inserted = await transactionHandler.saveBlockData({
         blockData,
         service,
@@ -20,18 +27,11 @@ function LitecoinSync({ service, transactionHandler }) {
     return inserted;
   }
 
-  async function blockrange(endHeight = null) {
+  async function blockrange() {
     const nextHash = await transactionHandler.getHighestBlockHash(service);
-    endHeight = await _checkHeight(endHeight);
+    endHeight = await _checkHeight(syncHeight);
     inserted = await _insertTransactions({ nextHash, endHeight });
     return inserted;
-  }
-
-  async function _getBlockData(blockhash) {
-    return ({ height, hash, tx, nextblockhash } = await service.getBlock({
-      blockhash,
-      verbose: true,
-    }));
   }
 
   async function _checkHeight(endHeight) {
@@ -39,7 +39,7 @@ function LitecoinSync({ service, transactionHandler }) {
     return ({ blocks } = await service.getBlockchainInfo());
   }
 
-  return { blockrange, events };
+  return { blockrange, setSyncHeight, events };
 }
 
 module.exports = LitecoinSync;
