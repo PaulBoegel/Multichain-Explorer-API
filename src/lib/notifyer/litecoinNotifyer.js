@@ -10,7 +10,7 @@ function LitecoinNotifyer(conf, sock) {
   async function connectToSocket() {
     try {
       await sock.connect(`tcp://${conf.worker.host}:${conf.worker.port}`);
-      console.log(`Litecoin worker connected to port ${conf.worker.port}`);
+      console.log(`${blockchain} worker connected to port ${conf.worker.port}`);
     } catch (e) {
       throw e;
     }
