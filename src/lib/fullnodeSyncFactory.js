@@ -8,9 +8,14 @@ function FullnodeSyncFactory({
 }) {
   function create(chainname) {
     switch (chainname) {
-      case "bitcoin":
       case "litecoin":
         return new LitecoinSync({
+          service: fullnodeServiceManager.getService(chainname),
+          transRepo: transactionRepo,
+          blockRepo,
+        });
+      case "bitcoin":
+        return new BitcoinSync({
           service: fullnodeServiceManager.getService(chainname),
           transRepo: transactionRepo,
           blockRepo,
