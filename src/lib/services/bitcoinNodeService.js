@@ -27,10 +27,11 @@ function BitcoinNodeService(rpc, chainname) {
   }
 
   async function getBlock({ blockhash, verbose }) {
-    return await rpc.getblock({
+    const { height, hash, tx, nextblockhash } = await rpc.getblock({
       blockhash,
       verbosity: verbose ? 2 : 1,
     });
+    return { height, hash, tx, nextblockhash };
   }
 
   async function getBlockchainInfo() {
