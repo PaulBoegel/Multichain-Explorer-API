@@ -1,5 +1,6 @@
 const assert = require("assert");
 const LitecoinSync = require("../src/lib/sync/litecoinSync");
+const TransactionHandler = require("../src/lib/handler/transactionHandler");
 const sinon = require("sinon");
 const blockMock = require("./mocks/blockMock.json");
 
@@ -44,7 +45,8 @@ describe("LitecoinSync Blockrange", () => {
       },
     };
     getBlockchainInfo = sinon.spy(service, "getBlockchainInfo");
-    sync = new LitecoinSync({ service, transRepo, blockRepo });
+    const transactionHandler = TransactionHandler(transRepo, blockRepo);
+    sync = LitecoinSync({ service, transactionHandler });
   });
 
   it("should check the blockchain info, if endHeight has not been defined", async () => {
