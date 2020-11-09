@@ -32,24 +32,6 @@ function TransactionHandler(transactionRepo, blockRepo) {
     });
   }
 
-  async function saveBlockTransactions(blockhash, service) {
-    const { height, hash, tx } = await service.getBlock({
-      blockhash,
-      verbose: true,
-    });
-
-    await blockRepo.add({
-      height,
-      hash,
-      tx: tx.map((transaction) => {
-        return transaction.txid;
-      }),
-      chainname: service.chainname,
-    });
-    tx.map((transaction) => (transaction.chainname = service.chainname));
-    return await transactionRepo.addMany(tx);
-  }
-
   async function getTransaction(txid, service) {
     try {
       let transaction = await transactionRepo.getByIds(txid, service.chainname);
@@ -66,6 +48,20 @@ function TransactionHandler(transactionRepo, blockRepo) {
     } catch (err) {
       throw err;
     }
+  }
+
+  async function saveBlockData({ blockData, service }) {
+    const { tx, ...data } = blockData;
+    tx.map((transaction) => (transaction.chainname = service.chainname));
+    const inserted = await transactionRepo.addMany(tx);
+    await blockRepo.add({
+      ...data,
+      chainname: service.chainname,
+      tx: tx.map((transaction) => {
+        return transaction.txid;
+      }),
+    });
+    return inserted;
   }
 
   async function getHighestBlockHash(service) {
@@ -85,7 +81,7 @@ function TransactionHandler(transactionRepo, blockRepo) {
     getTransaction,
     saveTransaction,
     saveManyTransactions,
-    saveBlockTransactions,
+    saveBlockData,
     getHighestBlockHash,
   };
 }
