@@ -15,7 +15,6 @@ function TransactionHandler(transactionRepo, blockRepo) {
       transaction.chainname = chainname;
       await transactionRepo.add(transaction);
       await service.handleTransactionInputs(transaction, inputDepth);
-      console.log(`Added ${id} to database.`);
     } catch (err) {
       throw err;
     }
@@ -30,7 +29,6 @@ function TransactionHandler(transactionRepo, blockRepo) {
 
     inputs.forEach(async (input) => {
       await service.handleTransactionInputs(input, inputDepth);
-      console.log(`Added ${input.txid} to database`);
     });
   }
 
@@ -47,7 +45,6 @@ function TransactionHandler(transactionRepo, blockRepo) {
         return transaction.txid;
       }),
     });
-    console.log(`Saved Block: ${height}`);
     return await transactionRepo.addMany(tx);
   }
 
