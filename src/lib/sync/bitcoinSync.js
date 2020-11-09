@@ -22,6 +22,7 @@ function BitcoinSync({ service, transRepo, blockRepo }) {
         tx: tx.map((transaction) => {
           return transaction.txid;
         }),
+        chainname: CHAINNAME,
       });
       tx.map((transaction) => (transaction.chainname = CHAINNAME));
       inserted += await transRepo.addMany(tx);
