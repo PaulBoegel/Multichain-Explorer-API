@@ -11,7 +11,7 @@ function FullnodeSyncManager(notifyManager) {
         "blockchainSynchronized",
         _onBlockchainSynchronized
       );
-      await sync.blockrange(100);
+      await sync.blockrange();
     });
   }
 
