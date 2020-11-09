@@ -1,4 +1,5 @@
 const LitecoinSync = require("./sync/litecoinSync");
+const BitcoinSync = require("./sync/bitcoinSync");
 
 function FullnodeSyncFactory({
   fullnodeServiceManager,
@@ -7,6 +8,7 @@ function FullnodeSyncFactory({
 }) {
   function create(chainname) {
     switch (chainname) {
+      case "bitcoin":
       case "litecoin":
         return new LitecoinSync({
           service: fullnodeServiceManager.getService(chainname),
