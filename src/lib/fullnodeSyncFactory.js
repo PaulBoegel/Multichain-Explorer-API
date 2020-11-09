@@ -4,28 +4,28 @@ const DashSync = require("./sync/dashSync");
 
 function FullnodeSyncFactory({
   fullnodeServiceManager,
-  transactionRepo,
-  blockRepo,
+  transactionHandler,
+  config,
 }) {
   function create(chainname) {
     switch (chainname) {
       case "litecoin":
         return new LitecoinSync({
           service: fullnodeServiceManager.getService(chainname),
-          transRepo: transactionRepo,
-          blockRepo,
+          transactionHandler,
+          syncHeight: config.litecoin.syncHeight,
         });
       case "bitcoin":
         return new BitcoinSync({
           service: fullnodeServiceManager.getService(chainname),
-          transRepo: transactionRepo,
-          blockRepo,
+          transactionHandler,
+          syncHeight: config.bitcoin.syncHeight,
         });
       case "dash":
         return new DashSync({
           service: fullnodeServiceManager.getService(chainname),
-          transRepo: transactionRepo,
-          blockRepo,
+          transactionHandler,
+          syncHeight: config.dash.syncHeight,
         });
     }
   }
