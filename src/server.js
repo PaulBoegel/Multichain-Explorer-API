@@ -23,6 +23,9 @@ async function main() {
     await transactionRepo.connect();
     await blockRepo.connect();
 
+    await transactionRepo.createIndex();
+    await blockRepo.createIndex();
+
     const transactionHandler = TransactionHandler(transactionRepo, blockRepo);
 
     const fullnodeServiceFactory = FullnodeServiceFactory(
@@ -42,13 +45,13 @@ async function main() {
       fullnodeNotifyerFactory.create("litecoin")
     );
 
-    // fullnodeServiceManager.setService(fullnodeServiceFactory.create("bitcoin"));
-    // fullnodeNotifyerManager.setNotifyer(
-    //   fullnodeNotifyerFactory.create("bitcoin")
-    // );
+    fullnodeServiceManager.setService(fullnodeServiceFactory.create("bitcoin"));
+    fullnodeNotifyerManager.setNotifyer(
+      fullnodeNotifyerFactory.create("bitcoin")
+    );
 
-    // fullnodeServiceManager.setService(fullnodeServiceFactory.create("dash"));
-    // fullnodeNotifyerManager.setNotifyer(fullnodeNotifyerFactory.create("dash"));
+    fullnodeServiceManager.setService(fullnodeServiceFactory.create("dash"));
+    fullnodeNotifyerManager.setNotifyer(fullnodeNotifyerFactory.create("dash"));
 
     const fullnodeSyncFactory = FullnodeSyncFactory({
       fullnodeServiceManager,
@@ -59,8 +62,8 @@ async function main() {
     const fullnodeSyncManager = FullnodeSyncManager(fullnodeNotifyerManager);
 
     fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("litecoin"));
-    // fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("bitcoin"));
-    // fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("dash"));
+    fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("bitcoin"));
+    fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("dash"));
 
     fullnodeNotifyerManager.events.addListener(
       "onNewBlock",
