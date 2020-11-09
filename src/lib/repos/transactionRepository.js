@@ -23,6 +23,11 @@ function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
     });
   }
 
+  function createIndex() {
+    _checkConnection();
+    db.collection("transactions").createIndex("txid");
+  }
+
   function _checkConnection() {
     if (Object.keys(db).length === 0)
       throw new Error("no database connection established");
@@ -82,7 +87,7 @@ function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
     return result.insertedCount;
   }
 
-  return { connect, addMany, get, getByIds, add };
+  return { connect, createIndex, addMany, get, getByIds, add };
 }
 
 module.exports = TransactionRepository;

@@ -20,6 +20,11 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
     });
   }
 
+  function createIndex() {
+    _checkConnection();
+    db.collection("blocks").createIndex("hash");
+  }
+
   function _checkConnection() {
     if (Object.keys(db).length === 0)
       throw new Error("no database connection established");
@@ -54,7 +59,7 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
     return true;
   }
 
-  return { connect, add, get };
+  return { connect, createIndex, add, get };
 }
 
 module.exports = BlockRepository;
