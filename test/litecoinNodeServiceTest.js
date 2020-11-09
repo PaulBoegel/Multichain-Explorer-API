@@ -1,17 +1,10 @@
 const assert = require("assert");
 const LitecoinNodeService = require("../src/lib/services/litecoinNodeService");
 const { RPCClient } = require("rpc-bitcoin");
-function getConfig() {
-  return {
-    url: "http://127.0.0.1",
-    user: "pboegelsack",
-    pass: "test",
-    port: "8332",
-  };
-}
+const configJSON = require("../explorer-config.json");
 
 describe("LitecoinNodeService getBlock", () => {
-  const config = getConfig();
+  const config = configJSON.blockchainConfig.litecoin.rpc;
   const rpc = new RPCClient(config);
   const service = new LitecoinNodeService(rpc, "litecoin");
 
@@ -33,7 +26,7 @@ describe("LitecoinNodeService getBlock", () => {
 });
 
 describe("LitecoinNodeService getTransaction", () => {
-  const config = getConfig();
+  const config = configJSON.blockchainConfig.litecoin.rpc;
   const rpc = new RPCClient(config);
   const service = new LitecoinNodeService(rpc, "litecoin");
   it("should return a decoded transaction", async () => {
@@ -50,7 +43,7 @@ describe("LitecoinNodeService getTransaction", () => {
 });
 
 describe("LitecoinNodeService decodeTransaction", () => {
-  const config = getConfig();
+  const config = configJSON.blockchainConfig.litecoin.rpc;
   const rpc = new RPCClient(config);
   const service = new LitecoinNodeService(rpc, "litecoin");
   it("should decode a byte array to transaction object", async () => {
@@ -65,7 +58,7 @@ describe("LitecoinNodeService decodeTransaction", () => {
   });
 });
 describe("LitecoinNodeService getBlockchainInfo", () => {
-  const config = getConfig();
+  const config = configJSON.blockchainConfig.litecoin.rpc;
   const rpc = new RPCClient(config);
   const service = new LitecoinNodeService(rpc, "litecoin");
   it("should return the actual blockchain info object", async () => {

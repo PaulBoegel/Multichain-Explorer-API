@@ -1,6 +1,7 @@
 const assert = require("assert");
 const zmq = require("zeromq");
 const LitecoinNotifyer = require("../../src/lib/notifyer/litecoinNotifyer");
+const conf = require("../../explorer-config.json");
 
 function getZmqConfig() {
   return {
@@ -9,7 +10,7 @@ function getZmqConfig() {
       notifyerRelationDepth: "1",
     },
     worker: {
-      host: "192.168.178.22",
+      host: "127.0.0.1",
       port: "29000",
     },
   };
@@ -17,8 +18,7 @@ function getZmqConfig() {
 
 describe("LitecoinNotifyer subscribeToTransactions", () => {
   const sock = new zmq.Subscriber();
-  const conf = getZmqConfig();
-  const notifyer = new LitecoinNotifyer(conf, sock);
+  const notifyer = new LitecoinNotifyer(conf.blockchainConfig.litecoin, sock);
   notifyer.connectToSocket().then();
   notifyer.subscribeToTransactions().then();
   it("should send the chainname if the blockchain creates a new block", (done) => {
@@ -55,8 +55,7 @@ describe("LitecoinNotifyer subscribeToTransactions", () => {
 
 describe("LitecoinNotifyer subscribeToBlocks", () => {
   const sock = new zmq.Subscriber();
-  const conf = getZmqConfig();
-  const notifyer = new LitecoinNotifyer(conf, sock);
+  const notifyer = new LitecoinNotifyer(conf.blockchainConfig.litecoin, sock);
   notifyer.connectToSocket().then();
   notifyer.subscribeToBlocks().then();
   it("should send the chainname if the blockchain created a new block", (done) => {

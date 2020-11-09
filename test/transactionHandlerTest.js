@@ -3,15 +3,7 @@ const sinon = require("sinon");
 const { RPCClient } = require("rpc-bitcoin");
 const LitecoinNodeService = require("../src/lib/services/litecoinNodeService");
 const TransactionHandler = require("../src/lib/handler/transactionHandler");
-
-function getRpcConfig() {
-  return {
-    url: "http://127.0.0.1",
-    user: "pboegelsack",
-    pass: "test",
-    port: "8332",
-  };
-}
+const configJSON = require("../explorer-config.json");
 
 describe("TransactionHandler saveBlockTransactions", () => {
   const blockRepo = {
@@ -24,7 +16,8 @@ describe("TransactionHandler saveBlockTransactions", () => {
       return transaction.length;
     },
   };
-  const rpc = new RPCClient(getRpcConfig());
+  const rpcConf = configJSON.blockchainConfig.litecoin.rpc;
+  const rpc = new RPCClient(rpcConf);
   const service = new LitecoinNodeService(rpc, "litecoin");
   const addBlock = sinon.spy(blockRepo, "add");
   const addTransaction = sinon.spy(transRepo, "addMany");
