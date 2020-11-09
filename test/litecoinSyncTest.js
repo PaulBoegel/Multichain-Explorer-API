@@ -5,7 +5,7 @@ const sinon = require("sinon");
 const blockMock = require("./mocks/blockMock.json");
 
 describe("LitecoinSync Blockrange", () => {
-  let service, transRepo, blockRepo;
+  let service, transRepo, blockRepo, sync;
 
   beforeEach(() => {
     service = {
@@ -55,7 +55,8 @@ describe("LitecoinSync Blockrange", () => {
     assert(getBlockchainInfo.calledOnce);
   });
   it("should not check block info, if endHeight has been defined", async () => {
-    await sync.blockrange(0);
+    sync.setSyncHeight(0);
+    await sync.blockrange();
     assert(getBlockchainInfo.called === false);
   });
   it("should fire blockchainSynchronized event, after end height was reached", (done) => {

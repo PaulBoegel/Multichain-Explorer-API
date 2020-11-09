@@ -13,8 +13,6 @@ describe("LitecoinNodeService getBlock", () => {
       "12a765e31ffd4059bada1e25190f6e98c99d9714d334efa41a195a7e7e04bfe2";
     const genesis = await service.getBlock({ blockhash, verbose: false });
     assert.strictEqual(genesis.height, 0);
-    assert.strictEqual(genesis.version, 1);
-    assert.strictEqual(genesis.versionHex, "00000001");
   });
 
   it("should return an array with decoded transactions", async () => {
