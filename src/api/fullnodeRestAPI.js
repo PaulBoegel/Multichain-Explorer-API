@@ -18,7 +18,8 @@ function FullnodeRestApi(transactionRepo) {
     });
   }
 
-  function initAPI() {
+  async function initAPI() {
+    await transactionRepo.connect();
     const transactionController = new TransactionController(transactionRepo);
     const transactionRouter = new TransactionRouter(
       express.Router(),
