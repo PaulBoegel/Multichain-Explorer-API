@@ -27,6 +27,7 @@ function DashSync({
       });
       nextHash = blockData.nextblockhash;
     }
+    console.log(`${CHAINNAME} synchronization finished`);
     return inserted;
   }
 
@@ -43,6 +44,7 @@ function DashSync({
       });
       nextHash = blockData.nextblockhash;
     } while (nextHash);
+    console.log(`${CHAINNAME} synchronization finished`);
     events.emit("blockchainSynchronized", CHAINNAME);
     return inserted;
   }
