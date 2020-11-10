@@ -27,7 +27,7 @@ function LitecoinSync({
       });
       nextHash = blockData.nextblockhash;
     }
-    console.log(`${CHAINNAME} synchronization finished`);
+    console.log(`--- ${CHAINNAME} synchronization finished ---`);
     return inserted;
   }
 
@@ -44,7 +44,7 @@ function LitecoinSync({
       });
       nextHash = blockData.nextblockhash;
     } while (nextHash);
-    console.log(`${CHAINNAME} synchronization finished`);
+    console.log(`--- ${CHAINNAME} synchronization finished ---`);
     events.emit("blockchainSynchronized", CHAINNAME);
     return inserted;
   }
