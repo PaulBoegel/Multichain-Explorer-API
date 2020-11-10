@@ -11,7 +11,7 @@ const TransactionPage = () => {
   const [displayInfo, setDisplayInfo] = useState("hide");
   const [nodes, setNodes] = useState([]);
   const [links, setLinks] = useState([]);
-  const [transform, setTransform] = useState({k: 1, x: 0, y: 0});
+  const [transform, setTransform] = useState({ k: 1, x: 0, y: 0 });
   const [activeNode, setActiveNode] = useState({
     id: 0,
     name: "",
@@ -19,13 +19,13 @@ const TransactionPage = () => {
     vx: 0,
     vy: 0,
     x: 0,
-    y: 0
+    y: 0,
   });
   const [transaction, setTransaction] = useState({
     txid: "",
     size: 0,
     locktime: 0,
-    vin: [{txid: ""}],
+    vin: [{ txid: "" }],
     vout: [],
   });
 
@@ -43,6 +43,12 @@ const TransactionPage = () => {
     link: "#",
     value: "bitcoin",
   });
+  blockchainList.push({
+    id: 2,
+    name: "Dash",
+    link: "#",
+    value: "dash",
+  });
 
   useEffect(() => {
     setBlockchain("litecoin");
@@ -51,11 +57,11 @@ const TransactionPage = () => {
   const pushTransactionInputs = (inputs, links, nodes, targetId) => {
     let nodesIndex = nodes.length;
     inputs.forEach((input) => {
-      const i = nodesIndex++
-      links.push({source: i, target: targetId})
-      nodes.push({id: i, name: input.txid, active: false});
+      const i = nodesIndex++;
+      links.push({ source: i, target: targetId });
+      nodes.push({ id: i, name: input.txid, active: false });
     });
-  }
+  };
 
   const transactionSearch = () => {
     transactionApi.getTransaction(blockchain, txid).then((_transaction) => {
@@ -65,7 +71,15 @@ const TransactionPage = () => {
       nodes.length = 0;
       links.length = 0;
 
-      const activeNode = {id: 0, name: _transaction.txid, x: 0, y: 0, k: 0, expand: true, active: true};
+      const activeNode = {
+        id: 0,
+        name: _transaction.txid,
+        x: 0,
+        y: 0,
+        k: 0,
+        expand: true,
+        active: true,
+      };
       nodes.push(activeNode);
       pushTransactionInputs(_transaction.vin, links, nodes, 0);
 
@@ -73,19 +87,19 @@ const TransactionPage = () => {
       setTransaction(_transaction);
       setDisplayInfo("show");
     });
-  }
+  };
 
-  const getTransaction = ({name, id}) => {
+  const getTransaction = ({ name, id }) => {
     transactionApi.getTransaction(blockchain, name).then((_transaction) => {
       _transaction.vin = filterInput(_transaction.vin);
       _transaction.vout = filterOutput(_transaction.vout);
 
-      nodes.map(node => Object.assign(node, {active: false}))
-      links.map(link => Object.assign(link, {active: false}))
-      const currentNode = nodes.find(node => node.name == name)
+      nodes.map((node) => Object.assign(node, { active: false }));
+      links.map((link) => Object.assign(link, { active: false }));
+      const currentNode = nodes.find((node) => node.name == name);
 
       currentNode.active = true;
-      if(currentNode.expand == true) {
+      if (currentNode.expand == true) {
         setTransaction(_transaction);
         return;
       }
@@ -94,7 +108,7 @@ const TransactionPage = () => {
       pushTransactionInputs(_transaction.vin, links, nodes, id);
       setTransaction(_transaction);
     });
-  }
+  };
 
   const handleTxIdChanged = ({ target }) => {
     setTxid(target.value);
@@ -106,30 +120,29 @@ const TransactionPage = () => {
   };
 
   const handleKeyUp = (event) => {
-    event.preventDefault()
-    if(event.key === 'ENTER' || event.keyCode === 13)
-    transactionSearch();
-  }
+    event.preventDefault();
+    if (event.key === "ENTER" || event.keyCode === 13) transactionSearch();
+  };
 
   const handleNodeMouseClick = (event, data) => {
     event.preventDefault();
-    setActiveNode(data)
+    setActiveNode(data);
     getTransaction(data);
-  }
+  };
 
   const handleObjectOnClick = (event) => {
     event.preventDefault();
     const data = {
-      id: event.target.getAttribute('data-id'),
-      name: event.target.getAttribute('data-name')
-    }
-    setActiveNode(data)
+      id: event.target.getAttribute("data-id"),
+      name: event.target.getAttribute("data-name"),
+    };
+    setActiveNode(data);
     getTransaction(data);
-  }
+  };
 
   const handleZoom = (transform) => {
     setTransform(transform);
-  }
+  };
 
   const handleBlockchainChanged = ({ target }) => {
     setBlockchain(target.value);
@@ -142,20 +155,24 @@ const TransactionPage = () => {
       index++;
       return input;
     });
-  }
+  };
 
   const filterOutput = (outputs) => {
     let index = 0;
     let totalValue = 0;
     const newOutput = outputs.map((output) => {
-      output = { index: index, value: output.value, addresses: output.scriptPubKey.addresses };
+      output = {
+        index: index,
+        value: output.value,
+        addresses: output.scriptPubKey.addresses,
+      };
       totalValue += output.value;
       index++;
       return output;
     });
     newOutput.totalValue = totalValue;
     return newOutput;
-  }
+  };
 
   return (
     <div className="md-form mt-0 grid">
@@ -171,9 +188,7 @@ const TransactionPage = () => {
         </div>
 
         <div className="object-list">
-          <TransactionList
-            nodes={nodes}
-            onClick={handleObjectOnClick}/>
+          <TransactionList nodes={nodes} onClick={handleObjectOnClick} />
         </div>
       </div>
       <div className="grid-left">
@@ -185,12 +200,11 @@ const TransactionPage = () => {
             links={links}
             transform={transform}
             onNodeMouseClick={handleNodeMouseClick}
-            onHandleZoom={handleZoom} />
+            onHandleZoom={handleZoom}
+          />
         </div>
         <div className="widget-info">
-          <TransactionInfo
-            className={displayInfo}
-            transaction={transaction} />
+          <TransactionInfo className={displayInfo} transaction={transaction} />
         </div>
       </div>
     </div>
