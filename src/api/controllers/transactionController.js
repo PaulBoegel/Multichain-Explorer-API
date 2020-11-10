@@ -1,13 +1,12 @@
 "use strict";
 
-function TransactionController(transactionHandler, fullnodeServiceManager) {
+function TransactionController(transactionRepo) {
   async function getByTxId(req, res) {
     try {
       const chainname = req.params.chainname;
       const txid = req.params.txid;
-      const service = fullnodeServiceManager.getService(chainname);
 
-      let result = await transactionHandler.getTransaction(txid, service);
+      let result = await transactionRepo.getByIds(txid, chainname);
 
       if (result) {
         res.setHeader("Content-Type", "application/json");
