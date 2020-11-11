@@ -6,3 +6,9 @@ export function getTransaction(chainname, txid) {
     .then(handleResponse)
     .catch(handleError);
 }
+
+export function getOutputTransactions(chainname, txid) {
+  return fetch(baseUrl + `/output/${chainname}/${txid}`)
+    .then(handleResponse)
+    .catch(handleError);
+}
