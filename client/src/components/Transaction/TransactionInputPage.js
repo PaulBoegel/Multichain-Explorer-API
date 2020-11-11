@@ -5,7 +5,7 @@ import TransactionGraph from "./TransactionGraph";
 import * as transactionApi from "../../api/transactionApi";
 import TransactionList from "./TransactionList";
 
-const TransactionPage = () => {
+const TransactionInputPage = () => {
   const [txid, setTxid] = useState("");
   const [blockchain, setBlockchain] = useState("");
   const [displayInfo, setDisplayInfo] = useState("hide");
@@ -211,4 +211,4 @@ const TransactionPage = () => {
   );
 };
 
-export default TransactionPage;
+export default TransactionInputPage;
