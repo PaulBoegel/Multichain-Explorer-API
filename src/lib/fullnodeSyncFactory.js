@@ -21,14 +21,14 @@ function FullnodeSyncFactory({
           service: fullnodeServiceManager.getService(chainname),
           transactionHandler,
           syncHeight: config.bitcoin.syncHeight,
-          syncHeightActive: config.litecoin.syncHeightActive,
+          syncHeightActive: config.bitcoin.syncHeightActive,
         });
       case "dash":
         return new DashSync({
           service: fullnodeServiceManager.getService(chainname),
           transactionHandler,
           syncHeight: config.dash.syncHeight,
-          syncHeightActive: config.litecoin.syncHeightActive,
+          syncHeightActive: config.dash.syncHeightActive,
         });
     }
   }
