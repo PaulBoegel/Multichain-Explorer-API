@@ -1,11 +1,13 @@
 import React from "react";
 import { Route } from "react-router-dom";
-import TransactionPage from "./Transaction/TransactionPage";
+import TransactionInputPage from "./Transaction/TransactionInputPage";
+import TransactionOutputPage from "./Transaction/TransactionOutputPage";
 
 const App = () => {
   return (
     <div className="container-fluid">
-      <Route exact path="/" component={TransactionPage} />
+      <Route exact path="/" component={TransactionInputPage} />
+      <Route path="/outputs" component={TransactionOutputPage} />
     </div>
   );
 };
