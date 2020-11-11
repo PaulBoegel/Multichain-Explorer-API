@@ -8,8 +8,7 @@
     "start:fullnode": "node src/server.js",
     "start:rest": "node src/api/server.js",
     "test": "mocha -w",
-    "test:transrepo": "nodemon tests/repos/transactionRepoHarness.js",
-    "test:litecoinService": "nodemon tests/services/litecoinNodeServiceHarness"
+    "test:rest": "mocha -w --timeout 10000 ./test/rest-tests"
   },
   "keywords": [],
   "author": "",
