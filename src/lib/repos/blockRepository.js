@@ -23,6 +23,7 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
   function createIndex() {
     _checkConnection();
     db.collection("blocks").createIndex("hash");
+    db.collection("blocks").createIndex("chainname");
   }
 
   function _checkConnection() {
