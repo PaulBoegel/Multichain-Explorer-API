@@ -34,17 +34,19 @@ function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
       throw new Error("no database connection established");
   }
 
-  async function get(query, limit) {
+  async function get(query, projection, limit) {
     try {
       _checkConnection();
-      let transactions = db.collection("transactions").find(query);
+      let transactions = db
+        .collection("transactions")
+        .find(query)
+        .project(projection);
 
       if (limit > 0) {
         transactions = transactions.limit(limit);
       }
 
       transactions = await transactions.toArray();
-
       return transactions;
     } catch (err) {
       throw err;
@@ -57,6 +59,7 @@ function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
       const transaction = await db
         .collection("transactions")
         .find({ txid, chainname })
+        .project({ _id: 0 })
         .limit(1);
 
       const result = await transaction.toArray();
