@@ -109,10 +109,10 @@ const TransactionOutputPage = () => {
         const currentNode = nodes.find((node) => node.name == name);
 
         currentNode.active = true;
-        if (currentNode.expand == true) {
-          setTransaction(_transaction);
-          return;
-        }
+        // if (currentNode.expand == true) {
+        //   setTransaction(_transaction);
+        //   return;
+        // }
 
         currentNode.expand = true;
         pushOutputTransactions(outputTransactions, links, nodes, id);
@@ -132,7 +132,10 @@ const TransactionOutputPage = () => {
         nodes.push({ id: source, name: output.txid, active: false });
       }
 
-      links.push({ source, target: targetId });
+      const existingLink = links.find(
+        (link) => link.source === source && link.target === targetId
+      );
+      if (existingLink === undefined) links.push({ source, target: targetId });
     });
   };
 
