@@ -1,7 +1,7 @@
 const Logger = require("./logger");
 
 class BlockLogger {
-  static #INSTANTS = null;
+  static #INSTANTS;
   constructor(options) {
     if (typeof BlockLogger.#INSTANTS === "object") return;
     BlockLogger.#INSTANTS = new Logger(options);

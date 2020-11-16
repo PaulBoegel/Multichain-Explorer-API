@@ -1,7 +1,7 @@
 const Logger = require("./logger");
 
 class ErrorLogger {
-  static #INSTANTS = null;
+  static #INSTANTS;
   constructor(options) {
     if (typeof ErrorLogger.#INSTANTS === "object") return;
     ErrorLogger.#INSTANTS = new Logger(options);
