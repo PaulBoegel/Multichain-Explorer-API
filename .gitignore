@@ -4,4 +4,4 @@
 /.vscode/
 explorer-config.json
 /log/block.log
-/lob/error.log
+/log/error.log
