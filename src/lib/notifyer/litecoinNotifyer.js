@@ -8,12 +8,8 @@ function LitecoinNotifyer(conf, sock) {
   const blockchain = "litecoin";
 
   async function connectToSocket() {
-    try {
-      await sock.connect(`tcp://${conf.worker.host}:${conf.worker.port}`);
-      console.log(`${blockchain} worker connected to port ${conf.worker.port}`);
-    } catch (e) {
-      throw e;
-    }
+    await sock.connect(`tcp://${conf.worker.host}:${conf.worker.port}`);
+    console.log(`${blockchain} worker connected to port ${conf.worker.port}`);
   }
 
   async function closeConnection() {
@@ -28,13 +24,9 @@ function LitecoinNotifyer(conf, sock) {
   }
 
   async function subscribeToTransactions() {
-    try {
-      sock.subscribe("rawtx");
-      for await (const [topic, msg] of sock) {
-        events.emit("onNewTransaction", msg, relationDepth, conf.chainname);
-      }
-    } catch (e) {
-      throw e;
+    sock.subscribe("rawtx");
+    for await (const [topic, msg] of sock) {
+      events.emit("onNewTransaction", msg, relationDepth, conf.chainname);
     }
   }
 

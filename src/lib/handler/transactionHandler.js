@@ -2,19 +2,15 @@
 
 function TransactionHandler(transactionRepo, blockRepo) {
   async function saveTransaction(inTransaction, inputDepth, service, verbose) {
-    try {
-      let transaction = verbose
-        ? inTransaction
-        : await service.decodeTransaction(inTransaction);
-      const chainname = service.chainname;
-      const id = transaction.txid;
+    let transaction = verbose
+      ? inTransaction
+      : await service.decodeTransaction(inTransaction);
+    const chainname = service.chainname;
+    const id = transaction.txid;
 
-      transaction.chainname = chainname;
-      await transactionRepo.add(transaction);
-      await service.handleTransactionInputs(transaction, inputDepth);
-    } catch (err) {
-      throw err;
-    }
+    transaction.chainname = chainname;
+    await transactionRepo.add(transaction);
+    await service.handleTransactionInputs(transaction, inputDepth);
   }
 
   async function saveManyTransactions(inputs, inputDepth, service) {
@@ -30,21 +26,17 @@ function TransactionHandler(transactionRepo, blockRepo) {
   }
 
   async function getTransaction(txid, service) {
-    try {
-      let transaction = await transactionRepo.getByIds(txid, service.chainname);
-      if (transaction) return transaction;
+    let transaction = await transactionRepo.getByIds(txid, service.chainname);
+    if (transaction) return transaction;
 
-      transaction = await service.getTransaction({ txid, verbose: true });
+    transaction = await service.getTransaction({ txid, verbose: true });
 
-      if (transaction) {
-        await transactionRepo.add(transaction);
-        return transaction;
-      }
-
-      return null;
-    } catch (err) {
-      throw err;
+    if (transaction) {
+      await transactionRepo.add(transaction);
+      return transaction;
     }
+
+    return null;
   }
 
   async function saveBlockDataWithHash({ blockhash, service }) {

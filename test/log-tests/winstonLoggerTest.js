@@ -2,7 +2,7 @@ const { assert } = require("chai");
 const sinon = require("sinon");
 const options = require("./options.js");
 const fs = require("fs");
-const LogHandler = require("../../src/lib/handler/logHandler.js");
+const LogHandler = require("../../src/lib/logger/logger.js");
 
 describe("LogHandler info", () => {
   it("should log info call in file", () => {

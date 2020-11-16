@@ -9,37 +9,28 @@ function FullnodeNotifyerManager() {
     notifyerArray.push(notifyer);
   }
 
-  function activateAllNotifyers() {
+  async function activateAllNotifyers() {
     if (notifyerArray.length == 0) throw "Notifyer array is empty.";
-
-    notifyerArray.forEach(async (notifyer) => {
+    for (notifyer of notifyerArray) {
       await initNotifyer(notifyer);
-    });
+    }
   }
 
   async function activateNotifyer(blockchainName) {
-    try {
-      if (notifyerArray.length == 0) throw "Notifyer array is empty.";
+    if (notifyerArray.length == 0) throw "Notifyer array is empty.";
 
-      const notifyer = notifyerArray.find(
-        (item) => item.blockchain == blockchainName
-      );
-      await initNotifyer(notifyer);
-    } catch (err) {
-      throw err;
-    }
+    const notifyer = notifyerArray.find(
+      (item) => item.blockchain == blockchainName
+    );
+    await initNotifyer(notifyer);
   }
 
   async function initNotifyer(notifyer) {
-    try {
-      //notifyer.events.addListener("onNewTransaction", onNewTransaction);
-      notifyer.events.addListener("onNewBlock", onNewBlock);
-      await notifyer.connectToSocket();
-      //await notifyer.subscribeToTransactions();
-      await notifyer.subscribeToBlocks();
-    } catch (err) {
-      throw err;
-    }
+    //notifyer.events.addListener("onNewTransaction", onNewTransaction);
+    notifyer.events.addListener("onNewBlock", onNewBlock);
+    await notifyer.connectToSocket();
+    //await notifyer.subscribeToTransactions();
+    await notifyer.subscribeToBlocks();
   }
 
   function onNewBlock(blockHash, chainname) {

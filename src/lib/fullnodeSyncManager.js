@@ -5,14 +5,14 @@ function FullnodeSyncManager(notifyManager) {
     syncArray.push(sync);
   }
 
-  function activateAllSynchronizer() {
-    syncArray.forEach(async (sync) => {
+  async function activateAllSynchronizer() {
+    for (sync of syncArray) {
       sync.events.addListener(
         "blockchainSynchronized",
         _onBlockchainSynchronized
       );
       await sync.blockrange();
-    });
+    }
   }
 
   function _onBlockchainSynchronized(chainname) {

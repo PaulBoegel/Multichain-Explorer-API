@@ -22,14 +22,10 @@ function FullnodeServiceManager() {
   }
 
   function activateListener(chainname) {
-    try {
-      if (serviceArray.length == 0) throw "Service array is empty.";
+    if (serviceArray.length == 0) throw "Service array is empty.";
 
-      const service = serviceArray.find((item) => item.chainname == chainname);
-      activateTransactionListener(service);
-    } catch (err) {
-      throw err;
-    }
+    const service = serviceArray.find((item) => item.chainname == chainname);
+    activateTransactionListener(service);
   }
 
   function activateTransactionListener(service) {
