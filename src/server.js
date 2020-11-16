@@ -11,10 +11,13 @@ const TransactionHandler = require("./lib/handler/transactionHandler");
 const TransactionRepository = require("./lib/repos/transactionRepository");
 const BlockRepository = require("./lib/repos/blockRepository");
 
+const LogHandler = require("./lib/handler/logHandler");
+const logOptions = require("./winston");
 const fs = require("fs");
 
 async function main() {
   try {
+    const logger = new LogHandler(logOptions);
     const configHandler = ConfigurationHandler(fs);
     const config = configHandler.readAndParseJsonFile("./explorer-config.json");
     const transactionRepo = TransactionRepository(config.dbConfig.test);
