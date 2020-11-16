@@ -3,3 +3,5 @@
 /.idea/
 /.vscode/
 explorer-config.json
+/log/block.log
+/lob/error.log
