@@ -8,12 +8,14 @@
     "start:fullnode": "node src/server.js",
     "start:rest": "node src/api/server.js",
     "test": "mocha -w",
-    "test:rest": "mocha -w --timeout 10000 ./test/rest-tests"
+    "test:rest": "mocha -w --timeout 10000 ./test/rest-tests",
+    "test:log": "mocha -w ./test/log-tests"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "app-root-path": "^3.0.0",
     "bitcoind-rpc": "^0.8.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
