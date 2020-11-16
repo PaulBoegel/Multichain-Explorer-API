@@ -1,4 +1,6 @@
 const EventEmitter = require("events");
+const { ExceptionHandler } = require("winston");
+const BlockLogger = require("../logger/blockLogger");
 
 function DashSync({
   service,
@@ -25,9 +27,20 @@ function DashSync({
         blockData,
         service,
       });
+      BlockLogger.info({
+        message: "block synchronized",
+        data: {
+          chainname: `${CHAINNAME}`,
+          height: blockData.height,
+          transactions: blockData.tx.length,
+        },
+      });
       nextHash = blockData.nextblockhash;
     }
-    console.log(`--- ${CHAINNAME} synchronization finished ---`);
+    BlockLogger.info({
+      message: "blockchain synchronized",
+      data: { chainname: `${CHAINNAME}`, transactions: inserted },
+    });
     return inserted;
   }
 
@@ -42,9 +55,20 @@ function DashSync({
         blockData,
         service,
       });
+      BlockLogger.info({
+        message: "block synchronized",
+        data: {
+          chainname: `${CHAINNAME}`,
+          height: blockData.height,
+          transactions: blockData.tx.length,
+        },
+      });
       nextHash = blockData.nextblockhash;
     } while (nextHash);
-    console.log(`--- ${CHAINNAME} synchronization finished ---`);
+    BlockLogger.info({
+      message: "blockchain synchronized",
+      data: { chainname: `${CHAINNAME}`, transactions: inserted },
+    });
     events.emit("blockchainSynchronized", CHAINNAME);
     return inserted;
   }

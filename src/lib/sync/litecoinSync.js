@@ -1,4 +1,5 @@
 const EventEmitter = require("events");
+const BlockLogger = require("../logger/blockLogger");
 
 function LitecoinSync({
   service,
@@ -25,9 +26,20 @@ function LitecoinSync({
         blockData,
         service,
       });
+      BlockLogger.info({
+        message: "block synchronized",
+        data: {
+          chainname: `${CHAINNAME}`,
+          height: blockData.height,
+          transactions: blockData.tx.length,
+        },
+      });
       nextHash = blockData.nextblockhash;
     }
-    console.log(`--- ${CHAINNAME} synchronization finished ---`);
+    BlockLogger.info({
+      message: "blockchain synchronized",
+      data: { chainname: `${CHAINNAME}`, transactions: inserted },
+    });
     return inserted;
   }
 
@@ -42,9 +54,20 @@ function LitecoinSync({
         blockData,
         service,
       });
+      BlockLogger.info({
+        message: "block synchronized",
+        data: {
+          chainname: `${CHAINNAME}`,
+          height: blockData.height,
+          transactions: blockData.tx.length,
+        },
+      });
       nextHash = blockData.nextblockhash;
     } while (nextHash);
-    console.log(`--- ${CHAINNAME} synchronization finished ---`);
+    BlockLogger.info({
+      message: "blockchain synchronized",
+      data: { chainname: `${CHAINNAME}`, transactions: inserted },
+    });
     events.emit("blockchainSynchronized", CHAINNAME);
     return inserted;
   }

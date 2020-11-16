@@ -11,13 +11,17 @@ const TransactionHandler = require("./lib/handler/transactionHandler");
 const TransactionRepository = require("./lib/repos/transactionRepository");
 const BlockRepository = require("./lib/repos/blockRepository");
 
-const LogHandler = require("./lib/handler/logHandler");
-const logOptions = require("./winston");
+const BlockLogger = require("./lib/logger/blockLogger");
+const ErrorLogger = require("./lib/logger/errorLogger");
+const blockLoggerConf = require("./conf/blockLoggerConf");
+const errorLoggerConf = require("./conf/errorLoggerConf");
 const fs = require("fs");
 
 async function main() {
   try {
-    const logger = new LogHandler(logOptions);
+    const blockLogger = new BlockLogger(blockLoggerConf);
+    const errorLogger = new ErrorLogger(errorLoggerConf);
+
     const configHandler = ConfigurationHandler(fs);
     const config = configHandler.readAndParseJsonFile("./explorer-config.json");
     const transactionRepo = TransactionRepository(config.dbConfig.test);
@@ -70,20 +74,26 @@ async function main() {
 
     fullnodeNotifyerManager.events.addListener(
       "onNewBlock",
-      (blockhash, chainname) => {
-        transactionHandler
-          .saveBlockDataWithHash({
+      async (blockhash, chainname) => {
+        try {
+          await transactionHandler.saveBlockDataWithHash({
             blockhash,
             service: fullnodeServiceManager.getService(chainname),
-          })
-          .then();
+          });
+        } catch (err) {
+          ErrorLogger.error(
+            `${err.message} - file: ${err.fileName} - line: ${err.lineNumber}`
+          );
+        }
       }
     );
 
     fullnodeServiceManager.activateAllListeners();
-    fullnodeSyncManager.activateAllSynchronizer();
+    await fullnodeSyncManager.activateAllSynchronizer();
   } catch (err) {
-    console.log(err);
+    ErrorLogger.error(
+      `${err.message} - file: ${err.fileName} - line: ${err.lineNumber}`
+    );
   }
 }
 
