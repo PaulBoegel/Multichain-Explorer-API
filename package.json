@@ -9,7 +9,8 @@
     "start:rest": "node src/api/server.js",
     "test": "mocha -w",
     "test:rest": "mocha -w --timeout 10000 ./test/rest-tests",
-    "test:log": "mocha -w ./test/log-tests"
+    "test:litecoin": "mocha -w --timeout 10000 ./test/litecoin-node-tests",
+    "test:ethereum": "mocha -w --timeout 10000 ./test/ethereum-node-tests"
   },
   "keywords": [],
   "author": "",
