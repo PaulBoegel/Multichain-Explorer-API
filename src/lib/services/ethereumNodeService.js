@@ -29,4 +29,4 @@ function EthereumNodeService(rpc, chainname) {
   };
 }
 
-module.exports = BitcoinNodeService;
+module.exports = EthereumNodeService;
