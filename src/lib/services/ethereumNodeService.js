@@ -2,20 +2,30 @@
 
 const EventEmitter = require("events");
 
-function EthereumNodeService(rpc, chainname) {
-  const events = new EventEmitter();
-
+function EthereumNodeService(web3, chainname) {
   async function decodeTransaction(byteArray) {}
 
-  async function getBlockHash({ height }) {}
+  async function getBlockHash({ height }) {
+    const { hash } = await web3.eth.getBlock(height);
+    return hash;
+  }
 
-  async function getBlock({ blockhash, verbose }) {}
+  async function getBlock({ blockhash, verbose }) {
+    const block = await web3.eth.getBlock(blockhash, verbose);
+    return block;
+  }
 
-  async function getBlockchainInfo() {}
+  async function getBlockchainInfo() {
+    const { currentBlock } = await web3.eth.isSyncing();
+    return {
+      blocks: currentBlock,
+    };
+  }
 
-  async function getTransaction({ txid, verbose = false }) {}
-
-  async function handleTransactionInputs(transaction, depth) {}
+  async function getTransaction({ txid }) {
+    const transaction = await web3.eth.getTransaction(txid);
+    return transaction;
+  }
 
   return {
     decodeTransaction,
@@ -23,9 +33,7 @@ function EthereumNodeService(rpc, chainname) {
     getBlockchainInfo,
     getBlock,
     getBlockHash,
-    handleTransactionInputs,
     chainname,
-    events,
   };
 }
 
