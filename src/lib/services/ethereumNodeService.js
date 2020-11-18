@@ -9,11 +9,11 @@ function EthereumNodeService(web3, chainname) {
   }
 
   async function getBlock({ blockhash, verbose }) {
-    const { transactions, ...blockData } = await web3.eth.getBlock(
+    const { transactions, number, ...blockData } = await web3.eth.getBlock(
       blockhash,
       verbose
     );
-    const block = Object.assign({}, blockData);
+    const block = Object.assign({ height: number }, blockData);
     block.tx = transactions.map((transaction) => {
       if (typeof transaction === "string") return transaction;
       const { hash, ...transactionData } = transaction;

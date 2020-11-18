@@ -22,7 +22,7 @@ function EthereumSync({
         blockhash: nextHash,
         verbose: true,
       });
-      if (blockData.number > syncHeight) break;
+      if (blockData.height > syncHeight) break;
       inserted = await transactionHandler.saveBlockData({
         blockData,
         service,
@@ -31,11 +31,11 @@ function EthereumSync({
         message: "block synchronized",
         data: {
           chainname: `${CHAINNAME}`,
-          height: blockData.number,
+          height: blockData.height,
           transactions: blockData.tx.length,
         },
       });
-      nextHash = await service.getBlockHash({ height: blockData.number + 1 });
+      nextHash = await service.getBlockHash({ height: blockData.height + 1 });
     }
     BlockLogger.info({
       message: "blockchain synchronized",
@@ -59,11 +59,11 @@ function EthereumSync({
         message: "block synchronized",
         data: {
           chainname: `${CHAINNAME}`,
-          height: blockData.number,
+          height: blockData.height,
           transactions: blockData.tx.length,
         },
       });
-      nextHash = await service.getBlockHash({ height: blockData.number + 1 });
+      nextHash = await service.getBlockHash({ height: blockData.height + 1 });
     } while (nextHash);
     BlockLogger.info({
       message: "blockchain synchronized",
