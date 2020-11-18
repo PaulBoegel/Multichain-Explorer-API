@@ -9,7 +9,6 @@ function TransactionHandler(transactionRepo, blockRepo) {
   async function saveBlockData({ blockData, service }) {
     const { tx, ...data } = blockData;
     tx.map((transaction) => (transaction.chainname = service.chainname));
-    const inserted = await transactionRepo.addMany(tx);
     await blockRepo.add({
       ...data,
       chainname: service.chainname,
@@ -17,6 +16,8 @@ function TransactionHandler(transactionRepo, blockRepo) {
         return transaction.txid;
       }),
     });
+    if (tx.length === 0) return 0;
+    const inserted = await transactionRepo.addMany(tx);
     return inserted;
   }
 
