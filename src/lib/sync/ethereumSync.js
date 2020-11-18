@@ -59,11 +59,11 @@ function EthereumSync({
         message: "block synchronized",
         data: {
           chainname: `${CHAINNAME}`,
-          height: blockData.height,
+          height: blockData.number,
           transactions: blockData.tx.length,
         },
       });
-      nextHash = service.getBlockHash({ height: blockData.number + 1 });
+      nextHash = await service.getBlockHash({ height: blockData.number + 1 });
     } while (nextHash);
     BlockLogger.info({
       message: "blockchain synchronized",
