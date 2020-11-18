@@ -3,8 +3,6 @@
 const EventEmitter = require("events");
 
 function BitcoinNodeService(rpc, chainname) {
-  const events = new EventEmitter();
-
   async function decodeTransaction(byteArray) {
     try {
       const transHex = byteArray.toString("hex");
@@ -77,7 +75,6 @@ function BitcoinNodeService(rpc, chainname) {
     getBlockHash,
     handleTransactionInputs,
     chainname,
-    events,
   };
 }
 

@@ -3,8 +3,6 @@
 const EventEmitter = require("events");
 
 function LitecoinNodeService(rpc, chainname) {
-  const events = new EventEmitter();
-
   async function decodeTransaction(byteArray) {
     try {
       const transHex = byteArray.toString("hex");
@@ -42,42 +40,13 @@ function LitecoinNodeService(rpc, chainname) {
     return await rpc.getrawtransaction({ txid, verbose });
   }
 
-  async function handleTransactionInputs(transaction, depth) {
-    try {
-      const inputs = [];
-      const vin = transaction.vin;
-
-      if (vin.length == 0) return;
-
-      if (depth == 0) return;
-
-      depth--;
-
-      for (let i = 0; i < vin.length; i++) {
-        inputs.push(await getTransaction(vin[i].txid, true));
-      }
-
-      events.emit("onNewInputs", inputs, depth, chainname);
-    } catch (err) {
-      throw err;
-    }
-  }
-
-  function coinbaseCheck(transaction) {
-    if (transaction.vin[0].coinbase == undefined) return false;
-
-    return true;
-  }
-
   return {
     decodeTransaction,
     getTransaction,
     getBlockchainInfo,
     getBlock,
     getBlockHash,
-    handleTransactionInputs,
     chainname,
-    events,
   };
 }
 

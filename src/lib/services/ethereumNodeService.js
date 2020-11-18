@@ -1,7 +1,5 @@
 "use strict";
 
-const EventEmitter = require("events");
-
 function EthereumNodeService(web3, chainname) {
   async function decodeTransaction(byteArray) {}
 
