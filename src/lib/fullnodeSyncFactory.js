@@ -1,6 +1,7 @@
 const LitecoinSync = require("./sync/litecoinSync");
 const BitcoinSync = require("./sync/bitcoinSync");
 const DashSync = require("./sync/dashSync");
+const EthereumSync = require("./sync/ethereumSync");
 
 function FullnodeSyncFactory({
   fullnodeServiceManager,
@@ -29,6 +30,13 @@ function FullnodeSyncFactory({
           transactionHandler,
           syncHeight: config.dash.syncHeight,
           syncHeightActive: config.dash.syncHeightActive,
+        });
+      case "ethereum":
+        return new EthereumSync({
+          service: fullnodeServiceManager.getService(chainname),
+          transactionHandler,
+          syncHeight: config.ethereum.syncHeight,
+          syncHeightActive: config.ethereum.syncHeightActive,
         });
     }
   }

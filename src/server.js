@@ -45,20 +45,27 @@ async function main() {
     const fullnodeServiceManager = FullnodeServiceManager();
     const fullnodeNotifyerManager = FullnodeNotifyerManager();
 
+    fullnodeServiceManager.setService(fullnodeServiceFactory.create("bitcoin"));
+
+    fullnodeServiceManager.setService(fullnodeServiceFactory.create("dash"));
+
     fullnodeServiceManager.setService(
       fullnodeServiceFactory.create("litecoin")
     );
-    fullnodeNotifyerManager.setNotifyer(
-      fullnodeNotifyerFactory.create("litecoin")
+
+    fullnodeServiceManager.setService(
+      fullnodeServiceFactory.create("ethereum")
     );
 
-    fullnodeServiceManager.setService(fullnodeServiceFactory.create("bitcoin"));
     fullnodeNotifyerManager.setNotifyer(
       fullnodeNotifyerFactory.create("bitcoin")
     );
 
-    fullnodeServiceManager.setService(fullnodeServiceFactory.create("dash"));
     fullnodeNotifyerManager.setNotifyer(fullnodeNotifyerFactory.create("dash"));
+
+    fullnodeNotifyerManager.setNotifyer(
+      fullnodeNotifyerFactory.create("litecoin")
+    );
 
     const fullnodeSyncFactory = FullnodeSyncFactory({
       fullnodeServiceManager,
@@ -68,9 +75,10 @@ async function main() {
 
     const fullnodeSyncManager = FullnodeSyncManager(fullnodeNotifyerManager);
 
-    fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("litecoin"));
     fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("bitcoin"));
     fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("dash"));
+    fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("litecoin"));
+    fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("ethereum"));
 
     fullnodeNotifyerManager.events.addListener(
       "onNewBlock",
@@ -88,9 +96,9 @@ async function main() {
       }
     );
 
-    fullnodeServiceManager.activateAllListeners();
     await fullnodeSyncManager.activateAllSynchronizer();
   } catch (err) {
+    console.log(err);
     ErrorLogger.error(
       `${err.message} - file: ${err.fileName} - line: ${err.lineNumber}`
     );
