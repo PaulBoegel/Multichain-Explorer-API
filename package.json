@@ -10,7 +10,8 @@
     "test": "mocha -w",
     "test:rest": "mocha -w --timeout 10000 ./test/rest-tests",
     "test:litecoin": "mocha -w --timeout 10000 ./test/litecoin-node-tests",
-    "test:ethereum": "mocha -w --timeout 10000 ./test/ethereum-node-tests"
+    "test:ethereum": "mocha -w --timeout 10000 ./test/ethereum-node-tests",
+    "test:end": "mocha -w --timeout 10000 ./test/end-to-end"
   },
   "keywords": [],
   "author": "",

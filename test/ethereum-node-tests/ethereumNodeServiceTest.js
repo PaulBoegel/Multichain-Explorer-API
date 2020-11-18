@@ -32,16 +32,24 @@ describe("EthereumNodeService getBlock", () => {
       "0x203827ffabdef862bf0d33a94d1efcbb2514f5610ab2b1f0cf78048ec862faba";
     const verbose = false;
     const block = await service.getBlock({ blockhash, verbose });
-    assert.strictEqual(block.transactions.length, 7);
-    assert.strictEqual(typeof block.transactions[0], "string");
+    assert.strictEqual(block.tx.length, 7);
+    assert.strictEqual(typeof block.tx[0], "string");
   });
   it("should return a block with transaction data", async () => {
     const blockhash =
       "0x203827ffabdef862bf0d33a94d1efcbb2514f5610ab2b1f0cf78048ec862faba";
     const verbose = true;
     const block = await service.getBlock({ blockhash, verbose });
-    assert.strictEqual(block.transactions.length, 7);
-    assert.strictEqual(typeof block.transactions[0], "object");
+    assert.strictEqual(block.tx.length, 7);
+    assert.strictEqual(typeof block.tx[0], "object");
+  });
+  it("it should return a block even with no transactions", async () => {
+    const blockhash =
+      "0x6341fd3daf94b748c72ced5a5b26028f2474f5f00d824504e4fa37a75767e177";
+    const verbose = true;
+    const block = await service.getBlock({ blockhash, verbose });
+    assert.strictEqual(block.tx.length, 0);
+    assert.strictEqual(typeof block.tx[0], "undefined");
   });
 });
 
