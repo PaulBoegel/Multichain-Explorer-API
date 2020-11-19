@@ -1,5 +1,5 @@
 "use strict";
-
+const BlockLogger = require("../logger/blockLogger");
 function TransactionHandler(transactionRepo, blockRepo) {
   async function saveBlockDataWithHash({ blockhash, service }) {
     const blockData = await service.getBlock({ blockhash, verbose: true });
@@ -18,6 +18,14 @@ function TransactionHandler(transactionRepo, blockRepo) {
     });
     if (tx.length === 0) return 0;
     const inserted = await transactionRepo.addMany(tx);
+    BlockLogger.info({
+      message: "block synchronized",
+      data: {
+        chainname: `${service.chainname}`,
+        height: data.height,
+        transactions: tx.length,
+      },
+    });
     return inserted;
   }
 
