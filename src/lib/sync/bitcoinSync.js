@@ -20,20 +20,13 @@ function BitcoinSync({
         blockData,
         service,
       });
-      BlockLogger.info({
-        message: "block synchronized",
-        data: {
-          chainname: `${this.chainname}`,
-          height: blockData.height,
-          transactions: blockData.tx.length,
-        },
-      });
       nextHash = blockData.nextblockhash;
     }
     BlockLogger.info({
       message: "blockchain synchronized",
       data: { chainname: `${this.chainname}`, transactions: inserted },
     });
+    this.events.emit("blockchainSynchronized", this.chainname);
     return inserted;
   }
 
@@ -47,14 +40,6 @@ function BitcoinSync({
       inserted = await transactionHandler.saveBlockData({
         blockData,
         service,
-      });
-      BlockLogger.info({
-        message: "block synchronized",
-        data: {
-          chainname: `${this.chainname}`,
-          height: blockData.height,
-          transactions: blockData.tx.length,
-        },
       });
       nextHash = blockData.nextblockhash;
       nextHash = blockData.nextblockhash;
