@@ -1,8 +1,10 @@
 "use strict";
-BitcoinNotifyer = require("./bitcoinNotifyer");
+const BitcoinNotifyer = require("./bitcoinNotifyer");
 function LitecoinNotifyer(conf, sock) {
   return Object.setPrototypeOf(
-    Object.assign(BitcoinNotifyer(conf, sock), {}),
+    Object.assign(BitcoinNotifyer(conf, sock), {
+      blockchain: "litecoin",
+    }),
     BitcoinNotifyer
   );
 }
