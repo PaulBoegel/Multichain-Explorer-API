@@ -63,7 +63,7 @@ function BitcoinSync({
       message: "blockchain synchronized",
       data: { chainname: `${this.chainname}`, transactions: inserted },
     });
-    events.emit("blockchainSynchronized", this.chainname);
+    this.events.emit("blockchainSynchronized", this.chainname);
     return inserted;
   }
 
