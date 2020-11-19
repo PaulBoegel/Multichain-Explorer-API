@@ -1,6 +1,10 @@
 "use strict";
 const BlockLogger = require("../logger/blockLogger");
 function TransactionHandler(transactionRepo, blockRepo) {
+  function _calculateSaveTimeInSeconds(startTime) {
+    const timeElapsed = Date.now() - startTime;
+    return timeElapsed * 1000;
+  }
   async function saveBlockDataWithHash({ blockhash, service }) {
     const blockData = await service.getBlock({ blockhash, verbose: true });
     saveBlockData({ blockData, service });
@@ -8,6 +12,7 @@ function TransactionHandler(transactionRepo, blockRepo) {
 
   async function saveBlockData({ blockData, service }) {
     const { tx, ...data } = blockData;
+    const startTime = Date.now();
     tx.map((transaction) => (transaction.chainname = service.chainname));
     await blockRepo.add({
       ...data,
@@ -18,12 +23,14 @@ function TransactionHandler(transactionRepo, blockRepo) {
     });
     if (tx.length === 0) return 0;
     const inserted = await transactionRepo.addMany(tx);
+    const timeElapsed = _calculateSaveTimeInSeconds({ startTime });
     BlockLogger.info({
-      message: "block synchronized",
+      message: "block saved",
       data: {
         chainname: `${service.chainname}`,
         height: data.height,
         transactions: tx.length,
+        syncTime: timeElapsed,
       },
     });
     return inserted;
