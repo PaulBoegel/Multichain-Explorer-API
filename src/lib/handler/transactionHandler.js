@@ -39,7 +39,7 @@ function TransactionHandler(transactionRepo, blockRepo) {
     }
     const inserted = await transactionRepo.addMany(tx);
     _logSaveProcess(
-      sevrice.chainname,
+      service.chainname,
       data.height,
       inserted,
       sTime,
