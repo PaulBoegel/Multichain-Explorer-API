@@ -19,14 +19,6 @@ function EthereumSync({
         blockData,
         service,
       });
-      BlockLogger.info({
-        message: "block synchronized",
-        data: {
-          chainname: `${this.chainname}`,
-          height: blockData.height,
-          transactions: blockData.tx.length,
-        },
-      });
       nextHash = await service.getBlockHash({ height: blockData.height + 1 });
     }
     BlockLogger.info({
@@ -46,14 +38,6 @@ function EthereumSync({
       inserted = await transactionHandler.saveBlockData({
         blockData,
         service,
-      });
-      BlockLogger.info({
-        message: "block synchronized",
-        data: {
-          chainname: `${this.chainname}`,
-          height: blockData.height,
-          transactions: blockData.tx.length,
-        },
       });
       nextHash = await service.getBlockHash({ height: blockData.height + 1 });
     } while (nextHash);
