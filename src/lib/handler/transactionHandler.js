@@ -1,9 +1,21 @@
 "use strict";
 const BlockLogger = require("../logger/blockLogger");
 function TransactionHandler(transactionRepo, blockRepo) {
-  function _calculateSaveTimeInSeconds(startTime) {
-    const timeElapsed = Date.now() - startTime;
-    return timeElapsed * 1000;
+  function _calculateSaveTimeInSeconds(sTime, eTime) {
+    const timeElapsed = eTime - sTime;
+    return timeElapsed ? (timeElapsed * 0.001).toFixed(2) : 0;
+  }
+
+  function _logSaveProcess(chainname, height, transactions, sTime, eTime) {
+    BlockLogger.info({
+      message: "block saved",
+      data: {
+        chainname,
+        height,
+        transactions,
+        saveTimeInSeconds: _calculateSaveTimeInSeconds(sTime, eTime),
+      },
+    });
   }
   async function saveBlockDataWithHash({ blockhash, service }) {
     const blockData = await service.getBlock({ blockhash, verbose: true });
@@ -12,7 +24,7 @@ function TransactionHandler(transactionRepo, blockRepo) {
 
   async function saveBlockData({ blockData, service }) {
     const { tx, ...data } = blockData;
-    const startTime = Date.now();
+    const sTime = Date.now();
     tx.map((transaction) => (transaction.chainname = service.chainname));
     await blockRepo.add({
       ...data,
@@ -21,18 +33,18 @@ function TransactionHandler(transactionRepo, blockRepo) {
         return transaction.txid;
       }),
     });
-    if (tx.length === 0) return 0;
+    if (tx.length === 0) {
+      _logSaveProcess(service.chainname, data.height, 0, sTime, Date.now());
+      return 0;
+    }
     const inserted = await transactionRepo.addMany(tx);
-    const timeElapsed = _calculateSaveTimeInSeconds({ startTime });
-    BlockLogger.info({
-      message: "block saved",
-      data: {
-        chainname: `${service.chainname}`,
-        height: data.height,
-        transactions: tx.length,
-        syncTime: timeElapsed,
-      },
-    });
+    _logSaveProcess(
+      sevrice.chainname,
+      data.height,
+      inserted,
+      sTime,
+      Date.now()
+    );
     return inserted;
   }
 
