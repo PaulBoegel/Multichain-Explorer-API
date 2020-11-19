@@ -1,12 +1,13 @@
 const assert = require("assert");
-const LitecoinSync = require("../src/lib/sync/litecoinSync");
-const TransactionHandler = require("../src/lib/handler/transactionHandler");
+const LitecoinSync = require("../../src/lib/sync/litecoinSync");
+const TransactionHandler = require("../../src/lib/handler/transactionHandler");
 const sinon = require("sinon");
-const blockMock = require("./mocks/blockMock.json");
+const blockMock = require("../mocks/blockMock.json");
+const BlockLogger = require("../../src/lib/logger/blockLogger");
 
 describe("LitecoinSync Blockrange", () => {
   let service, transRepo, blockRepo, sync;
-
+  sinon.stub(BlockLogger, "info");
   beforeEach(() => {
     service = {
       chainname: "litecoin",
@@ -56,5 +57,9 @@ describe("LitecoinSync Blockrange", () => {
       done();
     });
     sync.blockrange().then((result) => {});
+  });
+
+  after(() => {
+    BlockLogger.info.restore();
   });
 });
