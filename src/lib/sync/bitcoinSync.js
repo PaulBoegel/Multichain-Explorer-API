@@ -1,3 +1,4 @@
+"use strict";
 const EventEmitter = require("events");
 const BlockLogger = require("../logger/blockLogger");
 
@@ -7,13 +8,6 @@ function BitcoinSync({
   syncHeight = null,
   syncHeightActive = false,
 }) {
-  const events = new EventEmitter();
-  const CHAINNAME = "bitcoin";
-
-  function setSyncHeight(height) {
-    syncHeight = height;
-  }
-
   async function _syncDataWithHeight({ nextHash }) {
     let inserted = 0;
     while (true) {
@@ -29,7 +23,7 @@ function BitcoinSync({
       BlockLogger.info({
         message: "block synchronized",
         data: {
-          chainname: `${CHAINNAME}`,
+          chainname: `${this.chainname}`,
           height: blockData.height,
           transactions: blockData.tx.length,
         },
@@ -38,7 +32,7 @@ function BitcoinSync({
     }
     BlockLogger.info({
       message: "blockchain synchronized",
-      data: { chainname: `${CHAINNAME}`, transactions: inserted },
+      data: { chainname: `${this.chainname}`, transactions: inserted },
     });
     return inserted;
   }
@@ -57,7 +51,7 @@ function BitcoinSync({
       BlockLogger.info({
         message: "block synchronized",
         data: {
-          chainname: `${CHAINNAME}`,
+          chainname: `${this.chainname}`,
           height: blockData.height,
           transactions: blockData.tx.length,
         },
@@ -67,26 +61,31 @@ function BitcoinSync({
     } while (nextHash);
     BlockLogger.info({
       message: "blockchain synchronized",
-      data: { chainname: `${CHAINNAME}`, transactions: inserted },
+      data: { chainname: `${this.chainname}`, transactions: inserted },
     });
-    events.emit("blockchainSynchronized", CHAINNAME);
+    events.emit("blockchainSynchronized", this.chainname);
     return inserted;
   }
 
-  async function blockrange() {
-    const nextHash = await transactionHandler.getHighestBlockHash(service);
-    if ((await _checkHeight(syncHeight)) && syncHeightActive) {
-      return await _syncDataWithHeight({ nextHash });
-    }
-    return _syncData({ nextHash });
-  }
-
-  async function _checkHeight(endHeight) {
+  function _checkHeight(endHeight) {
     if (typeof endHeight === "number") return true;
     return false;
   }
 
-  return { blockrange, setSyncHeight, events };
+  return {
+    events: new EventEmitter(),
+    chainname: "bitcoin",
+    setSyncHeight(height) {
+      syncHeight = height;
+    },
+    async blockrange() {
+      const nextHash = await transactionHandler.getHighestBlockHash(service);
+      if ((await _checkHeight.call(this, syncHeight)) && syncHeightActive) {
+        return await _syncDataWithHeight.call(this, { nextHash });
+      }
+      return _syncData.call(this, { nextHash });
+    },
+  };
 }
 
 module.exports = BitcoinSync;
