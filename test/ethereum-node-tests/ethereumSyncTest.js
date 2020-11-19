@@ -38,8 +38,8 @@ describe("EthereumSync blockrange", () => {
     await sync.blockrange();
     const returns = await Promise.all(spyGetBlock.returnValues);
     assert.strictEqual(spyGetBlock.calledTwice, true);
-    assert.strictEqual(returns[0].number, 0);
-    assert.strictEqual(returns[1].number, 1);
+    assert.strictEqual(returns[0].height, 0);
+    assert.strictEqual(returns[1].height, 1);
   });
 
   it("should call service.getBlock thrice times if syncHeight is 1", async () => {
@@ -52,9 +52,9 @@ describe("EthereumSync blockrange", () => {
     await sync.blockrange();
     const returns = await Promise.all(spyGetBlock.returnValues);
     assert.strictEqual(spyGetBlock.calledThrice, true);
-    assert.strictEqual(returns[0].number, 0);
-    assert.strictEqual(returns[1].number, 1);
-    assert.strictEqual(returns[2].number, 2);
+    assert.strictEqual(returns[0].height, 0);
+    assert.strictEqual(returns[1].height, 1);
+    assert.strictEqual(returns[2].height, 2);
   });
 
   afterEach(() => {
