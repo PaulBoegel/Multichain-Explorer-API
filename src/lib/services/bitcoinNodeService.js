@@ -1,6 +1,7 @@
 "use strict";
 function BitcoinNodeService(rpc, chainname) {
   return {
+    chainname,
     async getTransaction({ txid, verbose = false }) {
       return await rpc.getrawtransaction({ txid, verbose });
     },
