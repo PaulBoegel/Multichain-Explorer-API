@@ -6,13 +6,15 @@ function FullnodeSyncManager(notifyManager) {
   }
 
   async function activateAllSynchronizer() {
+    const blockrangePromises = [];
     for (sync of syncArray) {
       sync.events.addListener(
         "blockchainSynchronized",
         _onBlockchainSynchronized
       );
-      await sync.blockrange();
+      blockrangePromises.push(sync.blockrange());
     }
+    await Promise.all(blockrangePromises);
   }
 
   function _onBlockchainSynchronized(chainname) {

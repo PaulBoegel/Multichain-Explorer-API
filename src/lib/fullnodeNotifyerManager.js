@@ -11,9 +11,11 @@ function FullnodeNotifyerManager() {
 
   async function activateAllNotifyers() {
     if (notifyerArray.length == 0) throw "Notifyer array is empty.";
+    const initPromiseArray = [];
     for (notifyer of notifyerArray) {
-      await initNotifyer(notifyer);
+      initPromiseArray.push(initNotifyer(notifyer));
     }
+    await Promise.all(initPromiseArray);
   }
 
   async function activateNotifyer(blockchainName) {
