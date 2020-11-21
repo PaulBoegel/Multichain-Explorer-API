@@ -34,9 +34,13 @@ function TransactionController(transactionRepo) {
       if (result) {
         result.forEach((transaction) => {
           const input = transaction.vin.find((input) => (input = txid));
-          const address = outputs.find((output) => output.n === input.vout)
-            .address;
-          transaction.address = address;
+          const { address, n } = outputs.find(
+            (output) => output.n === input.vout
+          );
+          transaction.to = transaction.vout.find(
+            (entry) => entry.n === n
+          ).scriptPubKey.addresses[0];
+          transaction.from = address;
         });
         res.setHeader("Conent-Type", "application/json");
         res.send(JSON.stringify(result, null, 4));
