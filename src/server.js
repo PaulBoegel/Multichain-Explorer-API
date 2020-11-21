@@ -6,6 +6,9 @@ const FullnodeServiceManager = require("./lib/fullnodeServiceManager");
 const FullnodeNotifyerManager = require("./lib/fullnodeNotifyerManager.js");
 const FullnodeSyncManager = require("./lib/fullnodeSyncManager");
 
+const TransactionFormaterFactory = require("./lib/transactionFormaterFactory");
+const TransactionFormaterManager = require("./lib/transactionFormaterManager");
+
 const ConfigurationHandler = require("./lib/handler/configurationHandler");
 const TransactionHandler = require("./lib/handler/transactionHandler");
 const TransactionRepository = require("./lib/repos/transactionRepository");
@@ -33,7 +36,27 @@ async function main() {
     await transactionRepo.createIndex();
     await blockRepo.createIndex();
 
-    const transactionHandler = TransactionHandler(transactionRepo, blockRepo);
+    const transactionFormaterFactory = TransactionFormaterFactory();
+    const transactionFormaterManager = TransactionFormaterManager();
+
+    transactionFormaterManager.setFormater(
+      transactionFormaterFactory.create("bitcoin")
+    );
+    transactionFormaterManager.setFormater(
+      transactionFormaterFactory.create("litecoin")
+    );
+    transactionFormaterManager.setFormater(
+      transactionFormaterFactory.create("dash")
+    );
+    transactionFormaterManager.setFormater(
+      transactionFormaterFactory.create("ethereum")
+    );
+
+    const transactionHandler = TransactionHandler(
+      transactionRepo,
+      blockRepo,
+      transactionFormaterManager
+    );
 
     const fullnodeServiceFactory = FullnodeServiceFactory(
       config.blockchainConfig

@@ -65,7 +65,7 @@ function BitcoinTransactionFormater() {
 
   Object.defineProperty(bitcoinTransactionFormater, "chainname", {
     value: "bitcoin",
-    writable: false,
+    writable: true,
     enumerable: true,
     configurable: true,
   });
