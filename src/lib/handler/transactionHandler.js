@@ -1,6 +1,10 @@
 "use strict";
 const BlockLogger = require("../logger/blockLogger");
-function TransactionHandler(transactionRepo, blockRepo) {
+function TransactionHandler(
+  transactionRepo,
+  blockRepo,
+  transactionFormaterManager
+) {
   function _calculateSaveTimeInSeconds(sTime, eTime) {
     const timeElapsed = eTime - sTime;
     return timeElapsed ? (timeElapsed * 0.001).toFixed(2) : 0;
@@ -37,6 +41,12 @@ function TransactionHandler(transactionRepo, blockRepo) {
       _logSaveProcess(service.chainname, data.height, 0, sTime, Date.now());
       return 0;
     }
+
+    const formater = transactionFormaterManager.getFormater(service.chainname);
+    tx.map((transaction) => {
+      return formater.formatForDB(transaction);
+    });
+
     const inserted = await transactionRepo.addMany(tx);
     _logSaveProcess(
       service.chainname,
