@@ -3,7 +3,7 @@ BitcoinTransactionFormater = require("../../src/lib/formater/bitcoinTransactionF
 const transactions = require("../mocks/transactionsMock.json");
 
 describe("BitcoinTransactionFormater formatForDB", () => {
-  it.only("should return a formated transaction obj", () => {
+  it("should return a formated transaction obj", () => {
     let transaction = transactions[0];
     const formater = BitcoinTransactionFormater();
     transaction = formater.formatForDB(transaction);
