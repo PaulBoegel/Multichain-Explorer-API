@@ -1,11 +1,11 @@
 const { assert } = require("chai");
-BitcoinTransactionFormater = require("../../src/lib/formater/bitcoinTransactionFormater");
+LitecoinTransactionFormater = require("../../src/lib/formater/litecoinTransactionFormater");
 const transactions = require("../mocks/transactionsMock.json");
 
-describe("BitcoinTransactionFormater formatForDB", () => {
-  it("should return a formated transaction obj", () => {
+describe("LitecoinTransactionFormater formatForDB", () => {
+  it.only("should return a formated transaction obj", () => {
     let transaction = transactions[0];
-    const formater = BitcoinTransactionFormater();
+    const formater = LitecoinTransactionFormater();
     transaction = formater.formatForDB(transaction);
     console.log(transaction);
     assert.strictEqual(Object.keys(transaction).length, 4);
