@@ -1,6 +1,6 @@
 "use strict";
 
-function TransactionController(transactionRepo) {
+function TransactionController(transactionRepo, formaterManager) {
   async function getByTxId(req, res) {
     try {
       const chainname = req.params.chainname;
