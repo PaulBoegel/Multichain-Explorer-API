@@ -1,3 +1,5 @@
+const { value } = require("numeral");
+
 function JsonObjectFormatHandler() {
   let newObject;
   let objEntries;
@@ -12,14 +14,35 @@ function JsonObjectFormatHandler() {
     });
   }
 
-  function _changePropertyHierachy({ hierachy, newHierachy }) {
-    let value;
-    let newProperty;
-    let property = objEntries.find((entry) => entry[0] === hierachy[0]);
+  function _getValueOutOfArrayObjects(property, hierachy, index) {
+    let value = [];
+    let deleteProperty = false;
+    const [propName, propValue] = property;
+    propValue.forEach((item) => {
+      if (typeof item !== "object") {
+        value.push(item);
+        deleteProperty = true;
+        return;
+      }
+      const valueObj = _getValueInHierachy(
+        hierachy.slice(index),
+        Object.entries(item)
+      );
+      if (valueObj.deleteProperty) delete item[valueObj.propName];
+      value.push(valueObj.value);
+    });
+    return { value, deleteProperty, propName };
+  }
 
+  function _getValueInHierachy(hierachy, entries) {
+    let value;
+    let property = entries.find((entry) => entry[0] === hierachy[0]);
     for (let index = 1; index < hierachy.length + 1; index++) {
       if (!property) return;
-      if (typeof property[1] !== "object" || property[1] instanceof Array) {
+      if (property[1] instanceof Array) {
+        return _getValueOutOfArrayObjects(property, hierachy, index);
+      }
+      if (typeof property[1] !== "object") {
         value = property[1];
         break;
       }
@@ -27,6 +50,12 @@ function JsonObjectFormatHandler() {
         (entry) => entry[0] === hierachy[index]
       );
     }
+    return { value, deleteProperty: false, propName: property[0] };
+  }
+
+  function _changePropertyHierachy({ hierachy, newHierachy }) {
+    let newProperty;
+    let { value } = _getValueInHierachy(hierachy, objEntries);
 
     if (newHierachy.length === 1) {
       Object.defineProperty(newObject, newHierachy[0], {

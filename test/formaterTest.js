@@ -54,4 +54,24 @@ describe("BitcoinTransactionFormater format", () => {
     obj = formater.format({ obj, templateMap: templateMapThree });
     assert.strictEqual(obj.secondParent.childProp, 1);
   });
+  it("should change the hierachie in array values with embeded objects", () => {
+    let obj = { property: [{ child: 1 }, { child: 2 }] };
+    const templateMap = new Map();
+    templateMap.set("property.child", "newProperty");
+    const formater = JsonObjectFormatHandler();
+    obj = formater.format({ obj, templateMap });
+    assert.strictEqual(typeof obj.newProperty[0], "number");
+    assert.strictEqual(typeof obj.newProperty[1], "number");
+  });
+  it("should extract property with array value out of embeded objects in array", () => {
+    let obj = { property: [{ child: [1, 2] }, { child: [3, 4] }] };
+    const templateMap = new Map();
+    templateMap.set("property.child", "newProperty");
+    const formater = JsonObjectFormatHandler();
+    obj = formater.format({ obj, templateMap });
+    assert.strictEqual(obj.newProperty[0] instanceof Array, true);
+    assert.strictEqual(obj.newProperty[0].length, 2);
+    assert.strictEqual(obj.newProperty[1] instanceof Array, true);
+    assert.strictEqual(obj.newProperty[1].length, 2);
+  });
 });
