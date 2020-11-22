@@ -61,6 +61,33 @@ function BitcoinTransactionFormater() {
 
       return formatedTransaction;
     },
+    async formatAccountStructure(transaction, repository) {
+      await repository.connect();
+      const transactionTemplate = new Map();
+
+      transactionTemplate.set("vout.addresses", "to");
+
+      transaction = this.formater.format({
+        obj: transaction,
+        templateMap: transactionTemplate,
+      });
+
+      const fromAddresses = [];
+      for (input of transaction.vin) {
+        const query = { txid: input.txid, chainname: this.chainname };
+        const projection = { _id: 0, _chainname: 0 };
+        const [inputTransaction] = await repository.get(query, projection);
+        if (!inputTransaction) continue;
+        const output = inputTransaction.vout.find(
+          (entry) => entry.n === input.vout
+        );
+        if (output.addresses) fromAddresses.push(...output.addresses);
+      }
+
+      transaction.from = fromAddresses;
+
+      return transaction;
+    },
   };
 
   Object.defineProperty(bitcoinTransactionFormater, "chainname", {
