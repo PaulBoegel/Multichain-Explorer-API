@@ -28,6 +28,7 @@ function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
     db.collection("transactions").createIndex("txid");
     db.collection("transactions").createIndex("chainname");
     db.collection("transactions").createIndex("vin.txid");
+    db.collection("transactions").createIndex("vout.addresses");
   }
 
   function _checkConnection() {
