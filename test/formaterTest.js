@@ -66,8 +66,10 @@ describe("BitcoinTransactionFormater format", () => {
     const formater = JsonObjectFormatHandler();
     obj = formater.format({ obj, templateMap: templateMapOne });
     assert.strictEqual(obj.parentProp, 1);
+    obj = obj = { parentProp: { childProp: 1 }, prop: 1 };
     obj = formater.format({ obj, templateMap: templateMapTwo });
     assert.strictEqual(obj.parentProp.firstChild.secondChild, 1);
+    obj = obj = { parentProp: { childProp: 1 }, prop: 1 };
     obj = formater.format({ obj, templateMap: templateMapThree });
     assert.strictEqual(obj.secondParent.childProp, 1);
   });
@@ -90,5 +92,14 @@ describe("BitcoinTransactionFormater format", () => {
     assert.strictEqual(obj.newProperty[0].length, 2);
     assert.strictEqual(obj.newProperty[1] instanceof Array, true);
     assert.strictEqual(obj.newProperty[1].length, 2);
+  });
+  it.only("should change properties in array objects without deleting the other properties in the object", () => {
+    let obj = { property: [{ child: 1, secondChild: [2] }] };
+    const templateMap = new Map();
+    templateMap.set("property.secondChild", "property.newSecondChild");
+    const formater = JsonObjectFormatHandler();
+    obj = formater.format({ obj, templateMap });
+    assert.strictEqual(obj.property[0].newSecondChild[0], 2);
+    assert.strictEqual(obj.property[0].child, 1);
   });
 });

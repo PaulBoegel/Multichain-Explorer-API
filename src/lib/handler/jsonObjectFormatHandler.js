@@ -71,8 +71,39 @@ function JsonObjectFormatHandler() {
     }
   }
 
+  function _createProperty(obj, name, value, hierachy) {
+    const config = { writable: true, configurable: true, enumerable: true };
+    if (hierachy.length > 0) {
+      const propertyName = hierachy.shift();
+      return Object.defineProperty(obj, name, {
+        value: _createProperty({}, propertyName, value, hierachy),
+        ...config,
+      });
+    }
+    return Object.defineProperty(obj, name, {
+      value,
+      ...config,
+    });
+  }
+
+  function _createNewPropertyInHierachy(hierachy, obj, value) {
+    const propertyName = hierachy.shift();
+    const objValue = obj[propertyName];
+    // if (typeof objValue === "object") {
+    //   if (objValue instanceof Array) {
+    //     objValue.forEach((item) =>
+    //       _createNewPropertyInHierachy(hierachy, item, value)
+    //     );
+    //     return;
+    //   }
+    //   _createNewPropertyInHierachy(hierachy, objValue, value);
+    //   return;
+    // }
+
+    _createProperty(obj, propertyName, value, hierachy);
+  }
+
   function _changePropertyHierachy({ hierachy, newHierachy }) {
-    let newProperty;
     let { value } = _getValueInHierachy(hierachy, Object.entries(newObject));
 
     if (newHierachy.length === 1) {
@@ -86,16 +117,7 @@ function JsonObjectFormatHandler() {
       return;
     }
 
-    newProperty = value;
-    for (let index = newHierachy.length - 1; index >= 0; index--) {
-      newProperty = Object.defineProperty({}, newHierachy[index], {
-        value: newProperty,
-        writable: true,
-        configurable: true,
-        enumerable: true,
-      });
-    }
-    Object.assign(newObject, newProperty);
+    _createNewPropertyInHierachy(newHierachy, newObject, value);
   }
 
   return {

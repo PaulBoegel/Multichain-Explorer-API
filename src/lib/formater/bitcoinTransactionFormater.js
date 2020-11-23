@@ -67,7 +67,7 @@ function BitcoinTransactionFormater() {
 
       transactionTemplate.set("vout.n", false);
       transactionTemplate.set("vout", "to");
-      transactionTemplate.set("to.addresses", "to.address");
+      //transactionTemplate.set("to.addresses", "to.address");
 
       transaction = this.formater.format({
         obj: transaction,
