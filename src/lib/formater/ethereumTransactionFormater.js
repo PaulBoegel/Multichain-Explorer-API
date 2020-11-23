@@ -22,6 +22,27 @@ function EthereumTransactionFormater() {
 
       return transaction;
     },
+    async formatAccountStructure(transaction, repository) {
+      const transactionTemplate = new Map();
+
+      const to = transaction.to;
+      const from = transaction.from;
+
+      transaction.to = [
+        {
+          value: transaction.gas,
+          address: [to],
+        },
+      ];
+      transaction.from = [
+        {
+          value: transaction.gas,
+          address: [from],
+        },
+      ];
+
+      return transaction;
+    },
   };
 
   Object.defineProperty(ethereumTransactionFormater, "chainname", {
