@@ -25,13 +25,9 @@ function TransactionController(transactionRepo, formaterManager) {
       const chainname = req.params.chainname;
       const txid = req.params.txid;
       const transaction = await transactionRepo.getByIds(txid, chainname);
-      const formater = formaterManager.getFormater(chainname);
-      const formatedTransaction = await formater.formatAccountStructure(
-        transaction,
-        transactionRepo
-      );
+
       res.setHeader("Conent-Type", "application/json");
-      res.send(JSON.stringify(formatedTransaction, null, 4));
+      res.send(JSON.stringify(transaction, null, 4));
     } catch (err) {
       res.send(err.message);
     }
