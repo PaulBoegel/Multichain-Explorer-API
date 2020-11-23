@@ -1,23 +1,51 @@
 function BitcoinQueryBuilder(formater, repo) {
   const queryBuilder = {
     async addressSearchQuery(address) {
-      const addressQuery = { "vout.addresses": address };
-      const projection = { _id: 0 };
-      const transactions = [];
+      try {
+        const addressQuery = { "vout.addresses": address };
+        const projection = { _id: 0 };
+        const transactions = [];
+        let transactionPromises = [];
+        let result = [];
 
-      await this.repo.connect();
+        await this.repo.connect();
 
-      for (let transaction of await this.repo.get(addressQuery, projection)) {
-        transactions.push(transaction);
-        const outputQuery = { "vin.txid": transaction.txid };
-        transactions.push(...(await this.repo.get(outputQuery, projection)));
+        for (let transaction of await this.repo.get(addressQuery, projection)) {
+          transactions.push(transaction);
+          const outputQuery = { "vin.txid": transaction.txid };
+          transactionPromises.push(this.repo.get(outputQuery, projection));
+        }
+
+        result = await Promise.all(transactionPromises);
+        result.forEach((item) => {
+          if (item instanceof Array) {
+            transactions.push(...item);
+            return;
+          }
+          transactions.push(item);
+        });
+
+        transactionPromises.length = 0;
+        for (let transaction of transactions) {
+          transactionPromises.push(
+            this.formater.formatAccountStructure(transaction, this.repo)
+          );
+        }
+
+        result.length = 0;
+        result = await Promise.all(transactionPromises);
+        result.forEach((item) => {
+          if (item instanceof Array) {
+            transactions.push(...item);
+            return;
+          }
+          transactions.push(item);
+        });
+
+        return transactions;
+      } catch (err) {
+        console.log(err);
       }
-
-      for (let transaction of transactions) {
-        await this.formater.formatAccountStructure(transaction, this.repo);
-      }
-
-      return transactions;
     },
   };
 
