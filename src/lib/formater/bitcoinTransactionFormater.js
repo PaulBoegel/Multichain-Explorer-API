@@ -64,20 +64,8 @@ function BitcoinTransactionFormater() {
     async formatAccountStructure(transaction, repository) {
       await repository.connect();
       const transactionTemplate = new Map();
-
-      transactionTemplate.set("vout.n", false);
-      transactionTemplate.set("vout", "to");
-      //transactionTemplate.set("to.addresses", "to.address");
-
-      transaction = this.formater.format({
-        obj: transaction,
-        templateMap: transactionTemplate,
-      });
-
-      const test = transaction.to.address[0];
-      transaction.to.address = test;
-
       const fromAddresses = [];
+
       for (input of transaction.vin) {
         const query = { txid: input.txid, chainname: this.chainname };
         const projection = { _id: 0, _chainname: 0 };
@@ -96,6 +84,19 @@ function BitcoinTransactionFormater() {
       }
 
       transaction.from = fromAddresses;
+
+      transactionTemplate.set("vin", false);
+      transactionTemplate.set("vout.n", false);
+      transactionTemplate.set("vout", "to");
+
+      transaction = this.formater.format({
+        obj: transaction,
+        templateMap: transactionTemplate,
+      });
+
+      transaction.to = transaction.to.map((to) => {
+        return { value: to.value, address: to.addresses };
+      });
 
       return transaction;
     },
