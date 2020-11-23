@@ -28,11 +28,16 @@ function TransactionController(queryBuilderManager) {
       const transactions = await queryBuilder.addressSearchQuery(address);
 
       res.setHeader("Conent-Type", "application/json");
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept"
+      );
       res.send(JSON.stringify(transactions, null, 4));
     } catch (err) {
       res.send(err.message);
     }
-    return res.code(404);
+    // return res.code(404);
   }
 
   async function getOutput(req, res) {
