@@ -43,15 +43,11 @@ function TransactionHandler(
     }
 
     const formater = transactionFormaterManager.getFormater(service.chainname);
-    const transactions = [];
+    tx.map((transaction) => {
+      return formater.formatForDB(transaction);
+    });
 
-    for (let transaction of tx) {
-      formater.formatForDB(transaction);
-      await formater.formatAccountStructure(transaction, transactionRepo);
-      transactions.push(transaction);
-    }
-
-    const inserted = await transactionRepo.addMany(transactions);
+    const inserted = await transactionRepo.addMany(tx);
     _logSaveProcess(
       service.chainname,
       data.height,
