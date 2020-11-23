@@ -67,6 +67,14 @@ function BitcoinTransactionFormater() {
       const fromAddresses = [];
 
       for (input of transaction.vin) {
+        if (input.coinbase) {
+          fromAddresses.push({
+            address: input.coinbase,
+            coinbase: true,
+            value: 0,
+          });
+          continue;
+        }
         const query = { txid: input.txid, chainname: this.chainname };
         const projection = { _id: 0, _chainname: 0 };
         const [inputTransaction] = await repository.get(query, projection);
