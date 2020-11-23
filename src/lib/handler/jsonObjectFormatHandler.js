@@ -2,9 +2,9 @@ const { value } = require("numeral");
 
 function JsonObjectFormatHandler() {
   let newObject;
-  let objEntries;
 
   function _changePropertyName({ name, newName }) {
+    const objEntries = Object.entries(newObject);
     const propertyArray = objEntries.find((entry) => entry[0] === name);
     Object.defineProperty(newObject, newName, {
       value: propertyArray[1],
@@ -53,9 +53,27 @@ function JsonObjectFormatHandler() {
     return { value, deleteProperty: false, propName: property[0] };
   }
 
+  function _deletePropertyInHierachy(hierachy, obj) {
+    let value;
+    for (hierachyEntry of hierachy) {
+      const objMap = new Map(Object.entries(obj));
+      value = objMap.get(hierachyEntry);
+      if (typeof value === "object") {
+        hierachy.shift();
+        if (value instanceof Array) {
+          value.forEach((item) => _deletePropertyInHierachy(hierachy, item));
+          return;
+        }
+        _deletePropertyInHierachy(hierachy, value);
+        return;
+      }
+      delete obj[hierachyEntry];
+    }
+  }
+
   function _changePropertyHierachy({ hierachy, newHierachy }) {
     let newProperty;
-    let { value } = _getValueInHierachy(hierachy, objEntries);
+    let { value } = _getValueInHierachy(hierachy, Object.entries(newObject));
 
     if (newHierachy.length === 1) {
       Object.defineProperty(newObject, newHierachy[0], {
@@ -82,26 +100,30 @@ function JsonObjectFormatHandler() {
 
   return {
     format({ obj, templateMap }) {
-      objEntries = Object.entries(obj);
-      newObject = {};
+      newObject = obj;
       for (item of templateMap) {
+        let hierachy = [];
         const [key, value] = item;
         switch (typeof value) {
           case "string":
-            const hierachy = key.split(".");
+            hierachy = key.split(".");
             const newHierachy = value.split(".");
             if (hierachy.length > 1 || newHierachy.length > 1) {
               _changePropertyHierachy({ hierachy, newHierachy });
               break;
             }
             _changePropertyName({ name: key, newName: value });
-            delete obj[key];
+            delete newObject[key];
+            break;
           case "boolean":
-            if (value === false) delete obj[key];
+            hierachy = key.split(".");
+            if (hierachy.length > 1)
+              _deletePropertyInHierachy(hierachy, newObject);
+            if (value === false) delete newObject[key];
             break;
         }
       }
-      return Object.assign(obj, newObject);
+      return newObject;
     },
   };
 }

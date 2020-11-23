@@ -34,6 +34,23 @@ describe("BitcoinTransactionFormater format", () => {
     assert.strictEqual(obj.firstProperty, 1);
     assert.strictEqual(obj.secondProperty, undefined);
   });
+  it("should delete propertys in object structure, if set to 0 in template", () => {
+    let obj = { property: { child: 1 } };
+    const templateMap = new Map();
+    templateMap.set("property.child", false);
+    const formater = JsonObjectFormatHandler();
+    obj = formater.format({ obj, templateMap });
+    assert.strictEqual(obj.property.child, undefined);
+  });
+  it("should delete propertys in array structure, if set to 0 in template", () => {
+    let obj = { property: [{ child: 1 }, { child: 2 }] };
+    const templateMap = new Map();
+    templateMap.set("property.child", false);
+    const formater = JsonObjectFormatHandler();
+    obj = formater.format({ obj, templateMap });
+    assert.strictEqual(obj.property[0].child, undefined);
+    assert.strictEqual(obj.property[1].child, undefined);
+  });
   it("should change the hierachie of a property if determined in template", () => {
     let obj = { parentProp: { childProp: 1 }, prop: 1 };
     const templateMapOne = new Map();

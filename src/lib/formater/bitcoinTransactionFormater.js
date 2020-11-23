@@ -65,12 +65,17 @@ function BitcoinTransactionFormater() {
       await repository.connect();
       const transactionTemplate = new Map();
 
-      transactionTemplate.set("vout.addresses", "to");
+      transactionTemplate.set("vout.n", false);
+      transactionTemplate.set("vout", "to");
+      transactionTemplate.set("to.addresses", "to.address");
 
       transaction = this.formater.format({
         obj: transaction,
         templateMap: transactionTemplate,
       });
+
+      const test = transaction.to.address[0];
+      transaction.to.address = test;
 
       const fromAddresses = [];
       for (input of transaction.vin) {
@@ -81,7 +86,13 @@ function BitcoinTransactionFormater() {
         const output = inputTransaction.vout.find(
           (entry) => entry.n === input.vout
         );
-        if (output.addresses) fromAddresses.push(...output.addresses);
+        if (output.addresses) {
+          let [address] = output.addresses;
+          fromAddresses.push({
+            address,
+            value: output.value,
+          });
+        }
       }
 
       transaction.from = fromAddresses;
