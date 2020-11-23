@@ -1,8 +1,10 @@
 "use strict";
 const BitcoinQueryBuilder = require("./bitcoinQueryBuilder");
 
-function LitecoinQueryBuilder() {
+function LitecoinQueryBuilder(formater, repo) {
   const litecoinQueryBuilder = {
+    repo,
+    formater,
     chainname: "litecoin",
   };
 

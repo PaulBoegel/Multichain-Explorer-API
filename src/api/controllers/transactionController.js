@@ -1,10 +1,6 @@
 "use strict";
 
-function TransactionController(
-  transactionRepo,
-  formaterManager,
-  queryBuilderManager
-) {
+function TransactionController(queryBuilderManager) {
   async function getByTxId(req, res) {
     try {
       const chainname = req.params.chainname;
@@ -24,23 +20,15 @@ function TransactionController(
     }
   }
 
-  async function getAddress(req, res) {
+  async function addressSearch(req, res) {
     try {
       const chainname = req.params.chainname;
       const address = req.params.address;
       const queryBuilder = queryBuilderManager.getQueryBuilder(chainname);
-      const query = queryBuilder.addressSearchQuery(address);
-      const transactions = await transactionRepo.get(query);
-      const result = [];
-      for (let transaction of transactions) {
-        const transaction = await formater.formatAccountStructure(
-          transaction,
-          transactionRepo
-        );
-        result.push(transaction);
-      }
+      const transactions = await queryBuilder.addressSearchQuery(address);
+
       res.setHeader("Conent-Type", "application/json");
-      res.send(JSON.stringify(result, null, 4));
+      res.send(JSON.stringify(transactions, null, 4));
     } catch (err) {
       res.send(err.message);
     }
@@ -52,20 +40,16 @@ function TransactionController(
       const chainname = req.params.chainname;
       const txid = req.params.txid;
       const transaction = await transactionRepo.getByIds(txid, chainname);
-      const formater = formaterManager.getFormater(chainname);
-      const formatedTransaction = await formater.formatAccountStructure(
-        transaction,
-        transactionRepo
-      );
+
       res.setHeader("Conent-Type", "application/json");
-      res.send(JSON.stringify(formatedTransaction, null, 4));
+      res.send(JSON.stringify(transaction, null, 4));
     } catch (err) {
       res.send(err.message);
     }
     return res.code(404);
   }
 
-  return { getByTxId, getOutput };
+  return { getByTxId, getOutput, addressSearch };
 }
 
 module.exports = TransactionController;

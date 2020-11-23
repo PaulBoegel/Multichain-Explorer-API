@@ -9,6 +9,10 @@ const TransactionFormaterManager = require("../lib/transactionFormaterManager");
 const QueryBuilderFactory = require("../lib/queryBuilderFactory");
 const QueryBuilderManager = require("../lib/queryBuilderManager");
 
+const configHandler = new ConfigurationHandler(fs);
+const config = configHandler.readAndParseJsonFile("./explorer-config.json");
+const transactionRepo = new TransactionRepository(config.dbConfig.test);
+
 const formaterFactory = TransactionFormaterFactory();
 const formaterManager = TransactionFormaterManager();
 
@@ -17,7 +21,10 @@ formaterManager.setFormater(formaterFactory.create("litecoin"));
 formaterManager.setFormater(formaterFactory.create("dash"));
 formaterManager.setFormater(formaterFactory.create("ethereum"));
 
-const queryBuilderFactory = QueryBuilderFactory();
+const queryBuilderFactory = QueryBuilderFactory(
+  formaterManager,
+  transactionRepo
+);
 const queryBuilderManager = QueryBuilderManager();
 
 queryBuilderManager.setQueryBuilder(queryBuilderFactory.create("bitcoin"));
@@ -25,13 +32,6 @@ queryBuilderManager.setQueryBuilder(queryBuilderFactory.create("litecoin"));
 queryBuilderManager.setQueryBuilder(queryBuilderFactory.create("dash"));
 queryBuilderManager.setQueryBuilder(queryBuilderFactory.create("ethereum"));
 
-const configHandler = new ConfigurationHandler(fs);
-const config = configHandler.readAndParseJsonFile("./explorer-config.json");
-const transactionRepo = new TransactionRepository(config.dbConfig.test);
-const fullnodeRestApi = new FullnodeRestApi(
-  transactionRepo,
-  formaterManager,
-  queryBuilderManager
-);
+const fullnodeRestApi = FullnodeRestApi(queryBuilderManager);
 
 fullnodeRestApi.start();

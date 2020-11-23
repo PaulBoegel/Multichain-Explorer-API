@@ -1,8 +1,10 @@
 "use strict";
 const BitcoinQueryBuilder = require("./bitcoinQueryBuilder");
 
-function DashQueryBuilder() {
+function DashQueryBuilder(formater, repo) {
   const dashQueryBuilder = {
+    repo,
+    formater,
     chainname: "dash",
   };
 

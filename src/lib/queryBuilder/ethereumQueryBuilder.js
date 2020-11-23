@@ -1,4 +1,4 @@
-function EthereumQueryBuilder() {
+function EthereumQueryBuilder(formater) {
   const queryBuilder = {
     addressSearchQuery(address) {
       return {
@@ -9,6 +9,13 @@ function EthereumQueryBuilder() {
 
   Object.defineProperty(queryBuilder, "chainname", {
     value: "ethereum",
+    writable: true,
+    enumerable: true,
+    configurable: true,
+  });
+
+  Object.defineProperty(queryBuilder, formater, {
+    value: formater,
     writable: true,
     enumerable: true,
     configurable: true,
