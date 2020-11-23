@@ -27,8 +27,7 @@ function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
     _checkConnection();
     db.collection("transactions").createIndex("txid");
     db.collection("transactions").createIndex("chainname");
-    db.collection("transactions").createIndex("from");
-    db.collection("transactions").createIndex("to");
+    db.collection("transactions").createIndex("vout.address");
   }
 
   function _checkConnection() {
@@ -36,7 +35,7 @@ function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
       throw new Error("no database connection established");
   }
 
-  async function get(query, projection, limit) {
+  async function get(query, projection = {}, limit) {
     try {
       _checkConnection();
       let transactions = db
