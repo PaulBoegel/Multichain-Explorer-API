@@ -1,6 +1,7 @@
 const assert = require("assert");
 const LitecoinSync = require("../../src/lib/sync/litecoinSync");
 const TransactionHandler = require("../../src/lib/handler/transactionHandler");
+const LitecoinTransactionFormater = require("../../src/lib/formater/litecoinTransactionFormater");
 const sinon = require("sinon");
 const blockMock = require("../mocks/blockMock.json");
 const BlockLogger = require("../../src/lib/logger/blockLogger");
@@ -46,8 +47,18 @@ describe("LitecoinSync Blockrange", () => {
         ];
       },
     };
+    const formater = LitecoinTransactionFormater();
+    const manager = {
+      getFormater() {
+        return formater;
+      },
+    };
     getBlockchainInfo = sinon.spy(service, "getBlockchainInfo");
-    const transactionHandler = TransactionHandler(transRepo, blockRepo);
+    const transactionHandler = TransactionHandler(
+      transRepo,
+      blockRepo,
+      manager
+    );
     sync = LitecoinSync({ service, transactionHandler });
   });
 

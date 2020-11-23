@@ -24,7 +24,7 @@ describe("LitecoinTransactionFormater formatForDB", () => {
 });
 
 describe("LitecoinTransactionFormater foramtAccountStructure", () => {
-  it.only("should return a transaction in account structure", async () => {
+  it("should return a transaction in account structure", async () => {
     const repository = TransactionRepository(getDbConfig());
     await repository.connect();
     await repository.addMany(dbTransactions);
