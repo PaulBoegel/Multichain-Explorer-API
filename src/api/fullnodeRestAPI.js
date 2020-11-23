@@ -5,7 +5,11 @@ const cors = require("cors");
 const TransactionRouter = require("./routes/transactionRouter");
 const TransactionController = require("./controllers/transactionController");
 
-function FullnodeRestApi(transactionRepo, formaterManager) {
+function FullnodeRestApi(
+  transactionRepo,
+  formaterManager,
+  queryBuilderManager
+) {
   const app = express();
   const port = process.env.PORT || 3000;
 
@@ -22,7 +26,8 @@ function FullnodeRestApi(transactionRepo, formaterManager) {
     await transactionRepo.connect();
     const transactionController = new TransactionController(
       transactionRepo,
-      formaterManager
+      formaterManager,
+      queryBuilderManager
     );
     const transactionRouter = new TransactionRouter(
       express.Router(),
