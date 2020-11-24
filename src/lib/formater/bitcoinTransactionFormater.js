@@ -79,9 +79,10 @@ function BitcoinTransactionFormater() {
         const projection = { _id: 0, _chainname: 0 };
         const [inputTransaction] = await repository.get(query, projection);
         if (!inputTransaction) continue;
-        const output = inputTransaction.vout.find(
+        let output = inputTransaction.vout.find(
           (entry) => entry.n === input.vout
         );
+        if (!output) output = { addresses: [] };
         if (output.addresses) {
           let [address] = output.addresses;
           fromAddresses.push({
