@@ -20,17 +20,13 @@ function EthereumNotifyer(conf) {
 
   async function subscribeToBlocks() {
     web3.eth
-      .subscribe("newBlockHeaders", (error, result) => {
-        if (error) {
-          console.log(error);
-        }
-        console.log(result);
-      })
+      .subscribe("newBlockHeaders")
       .on("data", (blockHeader) => {
-        console.log("test");
-        events.emit("onNewBlock", blockHeader, conf.chainname);
+        events.emit("onNewBlock", blockHeader.hash, conf.chainname);
       })
-      .on("error", (error) => console.log(error));
+      .on("error", (error) => {
+        throw new Error(error);
+      });
   }
 
   async function subscribeToTransactions() {}
