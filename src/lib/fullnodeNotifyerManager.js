@@ -28,19 +28,13 @@ function FullnodeNotifyerManager() {
   }
 
   async function initNotifyer(notifyer) {
-    //notifyer.events.addListener("onNewTransaction", onNewTransaction);
     notifyer.events.addListener("onNewBlock", onNewBlock);
     await notifyer.connectToSocket();
-    //await notifyer.subscribeToTransactions();
     await notifyer.subscribeToBlocks();
   }
 
   function onNewBlock(blockHash, chainname) {
     events.emit("onNewBlock", blockHash, chainname);
-  }
-
-  function onNewTransaction(transaction, inputDepth, chainname) {
-    events.emit("onNewTransaction", transaction, inputDepth, chainname);
   }
 
   return { activateAllNotifyers, activateNotifyer, setNotifyer, events };
