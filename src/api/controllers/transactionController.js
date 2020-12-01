@@ -22,10 +22,17 @@ function TransactionController(queryBuilderManager) {
 
   async function addressSearch(req, res) {
     try {
-      const chainname = req.params.chainname;
-      const address = req.params.address;
+      const chainname = req.param("chainname");
+      const from = req.param("from") === "" ? undefined : req.param("from");
+      const to = req.param("to") === "" ? undefined : req.param("to");
+      const limit = parseInt(req.param("limit"));
+
       const queryBuilder = queryBuilderManager.getQueryBuilder(chainname);
-      const transactions = await queryBuilder.addressSearchQuery(address);
+      const transactions = await queryBuilder.addressSearchQuery(
+        from,
+        to,
+        limit
+      );
 
       res.setHeader("Conent-Type", "application/json");
       res.setHeader("Access-Control-Allow-Origin", "*");

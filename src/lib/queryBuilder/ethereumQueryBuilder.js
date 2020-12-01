@@ -1,40 +1,30 @@
 function EthereumQueryBuilder(formater, repo) {
   const queryBuilder = {
-    async addressSearchQuery(address) {
-      const toQuery = { to: address };
-      const fromQuery = { from: address };
+    async addressSearchQuery(
+      from = { $exists: true },
+      to = { $exists: true },
+      limit = 0
+    ) {
       const projection = { _id: 0 };
       let promises = [];
       const transactions = [];
 
       await this.repo.connect();
 
-      promises.push(this.repo.get(toQuery, projection));
-      promises.push(this.repo.get(fromQuery, projection));
+      promises.push(this.repo.get({ from, to }, projection, limit));
 
-      let result = await Promise.all(promises);
-      result.forEach((item) => {
-        if (item instanceof Array) {
-          transactions.push(...item);
-          return;
+      let results = await Promise.all(promises);
+      for (result of results) {
+        if (result instanceof Array) {
+          transactions.push(...result);
+          continue;
         }
-        transactions.push(item);
-      });
-
-      promises.length = 0;
-      result.length = 0;
-      for (let transaction of transactions) {
-        promises.push(this.formater.formatAccountStructure(transaction));
+        transaction.push(result);
       }
 
-      result = await Promise.all(promises);
-      result.forEach((item) => {
-        if (item instanceof Array) {
-          transactions.push(...item);
-          return;
-        }
-        transactions.push(item);
-      });
+      for (let transaction of transactions) {
+        this.formater.formatAccountStructure(transaction);
+      }
 
       return transactions;
     },

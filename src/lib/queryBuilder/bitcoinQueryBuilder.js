@@ -1,8 +1,8 @@
 function BitcoinQueryBuilder(formater, repo) {
   const queryBuilder = {
-    async addressSearchQuery(address) {
+    async addressSearchQuery(from, to = undefined, limit = 0) {
       try {
-        const addressQuery = { "vout.addresses": address };
+        const fromQuery = { "vout.addresses": from };
         const projection = { _id: 0 };
         const transactions = [];
         let transactionPromises = [];
@@ -10,7 +10,7 @@ function BitcoinQueryBuilder(formater, repo) {
 
         await this.repo.connect();
 
-        for (let transaction of await this.repo.get(addressQuery, projection)) {
+        for (let transaction of await this.repo.get(fromQuery, projection)) {
           transactions.push(transaction);
           const outputQuery = { "vin.txid": transaction.txid };
           transactionPromises.push(this.repo.get(outputQuery, projection));
@@ -42,6 +42,7 @@ function BitcoinQueryBuilder(formater, repo) {
           transactions.push(item);
         });
 
+        if (limit > 0) transactions.length = limit - 1;
         return transactions;
       } catch (err) {
         console.log(err);

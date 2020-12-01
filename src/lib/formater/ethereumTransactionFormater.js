@@ -22,7 +22,7 @@ function EthereumTransactionFormater() {
 
       return transaction;
     },
-    async formatAccountStructure(transaction, repository) {
+    formatAccountStructure(transaction) {
       const to = transaction.to;
       const from = transaction.from;
 
