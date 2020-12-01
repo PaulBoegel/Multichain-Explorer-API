@@ -10,7 +10,7 @@ function EthereumTransactionFormater() {
       transactionTemplate.set("gasPrice", false);
       transactionTemplate.set("nonce", false);
       transactionTemplate.set("transactionIndex", false);
-      transactionTemplate.set("value", false);
+      // transactionTemplate.set("value", false);
       transactionTemplate.set("v", false);
       transactionTemplate.set("r", false);
       transactionTemplate.set("s", false);
@@ -23,20 +23,18 @@ function EthereumTransactionFormater() {
       return transaction;
     },
     async formatAccountStructure(transaction, repository) {
-      const transactionTemplate = new Map();
-
       const to = transaction.to;
       const from = transaction.from;
 
       transaction.to = [
         {
-          value: transaction.gas,
+          value: transaction.value,
           address: [to],
         },
       ];
       transaction.from = [
         {
-          value: transaction.gas,
+          value: transaction.value,
           address: [from],
         },
       ];
