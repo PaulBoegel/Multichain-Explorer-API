@@ -54,9 +54,7 @@ function BitcoinSync({
       });
 
       blockData.chainname = service.chainname;
-      await transactionHandler.saveBlockData({
-        blockData,
-      });
+      await transactionHandler.saveBlockData(blockData);
 
       nextHash = blockData.nextblockhash;
       nextHash = blockData.nextblockhash;

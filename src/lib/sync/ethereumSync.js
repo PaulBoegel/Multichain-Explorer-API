@@ -51,9 +51,7 @@ function EthereumSync({
 
       blockData.chainname = service.chainname;
 
-      await transactionHandler.saveBlockData({
-        blockData,
-      });
+      await transactionHandler.saveBlockData(blockData);
       nextHash = await service.getBlockHash({ height: blockData.height + 1 });
     } while (nextHash);
     _endSync.call(this);
