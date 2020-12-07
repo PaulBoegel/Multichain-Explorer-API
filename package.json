@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "npm-run-all --parallel start:fullnode start:rest",
-    "start:fullnode": "node src/server.js",
+    "start:fullnode": "node --inspect src/server.js ",
     "start:rest": "node src/api/server.js",
     "test": "mocha -w",
     "test:rest": "mocha -w --timeout 10000 ./test/rest-tests",

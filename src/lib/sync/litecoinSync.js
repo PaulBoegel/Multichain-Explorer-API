@@ -3,6 +3,7 @@ const BitcoinSync = require("./bitcoinSync");
 function LitecoinSync({
   service,
   transactionHandler,
+  formater,
   syncHeight = null,
   syncHeightActive = false,
 }) {
@@ -11,6 +12,7 @@ function LitecoinSync({
       BitcoinSync({
         service,
         transactionHandler,
+        formater,
         syncHeight,
         syncHeightActive,
       }),

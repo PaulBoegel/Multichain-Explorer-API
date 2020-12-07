@@ -52,11 +52,7 @@ async function main() {
       transactionFormaterFactory.create("ethereum")
     );
 
-    const transactionHandler = TransactionHandler(
-      transactionRepo,
-      blockRepo,
-      transactionFormaterManager
-    );
+    const transactionHandler = TransactionHandler(blockRepo);
 
     const fullnodeServiceFactory = FullnodeServiceFactory(
       config.blockchainConfig
@@ -90,8 +86,13 @@ async function main() {
       fullnodeNotifyerFactory.create("litecoin")
     );
 
+    fullnodeNotifyerManager.setNotifyer(
+      fullnodeNotifyerFactory.create("ethereum")
+    );
+
     const fullnodeSyncFactory = FullnodeSyncFactory({
       fullnodeServiceManager,
+      transactionFormaterManager,
       transactionHandler,
       config: config.blockchainConfig,
     });

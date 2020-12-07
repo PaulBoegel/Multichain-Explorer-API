@@ -4,49 +4,59 @@ const BlockLogger = require("../logger/blockLogger");
 function EthereumSync({
   service,
   transactionHandler,
+  formater,
   syncHeight = null,
   syncHeightActive = false,
 }) {
+  function _endSync() {
+    BlockLogger.info({
+      message: "blockchain synchronized",
+      data: { chainname: `${this.chainname}` },
+    });
+    this.events.emit("blockchainSynchronized", this.chainname);
+  }
+
   async function _syncDataWithHeight({ nextHash }) {
-    let inserted = 0;
     while (true) {
       const blockData = await service.getBlock({
         blockhash: nextHash,
         verbose: true,
       });
+
       if (blockData.height > syncHeight) break;
-      inserted = await transactionHandler.saveBlockData({
-        blockData,
-        service,
+
+      blockData.tx.forEach((transaction) => {
+        formater.formatForDB(transaction);
       });
+
+      blockData.chainname = service.chainname;
+
+      await transactionHandler.saveBlockData(blockData);
+
       nextHash = await service.getBlockHash({ height: blockData.height + 1 });
     }
-    BlockLogger.info({
-      message: "blockchain synchronized",
-      data: { chainname: `${this.chainname}`, transactions: inserted },
-    });
-    return inserted;
+    _endSync.call(this);
   }
 
   async function _syncData({ nextHash }) {
-    let inserted = 0;
     do {
       const blockData = await service.getBlock({
         blockhash: nextHash,
         verbose: true,
       });
-      inserted = await transactionHandler.saveBlockData({
+
+      blockData.tx.forEach((transaction) => {
+        formater.formatForDB(transaction);
+      });
+
+      blockData.chainname = service.chainname;
+
+      await transactionHandler.saveBlockData({
         blockData,
-        service,
       });
       nextHash = await service.getBlockHash({ height: blockData.height + 1 });
     } while (nextHash);
-    BlockLogger.info({
-      message: "blockchain synchronized",
-      data: { chainname: `${this.chainname}`, transactions: inserted },
-    });
-    this.events.emit("blockchainSynchronized", this.chainname);
-    return inserted;
+    _endSync.call(this);
   }
 
   async function _checkHeight(endHeight) {

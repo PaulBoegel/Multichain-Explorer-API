@@ -62,7 +62,7 @@ describe("LitecoinSync Blockrange", () => {
     sync = LitecoinSync({ service, transactionHandler });
   });
 
-  it("should fire blockchainSynchronized event, after end height was reached", (done) => {
+  it.only("should fire blockchainSynchronized event, after end height was reached", (done) => {
     sync.events.addListener("blockchainSynchronized", (chainname) => {
       assert(chainname, "litecoin");
       done();

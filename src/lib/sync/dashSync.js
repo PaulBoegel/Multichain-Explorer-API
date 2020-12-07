@@ -3,6 +3,7 @@ const BitcoinSync = require("./bitcoinSync");
 function DashSync({
   service,
   transactionHandler,
+  formater,
   syncHeight = null,
   syncHeightActive = false,
 }) {
@@ -11,6 +12,7 @@ function DashSync({
       BitcoinSync({
         service,
         transactionHandler,
+        formater,
         syncHeight,
         syncHeightActive,
       }),
