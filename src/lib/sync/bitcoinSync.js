@@ -22,96 +22,52 @@ function BitcoinSync({
     return timeElapsed ? (timeElapsed * 0.001).toFixed(2) : 0;
   }
 
-  async function _syncDataWithHeight({ nextHash }) {
-    while (true) {
+  async function _syncData({ startHeight, endHeight }) {
+    let height = startHeight;
+    while (endHeight === undefined || height < endHeight) {
       const sRequestTime = Date.now();
-      const blockData = await service.getBlock({
-        blockhash: nextHash,
-        verbose: true,
-      });
-      const eRequestTime = Date.now();
+      const blockhash = await service.getBlockHash({ height, verbose: true });
+      if (!blockhash) break;
+      service
+        .getBlock({
+          blockhash,
+          verbose: true,
+        })
+        .then(async (blockData) => {
+          const eRequestTime = Date.now();
+          const sFormatTime = Date.now();
+          blockData.tx.forEach((transaction) => {
+            formater.formatForDB(transaction);
+          });
+          const eFormatTime = Date.now();
 
-      if (blockData.height > syncHeight) break;
+          blockData.chainname = service.chainname;
 
-      const sFormatTime = Date.now();
-      blockData.tx.forEach((transaction) => {
-        formater.formatForDB(transaction);
-      });
-      const eFormatTime = Date.now();
+          const requestTime = _calculateSaveTimeInSeconds(
+            sRequestTime,
+            eRequestTime
+          );
+          const formatingTime = _calculateSaveTimeInSeconds(
+            sFormatTime,
+            eFormatTime
+          );
+          const saveTime = await transactionHandler.saveBlockData(blockData);
 
-      blockData.chainname = service.chainname;
+          BlockLogger.info({
+            message: "block saved",
+            data: {
+              chainname: blockData.chainname,
+              height: blockData.height,
+              transactions: blockData.tx.length,
+              requestTime,
+              formatingTime,
+              saveTime,
+            },
+          });
+        });
 
-      const requestTime = _calculateSaveTimeInSeconds(
-        sRequestTime,
-        eRequestTime
-      );
-      const formatingTime = _calculateSaveTimeInSeconds(
-        sFormatTime,
-        eFormatTime
-      );
-      const saveTime = await transactionHandler.saveBlockData(blockData);
-
-      BlockLogger.info({
-        message: "block saved",
-        data: {
-          chainname: blockData.chainname,
-          height: blockData.height,
-          transactions: blockData.tx.length,
-          requestTime,
-          formatingTime,
-          saveTime,
-        },
-      });
-
-      nextHash = blockData.nextblockhash;
+      height += 1;
     }
-
-    _endSync.call(this, false);
-
-    return true;
-  }
-
-  async function _syncData({ nextHash }) {
-    do {
-      const sRequestTime = Date.now();
-      const blockData = await service.getBlock({
-        blockhash: nextHash,
-        verbose: true,
-      });
-      const eRequestTime = Date.now();
-
-      const sFormatTime = Date.now();
-      blockData.tx.forEach((transaction) => {
-        formater.formatForDB(transaction);
-      });
-      const eFormatTime = Date.now();
-
-      blockData.chainname = service.chainname;
-
-      const requestTime = _calculateSaveTimeInSeconds(
-        sRequestTime,
-        eRequestTime
-      );
-      const formatingTime = _calculateSaveTimeInSeconds(
-        sFormatTime,
-        eFormatTime
-      );
-      const saveTime = await transactionHandler.saveBlockData(blockData);
-
-      BlockLogger.info({
-        message: "block saved",
-        data: {
-          chainname: blockData.chainname,
-          height: blockData.height,
-          transactions: blockData.tx.length,
-          requestTime,
-          formatingTime,
-          saveTime,
-        },
-      });
-
-      nextHash = blockData.nextblockhash;
-    } while (nextHash);
 
     _endSync.call(this, true);
   }
@@ -128,11 +84,14 @@ function BitcoinSync({
       syncHeight = height;
     },
     async blockrange() {
-      const nextHash = await transactionHandler.getHighestBlockHash(service);
+      const { height } = await transactionHandler.getHighestBlock(service);
       if ((await _checkHeight.call(this, syncHeight)) && syncHeightActive) {
-        return await _syncDataWithHeight.call(this, { nextHash });
+        return await _syncData.call(this, {
+          startHeight: height,
+          endHeight: syncHeight,
+        });
       }
-      return _syncData.call(this, { nextHash });
+      return _syncData.call(this, { startHeight: height });
     },
   };
 }

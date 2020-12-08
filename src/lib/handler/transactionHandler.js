@@ -19,24 +19,27 @@ function TransactionHandler(blockRepo) {
     return _calculateSaveTimeInSeconds(sTime, eTime);
   }
 
-  async function getHighestBlockHash(service) {
-    let height = 0;
-    let blocks = await blockRepo.get({
+  async function getHighestBlock(service) {
+    let [block] = await blockRepo.get({
       query: { chainname: service.chainname },
       sort: { height: -1 },
       limit: 1,
     });
-    if (blocks.length > 0) {
-      height = blocks[0].height + 1;
+    if (!block) {
+      const blockhash = await service.getBlockHash({
+        height: 0,
+        verbose: true,
+      });
+      block = await service.getBlock({ blockhash, verbose: true });
     }
 
-    return await service.getBlockHash({ height, verbose: true });
+    return block;
   }
 
   return {
     saveBlockData,
     saveBlockDataWithHash,
-    getHighestBlockHash,
+    getHighestBlock,
   };
 }
 
