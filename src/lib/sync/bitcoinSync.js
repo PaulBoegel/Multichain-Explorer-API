@@ -24,8 +24,8 @@ function BitcoinSync({
     const height = lastHeightSaved + 1;
     const block = blockCach.get(height);
     if (!block) return;
-    await transactionHandler.saveBlockData(block);
     blockCach.delete(height);
+    await transactionHandler.saveBlockData(block);
     lastHeightSaved++;
     BlockLogger.info({
       message: "cached block saved",
