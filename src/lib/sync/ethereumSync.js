@@ -8,6 +8,27 @@ function EthereumSync({
   syncHeight = null,
   syncHeightActive = false,
 }) {
+  const blockCach = new Map();
+  let lastHeightSaved = 0;
+
+  async function _checkblockCach() {
+    const height = lastHeightSaved + 1;
+    const block = blockCach.get(height);
+    if (!block) return;
+    blockCach.delete(height);
+    await transactionHandler.saveBlockData(block);
+    lastHeightSaved++;
+    BlockLogger.info({
+      message: "cached block saved",
+      data: {
+        chainname: block.chainname,
+        height: block.height,
+        transactions: block.tx.length,
+      },
+    });
+    await _checkblockCach();
+  }
+
   function _endSync(fireEvent) {
     BlockLogger.info({
       message: "blockchain synchronized",
@@ -49,19 +70,26 @@ function EthereumSync({
           eFormatTime
         );
 
-        const saveTime = await transactionHandler.saveBlockData(blockData);
+        if (blockCach.size > 0)
+          await _checkblockCach(blockCach, lastHeightSaved);
 
-        BlockLogger.info({
-          message: "block saved",
-          data: {
-            chainname: blockData.chainname,
-            height: blockData.height,
-            transactions: blockData.tx.length,
-            requestTime,
-            formatingTime,
-            saveTime,
-          },
-        });
+        if (blockData.height - 1 === lastHeightSaved || lastHeightSaved === 0) {
+          const saveTime = await transactionHandler.saveBlockData(blockData);
+
+          BlockLogger.info({
+            message: "block saved",
+            data: {
+              chainname: blockData.chainname,
+              height: blockData.height,
+              transactions: blockData.tx.length,
+              requestTime,
+              formatingTime,
+              saveTime,
+            },
+          });
+          return;
+        }
+        blockCach.set(blockData.height, blockData);
       });
   }
 
