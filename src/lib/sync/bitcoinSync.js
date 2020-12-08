@@ -17,6 +17,11 @@ function BitcoinSync({
     if (fireEvent) this.events.emit("blockchainSynchronized", this.chainname);
   }
 
+  function _calculateSaveTimeInSeconds(sTime, eTime) {
+    const timeElapsed = eTime - sTime;
+    return timeElapsed ? (timeElapsed * 0.001).toFixed(2) : 0;
+  }
+
   async function _syncDataWithHeight({ nextHash }) {
     while (true) {
       const blockData = await service.getBlock({
@@ -26,13 +31,17 @@ function BitcoinSync({
 
       if (blockData.height > syncHeight) break;
 
+      const sTime = Date.now();
       blockData.tx.forEach((transaction) => {
         formater.formatForDB(transaction);
       });
+      const eTime = Date.now();
+
+      const formatingTime = _calculateSaveTimeInSeconds(sTime, eTime);
 
       blockData.chainname = service.chainname;
 
-      await transactionHandler.saveBlockData(blockData);
+      await transactionHandler.saveBlockData(blockData, formatingTime);
 
       nextHash = blockData.nextblockhash;
     }

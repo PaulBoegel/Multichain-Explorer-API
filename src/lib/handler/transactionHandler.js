@@ -6,13 +6,21 @@ function TransactionHandler(blockRepo) {
     return timeElapsed ? (timeElapsed * 0.001).toFixed(2) : 0;
   }
 
-  function _logSaveProcess(chainname, height, transactions, sTime, eTime) {
+  function _logSaveProcess(
+    chainname,
+    height,
+    transactions,
+    formatingTime,
+    sTime,
+    eTime
+  ) {
     BlockLogger.info({
       message: "block saved",
       data: {
         chainname,
         height,
         transactions,
+        formatingTime,
         saveTimeInSeconds: _calculateSaveTimeInSeconds(sTime, eTime),
       },
     });
@@ -22,7 +30,7 @@ function TransactionHandler(blockRepo) {
     saveBlockData({ blockData, service });
   }
 
-  async function saveBlockData(blockData) {
+  async function saveBlockData(blockData, formatingTime) {
     const sTime = Date.now();
     await blockRepo.add(blockData);
     const eTime = Date.now();
@@ -33,6 +41,7 @@ function TransactionHandler(blockRepo) {
       blockData.chainname,
       blockData.height,
       inserted,
+      formatingTime,
       sTime,
       eTime
     );
