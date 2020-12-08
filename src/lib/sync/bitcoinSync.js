@@ -17,6 +17,63 @@ function BitcoinSync({
     if (fireEvent) this.events.emit("blockchainSynchronized", this.chainname);
   }
 
+  function _saveBlockData(blockhash) {
+    const sRequestTime = Date.now();
+    service
+      .getBlock({
+        blockhash,
+        verbose: true,
+      })
+      .then(async (blockData) => {
+        const eRequestTime = Date.now();
+        const sFormatTime = Date.now();
+        blockData.tx.forEach((transaction) => {
+          formater.formatForDB(transaction);
+        });
+        const eFormatTime = Date.now();
+
+        blockData.chainname = service.chainname;
+
+        const requestTime = _calculateSaveTimeInSeconds(
+          sRequestTime,
+          eRequestTime
+        );
+        const formatingTime = _calculateSaveTimeInSeconds(
+          sFormatTime,
+          eFormatTime
+        );
+        const saveTime = await transactionHandler.saveBlockData(blockData);
+
+        BlockLogger.info({
+          message: "block saved",
+          data: {
+            chainname: blockData.chainname,
+            height: blockData.height,
+            transactions: blockData.tx.length,
+            requestTime,
+            formatingTime,
+            saveTime,
+          },
+        });
+      });
+  }
+
+  async function _checkHeightConsistency(height) {
+    if (!height) return;
+    const heightArray = await transactionHandler.getAllBlockHeights(
+      service.chainname
+    );
+    const heightSet = new Set([...heightArray]);
+
+    for (let index = 0; index < height; index++) {
+      if (heightSet.has(index)) continue;
+      const blockhash = await service.getBlockHash({
+        height: index,
+      });
+      _saveBlockData.call(this, blockhash);
+    }
+  }
+
   function _calculateSaveTimeInSeconds(sTime, eTime) {
     const timeElapsed = eTime - sTime;
     return timeElapsed ? (timeElapsed * 0.001).toFixed(2) : 0;
@@ -25,46 +82,10 @@ function BitcoinSync({
   async function _syncData({ startHeight, endHeight }) {
     let height = startHeight;
     while (endHeight === undefined || height <= endHeight) {
-      const sRequestTime = Date.now();
       const blockhash = await service.getBlockHash({ height, verbose: true });
       if (!blockhash) break;
-      service
-        .getBlock({
-          blockhash,
-          verbose: true,
-        })
-        .then(async (blockData) => {
-          const eRequestTime = Date.now();
-          const sFormatTime = Date.now();
-          blockData.tx.forEach((transaction) => {
-            formater.formatForDB(transaction);
-          });
-          const eFormatTime = Date.now();
 
-          blockData.chainname = service.chainname;
-
-          const requestTime = _calculateSaveTimeInSeconds(
-            sRequestTime,
-            eRequestTime
-          );
-          const formatingTime = _calculateSaveTimeInSeconds(
-            sFormatTime,
-            eFormatTime
-          );
-          const saveTime = await transactionHandler.saveBlockData(blockData);
-
-          BlockLogger.info({
-            message: "block saved",
-            data: {
-              chainname: blockData.chainname,
-              height: blockData.height,
-              transactions: blockData.tx.length,
-              requestTime,
-              formatingTime,
-              saveTime,
-            },
-          });
-        });
+      _saveBlockData.call(this, blockhash);
 
       height += 1;
     }
@@ -85,6 +106,7 @@ function BitcoinSync({
     },
     async blockrange() {
       const { height } = await transactionHandler.getHighestBlock(service);
+      await _checkHeightConsistency.call(this, height);
       if ((await _checkHeight.call(this, syncHeight)) && syncHeightActive) {
         return await _syncData.call(this, {
           startHeight: height,

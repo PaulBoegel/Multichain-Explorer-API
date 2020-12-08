@@ -42,7 +42,7 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
       _checkConnection();
       let blocks = await db
         .collection("blocks")
-        .find(query, projection)
+        .find(query, { projection })
         .sort(sort);
       if (limit > 0) {
         blocks = blocks.limit(limit);

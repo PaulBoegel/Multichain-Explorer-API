@@ -19,6 +19,20 @@ function TransactionHandler(blockRepo) {
     return _calculateSaveTimeInSeconds(sTime, eTime);
   }
 
+  async function getAllBlockHeights(chainname) {
+    const heightResult = await blockRepo.get({
+      query: { chainname },
+      projection: {
+        _id: 0,
+        height: 1,
+      },
+      sort: { height: -1 },
+    });
+    return heightResult.map((block) => {
+      return block.height;
+    });
+  }
+
   async function getHighestBlock(service) {
     let [block] = await blockRepo.get({
       query: { chainname: service.chainname },
@@ -40,6 +54,7 @@ function TransactionHandler(blockRepo) {
     saveBlockData,
     saveBlockDataWithHash,
     getHighestBlock,
+    getAllBlockHeights,
   };
 }
 
