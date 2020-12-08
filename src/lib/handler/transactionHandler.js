@@ -21,12 +21,12 @@ function TransactionHandler(blockRepo) {
 
   async function getAllBlockHeights(chainname) {
     const heightResult = await blockRepo.get({
-      query: { $text: { $search: chainname } },
+      query: { chainname },
       projection: {
         _id: 0,
         height: 1,
       },
-      //sort: { height: -1 },
+      sort: { height: -1 },
     });
     return heightResult.map((block) => {
       return block.height;

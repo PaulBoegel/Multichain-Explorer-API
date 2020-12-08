@@ -65,22 +65,6 @@ function EthereumSync({
       });
   }
 
-  async function _checkHeightConsistency(height) {
-    if (!height) return;
-    const heightArray = await transactionHandler.getAllBlockHeights(
-      service.chainname
-    );
-    const heightSet = new Set([...heightArray]);
-
-    for (let index = 0; index < height; index++) {
-      if (heightSet.has(index)) continue;
-      const blockhash = await service.getBlockHash({
-        height: index,
-      });
-      _saveBlockData.call(this, blockhash);
-    }
-  }
-
   async function _syncData({ startHeight, endHeight }) {
     height = startHeight;
     while (endHeight === undefined || height <= endHeight) {
@@ -110,7 +94,6 @@ function EthereumSync({
     },
     async blockrange() {
       const { height } = await transactionHandler.getHighestBlock(service);
-      await _checkHeightConsistency.call(this, height);
       if ((await _checkHeight.call(this, syncHeight)) && syncHeightActive) {
         return await _syncData.call(this, {
           startHeight: height,
