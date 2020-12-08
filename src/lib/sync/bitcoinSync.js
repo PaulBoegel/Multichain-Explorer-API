@@ -24,24 +24,44 @@ function BitcoinSync({
 
   async function _syncDataWithHeight({ nextHash }) {
     while (true) {
+      const sRequestTime = Date.now();
       const blockData = await service.getBlock({
         blockhash: nextHash,
         verbose: true,
       });
+      const eRequestTime = Date.now();
 
       if (blockData.height > syncHeight) break;
 
-      const sTime = Date.now();
+      const sFormatTime = Date.now();
       blockData.tx.forEach((transaction) => {
         formater.formatForDB(transaction);
       });
-      const eTime = Date.now();
-
-      const formatingTime = _calculateSaveTimeInSeconds(sTime, eTime);
+      const eFormatTime = Date.now();
 
       blockData.chainname = service.chainname;
 
-      await transactionHandler.saveBlockData(blockData, formatingTime);
+      const requestTime = _calculateSaveTimeInSeconds(
+        sRequestTime,
+        eRequestTime
+      );
+      const formatingTime = _calculateSaveTimeInSeconds(
+        sFormatTime,
+        eFormatTime
+      );
+      const saveTime = await transactionHandler.saveBlockData(blockData);
+
+      BlockLogger.info({
+        message: "block saved",
+        data: {
+          chainname: blockData.chainname,
+          height: blockData.height,
+          transactions: blockData.tx.length,
+          requestTime,
+          formatingTime,
+          saveTime,
+        },
+      });
 
       nextHash = blockData.nextblockhash;
     }
@@ -53,19 +73,43 @@ function BitcoinSync({
 
   async function _syncData({ nextHash }) {
     do {
+      const sRequestTime = Date.now();
       const blockData = await service.getBlock({
         blockhash: nextHash,
         verbose: true,
       });
+      const eRequestTime = Date.now();
 
+      const sFormatTime = Date.now();
       blockData.tx.forEach((transaction) => {
         formater.formatForDB(transaction);
       });
+      const eFormatTime = Date.now();
 
       blockData.chainname = service.chainname;
-      await transactionHandler.saveBlockData(blockData);
 
-      nextHash = blockData.nextblockhash;
+      const requestTime = _calculateSaveTimeInSeconds(
+        sRequestTime,
+        eRequestTime
+      );
+      const formatingTime = _calculateSaveTimeInSeconds(
+        sFormatTime,
+        eFormatTime
+      );
+      const saveTime = await transactionHandler.saveBlockData(blockData);
+
+      BlockLogger.info({
+        message: "block saved",
+        data: {
+          chainname: blockData.chainname,
+          height: blockData.height,
+          transactions: blockData.tx.length,
+          requestTime,
+          formatingTime,
+          saveTime,
+        },
+      });
+
       nextHash = blockData.nextblockhash;
     } while (nextHash);
 
