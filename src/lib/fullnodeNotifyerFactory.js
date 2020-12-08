@@ -4,6 +4,7 @@ const zmq = require("zeromq");
 const LitecoinNotifyer = require("./notifyer/litecoinNotifyer");
 const BitcoinNotifyer = require("./notifyer/bitcoinNotifyer");
 const DashNotifyer = require("./notifyer/dashNotifyer");
+const EthereumNotifyer = require("./notifyer/ethereumNotifyer");
 
 function FullnodeNotifyerFactory(config) {
   function create(blockchainName) {
@@ -14,6 +15,8 @@ function FullnodeNotifyerFactory(config) {
         return createBitcoinNotifyer();
       case config.dash.chainname:
         return createDashNotifyer();
+      case config.ethereum.chainname:
+        return createEthereumNotifyer();
     }
   }
 
@@ -30,6 +33,10 @@ function FullnodeNotifyerFactory(config) {
   function createDashNotifyer() {
     const dashSock = new zmq.Subscriber();
     return new DashNotifyer(config.dash, dashSock);
+  }
+
+  function createEthereumNotifyer() {
+    return new EthereumNotifyer(config.ethereum);
   }
 
   return { create };
