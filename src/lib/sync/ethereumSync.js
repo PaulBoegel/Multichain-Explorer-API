@@ -8,12 +8,12 @@ function EthereumSync({
   syncHeight = null,
   syncHeightActive = false,
 }) {
-  function _endSync() {
+  function _endSync(fireEvent) {
     BlockLogger.info({
       message: "blockchain synchronized",
       data: { chainname: `${this.chainname}` },
     });
-    this.events.emit("blockchainSynchronized", this.chainname);
+    if (fireEvent) this.events.emit("blockchainSynchronized", this.chainname);
   }
 
   async function _syncDataWithHeight({ nextHash }) {
@@ -35,7 +35,7 @@ function EthereumSync({
 
       nextHash = await service.getBlockHash({ height: blockData.height + 1 });
     }
-    _endSync.call(this);
+    _endSync.call(this, false);
   }
 
   async function _syncData({ nextHash }) {
@@ -54,7 +54,7 @@ function EthereumSync({
       await transactionHandler.saveBlockData(blockData);
       nextHash = await service.getBlockHash({ height: blockData.height + 1 });
     } while (nextHash);
-    _endSync.call(this);
+    _endSync.call(this, true);
   }
 
   async function _checkHeight(endHeight) {

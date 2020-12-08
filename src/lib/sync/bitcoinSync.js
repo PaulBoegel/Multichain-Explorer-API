@@ -9,12 +9,12 @@ function BitcoinSync({
   syncHeight = null,
   syncHeightActive = false,
 }) {
-  function _endSync() {
+  function _endSync(fireEvent) {
     BlockLogger.info({
       message: "blockchain synchronized",
       data: { chainname: `${this.chainname}` },
     });
-    this.events.emit("blockchainSynchronized", this.chainname);
+    if (fireEvent) this.events.emit("blockchainSynchronized", this.chainname);
   }
 
   async function _syncDataWithHeight({ nextHash }) {
@@ -37,7 +37,7 @@ function BitcoinSync({
       nextHash = blockData.nextblockhash;
     }
 
-    _endSync.call(this);
+    _endSync.call(this, false);
 
     return true;
   }
@@ -60,7 +60,7 @@ function BitcoinSync({
       nextHash = blockData.nextblockhash;
     } while (nextHash);
 
-    _endSync.call(this);
+    _endSync.call(this, true);
   }
 
   function _checkHeight(endHeight) {
