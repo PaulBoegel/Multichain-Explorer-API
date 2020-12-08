@@ -24,7 +24,7 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
     _checkConnection();
     db.collection("blocks").createIndex("hash");
     db.collection("blocks").createIndex("height");
-    db.collection("blocks").createIndex("chainname");
+    db.collection("blocks").createIndex({ chainname: "text" });
     db.collection("blocks").createIndex("tx.txid");
     db.collection("blocks").createIndex("tx.vin.txid");
     db.collection("blocks").createIndex("tx.vout.addresses");
@@ -38,21 +38,17 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
   }
 
   async function get({ query = {}, projection = {}, sort = {}, limit = 0 }) {
-    try {
-      _checkConnection();
-      let blocks = await db
-        .collection("blocks")
-        .find(query, { projection })
-        .sort(sort);
-      if (limit > 0) {
-        blocks = blocks.limit(limit);
-      }
-
-      blocks = await blocks.toArray();
-      return blocks;
-    } catch (err) {
-      throw err;
+    _checkConnection();
+    let blocks = await db
+      .collection("blocks")
+      .find(query, { projection })
+      .sort(sort);
+    if (limit > 0) {
+      blocks = blocks.limit(limit);
     }
+
+    blocks = await blocks.toArray();
+    return blocks;
   }
 
   async function add(newBlock) {
