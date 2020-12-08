@@ -23,7 +23,7 @@ function EthereumSync({
 
   async function _syncData({ startHeight, endHeight }) {
     height = startHeight;
-    while (endHeight === undefined || height < endHeight) {
+    while (endHeight === undefined || height <= endHeight) {
       const sRequestTime = Date.now();
       const blockhash = await service.getBlockHash({ height, verbose: true });
 

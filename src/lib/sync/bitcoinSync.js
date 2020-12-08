@@ -24,7 +24,7 @@ function BitcoinSync({
 
   async function _syncData({ startHeight, endHeight }) {
     let height = startHeight;
-    while (endHeight === undefined || height < endHeight) {
+    while (endHeight === undefined || height <= endHeight) {
       const sRequestTime = Date.now();
       const blockhash = await service.getBlockHash({ height, verbose: true });
       if (!blockhash) break;
