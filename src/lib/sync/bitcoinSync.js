@@ -21,18 +21,27 @@ function BitcoinSync({
   }
 
   async function _checkblockCach() {
-    const height = lastHeightSaved + 1;
-    const block = blockCach.get(height);
-    if (!block) return;
-    blockCach.delete(height);
-    await transactionHandler.saveBlockData(block);
-    lastHeightSaved++;
+    let height = lastHeightSaved + 1;
+    const saveBlocks = [];
+    let block;
+    while (true) {
+      block = blockCach.get(height);
+      if (block) {
+        saveBlocks.push(block);
+        blockCach.delete(height);
+        height++;
+        continue;
+      }
+      break;
+    }
+    if (saveBlocks.length === 0) return;
+    await transactionHandler.saveBlockDataMany(saveBlocks);
+    const [lastBlock] = saveBlocks.slice(-1);
+    lastHeightSaved = lastBlock.height;
     BlockLogger.info({
-      message: "cached block saved",
+      message: "cached blocks saved",
       data: {
-        chainId: block.chainId,
-        height: block.height,
-        transactions: block.tx.length,
+        count: saveBlocks.length,
       },
     });
     await _checkblockCach();

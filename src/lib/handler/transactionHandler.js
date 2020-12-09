@@ -19,6 +19,14 @@ function TransactionHandler(blockRepo) {
     return _calculateSaveTimeInSeconds(sTime, eTime);
   }
 
+  async function saveBlockDataMany(blockData) {
+    const sTime = Date.now();
+    await blockRepo.addMany(blockData);
+    const eTime = Date.now();
+
+    return _calculateSaveTimeInSeconds(sTime, eTime);
+  }
+
   async function getAllBlockHeights(chainId) {
     const heightResult = await blockRepo.get({
       query: { chainId },
@@ -52,6 +60,7 @@ function TransactionHandler(blockRepo) {
 
   return {
     saveBlockData,
+    saveBlockDataMany,
     saveBlockDataWithHash,
     getHighestBlock,
     getAllBlockHeights,
