@@ -29,6 +29,7 @@ function BitcoinSync({
       block = blockcache.get(height);
       if (block) {
         if (block.height <= lastHeightSaved) {
+          console.log("deleted from cache: " + block.height);
           blockcache.delete(height);
           height++;
           continue;
@@ -106,7 +107,6 @@ function BitcoinSync({
         }
 
         if (blockcache.has(blockData.height)) return;
-        if (blockData.height <= lastHeightSaved) return;
         blockcache.set(blockData.height, blockData);
         BlockLogger.info({
           message: "block saved in cache",
