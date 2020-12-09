@@ -106,6 +106,7 @@ function BitcoinSync({
         }
 
         if (blockcache.has(blockData.height)) return;
+        if (blockData.height <= lastHeightSaved) return;
         blockcache.set(blockData.height, blockData);
         BlockLogger.info({
           message: "block saved in cache",
