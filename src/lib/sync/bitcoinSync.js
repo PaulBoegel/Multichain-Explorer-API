@@ -41,6 +41,7 @@ function BitcoinSync({
       break;
     }
     if (saveBlocks.length === 0) return;
+    console.log("speichern: " + saveBlocks.length);
     await transactionHandler.saveBlockDataMany(saveBlocks);
     lastHeightSaved = Math.max(...saveBlocks.map((block) => block.height));
     BlockLogger.info({
