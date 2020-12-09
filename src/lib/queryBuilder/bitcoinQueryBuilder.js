@@ -1,5 +1,33 @@
-function BitcoinQueryBuilder(formater, repo) {
+function BitcoinQueryBuilder(formater, repo, chainId) {
   const queryBuilder = {
+    async blockSearch({ height, projection = {} }) {
+      const query = { chainId: this.chainId, height };
+      await this.repo.connect();
+      const blocks = await this.repo.get({ query, projection });
+      const transactions = [];
+      const inputs = [];
+
+      blocks.forEach((block) => {
+        transactions.push(...block.tx);
+      });
+
+      transactions.forEach((transaction) => {
+        inputs.push(...transaction.vin);
+      });
+
+      inputs.map((input) => {
+        return input.txid;
+      });
+
+      blocks.push(
+        await this.repo.get({
+          chainId: this.chainId,
+          "tx.txid": { $in: inputs },
+        })
+      );
+
+      return blocks;
+    },
     async addressSearchQuery(from, to = undefined, limit = 0) {
       try {
         const fromQuery = { "vout.addresses": from };
@@ -50,8 +78,8 @@ function BitcoinQueryBuilder(formater, repo) {
     },
   };
 
-  Object.defineProperty(queryBuilder, "chainname", {
-    value: "bitcoin",
+  Object.defineProperty(queryBuilder, "chainId", {
+    value: chainId,
     writable: true,
     enumerable: true,
     configurable: true,

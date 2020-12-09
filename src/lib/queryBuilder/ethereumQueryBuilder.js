@@ -1,5 +1,11 @@
-function EthereumQueryBuilder(formater, repo) {
+function EthereumQueryBuilder(formater, repo, chainId) {
   const queryBuilder = {
+    async blockSearch({ height, projection = {} }) {
+      const query = { chainId: this.chainId, height };
+      await this.repo.connect();
+      const result = await this.repo.get({ query, projection });
+      return result;
+    },
     async addressSearchQuery(
       from = { $exists: true },
       to = { $exists: true },
@@ -30,8 +36,8 @@ function EthereumQueryBuilder(formater, repo) {
     },
   };
 
-  Object.defineProperty(queryBuilder, "chainname", {
-    value: "ethereum",
+  Object.defineProperty(queryBuilder, "chainId", {
+    value: chainId,
     writable: true,
     enumerable: true,
     configurable: true,

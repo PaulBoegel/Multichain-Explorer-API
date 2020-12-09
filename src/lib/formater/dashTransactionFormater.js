@@ -1,9 +1,9 @@
 "use strict";
 const BitcoinTransactionFormater = require("./bitcoinTransactionFormater");
 
-function DashTransactionFormater() {
+function DashTransactionFormater(chainId) {
   const dashTransactionFormater = {
-    chainname: "dash",
+    chainId,
     formatForDB(transaction) {
       transaction = super.formatForDB(transaction);
       const transactionTemplate = new Map();

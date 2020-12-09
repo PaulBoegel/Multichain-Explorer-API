@@ -1,6 +1,6 @@
 const JsonObjectFormatHandler = require("../handler/jsonObjectFormatHandler");
 
-function BitcoinTransactionFormater() {
+function BitcoinTransactionFormater(chainId) {
   function _formatDbVout(vout) {
     const outputTemplate = new Map();
     outputTemplate.set("scriptPubKey.addresses", "addresses");
@@ -75,8 +75,8 @@ function BitcoinTransactionFormater() {
           });
           continue;
         }
-        const query = { txid: input.txid, chainname: this.chainname };
-        const projection = { _id: 0, _chainname: 0 };
+        const query = { txid: input.txid, chainId: this.chainId };
+        const projection = { _id: 0, _chainId: 0 };
         const [inputTransaction] = await repository.get(query, projection);
         if (!inputTransaction) continue;
         let output = inputTransaction.vout.find(
@@ -111,8 +111,8 @@ function BitcoinTransactionFormater() {
     },
   };
 
-  Object.defineProperty(bitcoinTransactionFormater, "chainname", {
-    value: "bitcoin",
+  Object.defineProperty(bitcoinTransactionFormater, "chainId", {
+    value: chainId,
     writable: true,
     enumerable: true,
     configurable: true,

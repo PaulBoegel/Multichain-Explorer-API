@@ -1,9 +1,9 @@
 "user-strict";
 
 const fs = require("fs");
-const FullnodeRestApi = require("./fullnodeRestAPI");
+const FullnodeApi = require("./fullnodeAPI");
 const ConfigurationHandler = require("../lib/handler/configurationHandler");
-const TransactionRepository = require("../lib/repos/transactionRepository");
+const BlockRepository = require("../lib/repos/blockRepository");
 const TransactionFormaterFactory = require("../lib/transactionFormaterFactory");
 const TransactionFormaterManager = require("../lib/transactionFormaterManager");
 const QueryBuilderFactory = require("../lib/queryBuilderFactory");
@@ -11,27 +11,44 @@ const QueryBuilderManager = require("../lib/queryBuilderManager");
 
 const configHandler = new ConfigurationHandler(fs);
 const config = configHandler.readAndParseJsonFile("./explorer-config.json");
-const transactionRepo = new TransactionRepository(config.dbConfig.test);
+const blockRepo = new BlockRepository(config.dbConfig.test);
 
-const formaterFactory = TransactionFormaterFactory();
+const formaterFactory = TransactionFormaterFactory(config.blockchainConfig);
 const formaterManager = TransactionFormaterManager();
 
-formaterManager.setFormater(formaterFactory.create("bitcoin"));
-formaterManager.setFormater(formaterFactory.create("litecoin"));
-formaterManager.setFormater(formaterFactory.create("dash"));
-formaterManager.setFormater(formaterFactory.create("ethereum"));
+formaterManager.setFormater(
+  formaterFactory.create(config.blockchainConfig.bitcoin.chainId)
+);
+formaterManager.setFormater(
+  formaterFactory.create(config.blockchainConfig.litecoin.chainId)
+);
+formaterManager.setFormater(
+  formaterFactory.create(config.blockchainConfig.dash.chainId)
+);
+formaterManager.setFormater(
+  formaterFactory.create(config.blockchainConfig.ethereum.chainId)
+);
 
 const queryBuilderFactory = QueryBuilderFactory(
   formaterManager,
-  transactionRepo
+  blockRepo,
+  config.blockchainConfig
 );
 const queryBuilderManager = QueryBuilderManager();
 
-queryBuilderManager.setQueryBuilder(queryBuilderFactory.create("bitcoin"));
-queryBuilderManager.setQueryBuilder(queryBuilderFactory.create("litecoin"));
-queryBuilderManager.setQueryBuilder(queryBuilderFactory.create("dash"));
-queryBuilderManager.setQueryBuilder(queryBuilderFactory.create("ethereum"));
+queryBuilderManager.setQueryBuilder(
+  queryBuilderFactory.create(config.blockchainConfig.bitcoin.chainId)
+);
+queryBuilderManager.setQueryBuilder(
+  queryBuilderFactory.create(config.blockchainConfig.litecoin.chainId)
+);
+queryBuilderManager.setQueryBuilder(
+  queryBuilderFactory.create(config.blockchainConfig.dash.chainId)
+);
+queryBuilderManager.setQueryBuilder(
+  queryBuilderFactory.create(config.blockchainConfig.ethereum.chainId)
+);
 
-const fullnodeRestApi = FullnodeRestApi(queryBuilderManager);
+const fullnodeApi = FullnodeApi(queryBuilderManager);
 
-fullnodeRestApi.start();
+fullnodeApi.start();

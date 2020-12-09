@@ -1,5 +1,5 @@
 const request = require("request");
-function BitcoinNodeService(rpcConf, chainname) {
+function BitcoinNodeService(rpcConf, chainId) {
   function _fetchBlockData(options) {
     return new Promise((resolve, reject) => {
       request(options, (error, response, body) => {
@@ -25,7 +25,7 @@ function BitcoinNodeService(rpcConf, chainname) {
   }
 
   return {
-    chainname,
+    chainId,
     async getTransaction({ txid, verbose = false }) {
       return await rpc.getrawtransaction({ txid, verbose });
     },

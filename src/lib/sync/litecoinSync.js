@@ -17,7 +17,7 @@ function LitecoinSync({
         syncHeightActive,
       }),
       {
-        chainname: "litecoin",
+        chainId: service.chainId,
       }
     ),
     BitcoinSync

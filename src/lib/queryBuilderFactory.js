@@ -3,29 +3,29 @@ const LitecoinQueryBuilder = require("./queryBuilder/litecoinQueryBuilder");
 const DashQueryBuilder = require("./queryBuilder/dashQueryBuilder");
 const EthereumQueryBuilder = require("./queryBuilder/ethereumQueryBuilder");
 
-function QueryBuilderFactory(formaterManager, transRepo) {
+function QueryBuilderFactory(formaterManager, blockRepo, conf) {
   return {
-    create(chainname) {
-      switch (chainname) {
-        case "bitcoin":
+    create(chainId) {
+      switch (chainId) {
+        case conf.bitcoin.chainId:
           return BitcoinQueryBuilder(
-            formaterManager.getFormater("bitcoin"),
-            transRepo
+            formaterManager.getFormater(conf.bitcoin.chainId),
+            blockRepo
           );
-        case "litecoin":
+        case conf.bitcoin.chainId:
           return LitecoinQueryBuilder(
-            formaterManager.getFormater("litecoin"),
-            transRepo
+            formaterManager.getFormater(conf.bitcoin.chainId),
+            blockRepo
           );
-        case "dash":
+        case conf.bitcoin.chainId:
           return DashQueryBuilder(
-            formaterManager.getFormater("dash"),
-            transRepo
+            formaterManager.getFormater(conf.bitcoin.chainId),
+            blockRepo
           );
-        case "ethereum":
+        case conf.bitcoin.chainId:
           return EthereumQueryBuilder(
-            formaterManager.getFormater("ethereum"),
-            transRepo
+            formaterManager.getFormater(conf.bitcoin.chainId),
+            blockRepo
           );
       }
     },

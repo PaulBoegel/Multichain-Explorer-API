@@ -40,16 +40,20 @@ async function main() {
     const transactionFormaterManager = TransactionFormaterManager();
 
     transactionFormaterManager.setFormater(
-      transactionFormaterFactory.create("bitcoin")
+      transactionFormaterFactory.create(config.blockchainConfig.bitcoin.chainId)
     );
     transactionFormaterManager.setFormater(
-      transactionFormaterFactory.create("litecoin")
+      transactionFormaterFactory.create(
+        config.blockchainConfig.litecoin.chainId
+      )
     );
     transactionFormaterManager.setFormater(
-      transactionFormaterFactory.create("dash")
+      transactionFormaterFactory.create(config.blockchainConfig.dash.chainId)
     );
     transactionFormaterManager.setFormater(
-      transactionFormaterFactory.create("ethereum")
+      transactionFormaterFactory.create(
+        config.blockchainConfig.ethereum.chainId
+      )
     );
 
     const transactionHandler = TransactionHandler(blockRepo);
@@ -64,30 +68,36 @@ async function main() {
     const fullnodeServiceManager = FullnodeServiceManager();
     const fullnodeNotifyerManager = FullnodeNotifyerManager();
 
-    fullnodeServiceManager.setService(fullnodeServiceFactory.create("bitcoin"));
+    fullnodeServiceManager.setService(
+      fullnodeServiceFactory.create(config.blockchainConfig.bitcoin.chainId)
+    );
 
     fullnodeServiceManager.setService(fullnodeServiceFactory.create("dash"));
 
     fullnodeServiceManager.setService(
-      fullnodeServiceFactory.create("litecoin")
+      fullnodeServiceFactory.create(config.blockchainConfig.litecoin.chainId)
     );
 
     fullnodeServiceManager.setService(
-      fullnodeServiceFactory.create("ethereum")
+      fullnodeServiceFactory.create(
+        config.blockchainConfig.blockchainConfig.ethereum.chainId
+      )
     );
 
     fullnodeNotifyerManager.setNotifyer(
-      fullnodeNotifyerFactory.create("bitcoin")
-    );
-
-    fullnodeNotifyerManager.setNotifyer(fullnodeNotifyerFactory.create("dash"));
-
-    fullnodeNotifyerManager.setNotifyer(
-      fullnodeNotifyerFactory.create("litecoin")
+      fullnodeNotifyerFactory.create(config.blockchainConfig.bitcoin.chainId)
     );
 
     fullnodeNotifyerManager.setNotifyer(
-      fullnodeNotifyerFactory.create("ethereum")
+      fullnodeNotifyerFactory.create(config.blockchainConfig.dash.chainId)
+    );
+
+    fullnodeNotifyerManager.setNotifyer(
+      fullnodeNotifyerFactory.create(config.blockchainConfiglitecoin.chainId)
+    );
+
+    fullnodeNotifyerManager.setNotifyer(
+      fullnodeNotifyerFactory.create(config.blockchainConfig.ethereum.chainId)
     );
 
     const fullnodeSyncFactory = FullnodeSyncFactory({
@@ -99,18 +109,26 @@ async function main() {
 
     const fullnodeSyncManager = FullnodeSyncManager(fullnodeNotifyerManager);
 
-    fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("bitcoin"));
-    fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("dash"));
-    fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("litecoin"));
-    fullnodeSyncManager.setSynchronizer(fullnodeSyncFactory.create("ethereum"));
+    fullnodeSyncManager.setSynchronizer(
+      fullnodeSyncFactory.create(config.blockchainConfig.bitcoin.chainId)
+    );
+    fullnodeSyncManager.setSynchronizer(
+      fullnodeSyncFactory.create(config.blockchainConfig.dash.chainId)
+    );
+    fullnodeSyncManager.setSynchronizer(
+      fullnodeSyncFactory.create(config.blockchainConfig.litecoin.chainId)
+    );
+    fullnodeSyncManager.setSynchronizer(
+      fullnodeSyncFactory.create(config.blockchainConfig.ethereum.chainId)
+    );
 
     fullnodeNotifyerManager.events.addListener(
       "onNewBlock",
-      async (blockhash, chainname) => {
+      async (blockhash, chainId) => {
         try {
           await transactionHandler.saveBlockDataWithHash({
             blockhash,
-            service: fullnodeServiceManager.getService(chainname),
+            service: fullnodeServiceManager.getService(chainId),
           });
         } catch (err) {
           ErrorLogger.error(

@@ -2,10 +2,11 @@ const assert = require("assert");
 const zmq = require("zeromq");
 const LitecoinNotifyer = require("../../src/lib/notifyer/litecoinNotifyer");
 const conf = require("../../explorer-config.json");
+const chainId = conf.litecoin.chainId;
 
 function getZmqConfig() {
   return {
-    chainname: "litecoin",
+    chainId: chainId,
     transactions: {
       notifyerRelationDepth: "1",
     },
@@ -21,13 +22,13 @@ describe("LitecoinNotifyer subscribeToTransactions", () => {
   const notifyer = new LitecoinNotifyer(conf.blockchainConfig.litecoin, sock);
   notifyer.connectToSocket().then();
   notifyer.subscribeToTransactions().then();
-  it("should send the chainname if the blockchain creates a new block", (done) => {
+  it("should send the chainId if the blockchain creates a new block", (done) => {
     let isDone = false;
     notifyer.events.addListener(
       "onNewTransaction",
-      (transaction, depth, chainname) => {
+      (transaction, depth, chainId) => {
         if (isDone == false) {
-          assert.strictEqual(chainname, "litecoin");
+          assert.strictEqual(chainId, "litecoin");
           done();
           isDone = true;
         }
@@ -36,17 +37,14 @@ describe("LitecoinNotifyer subscribeToTransactions", () => {
   });
   it("should send the transaction as byte array if a new has been created", (done) => {
     let isDone = false;
-    notifyer.events.addListener(
-      "onNewTransaction",
-      (transaction, chainname) => {
-        const isByteArray = transaction && transaction.byteLength !== undefined;
-        assert.strictEqual(isByteArray, true);
-        if (isDone == false) {
-          done();
-          isDone = true;
-        }
+    notifyer.events.addListener("onNewTransaction", (transaction, chainId) => {
+      const isByteArray = transaction && transaction.byteLength !== undefined;
+      assert.strictEqual(isByteArray, true);
+      if (isDone == false) {
+        done();
+        isDone = true;
       }
-    );
+    });
   });
   after(async () => {
     await notifyer.closeConnection();
@@ -58,10 +56,10 @@ describe("LitecoinNotifyer subscribeToBlocks", () => {
   const notifyer = new LitecoinNotifyer(conf.blockchainConfig.litecoin, sock);
   notifyer.connectToSocket().then();
   notifyer.subscribeToBlocks().then();
-  it("should send the chainname if the blockchain created a new block", (done) => {
+  it("should send the chainId if the blockchain created a new block", (done) => {
     let isDone = false;
-    notifyer.events.addListener("onNewBlock", (block, chainname) => {
-      assert.strictEqual(chainname, "litecoin");
+    notifyer.events.addListener("onNewBlock", (block, chainId) => {
+      assert.strictEqual(chainId, "litecoin");
       if (isDone == false) {
         done();
         isDone = true;
@@ -70,7 +68,7 @@ describe("LitecoinNotifyer subscribeToBlocks", () => {
   });
   it("should send the block as byte array if a new has been created", (done) => {
     let isDone = false;
-    notifyer.events.addListener("onNewBlock", (blockHash, chainname) => {
+    notifyer.events.addListener("onNewBlock", (blockHash, chainId) => {
       const isByteArray = blockHash && blockHash.byteLength !== undefined;
       assert.strictEqual(isByteArray, true);
       if (isDone == false) {

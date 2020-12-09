@@ -3,17 +3,17 @@ const DashTransactionFormater = require("./formater/dashTransactionFormater");
 const EthereumTransactionFormater = require("./formater/ethereumTransactionFormater");
 const LitecoinTransactionFormater = require("./formater/litecoinTransactionFormater");
 
-function TransactionFormaterFactory() {
+function TransactionFormaterFactory(conf) {
   return {
-    create(chainname) {
-      switch (chainname) {
-        case "bitcoin":
+    create(chainId) {
+      switch (chainId) {
+        case conf.bitcoin.chainId:
           return BitcoinTransactionFormater();
-        case "litecoin":
+        case conf.litecoin.chainId:
           return LitecoinTransactionFormater();
-        case "dash":
+        case conf.dash.chainId:
           return DashTransactionFormater();
-        case "ethereum":
+        case conf.ethereum.chainId:
           return EthereumTransactionFormater();
       }
     },

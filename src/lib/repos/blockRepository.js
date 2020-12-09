@@ -22,14 +22,16 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
 
   function createIndex() {
     _checkConnection();
-    db.collection("blocks").createIndex("hash");
-    db.collection("blocks").createIndex("height");
-    db.collection("blocks").createIndex({ chainname: "text" });
-    db.collection("blocks").createIndex("tx.txid");
-    db.collection("blocks").createIndex("tx.vin.txid");
-    db.collection("blocks").createIndex("tx.vout.addresses");
-    db.collection("blocks").createIndex("tx.from");
-    db.collection("blocks").createIndex("tx.to");
+    db.collection("blocks").createIndex({ chainId: 1, hash: 1 });
+    db.collection("blocks").createIndex({ chainId: 1, height: 1 });
+    db.collection("blocks").createIndex({ chainId: 1, "tx.txid": 1 });
+    db.collection("blocks").createIndex({ chainId: 1, "tx.txid": 1 });
+    db.collection("blocks").createIndex({
+      chainId: 1,
+      "tx.vout.addresses": 1,
+    });
+    db.collection("blocks").createIndex({ chainId: 1, "tx.from": 1 });
+    db.collection("blocks").createIndex({ chainId: 1, "tx.to": 1 });
   }
 
   function _checkConnection() {

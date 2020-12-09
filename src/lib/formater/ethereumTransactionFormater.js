@@ -1,6 +1,7 @@
+const { config } = require("winston");
 const JsonObjectFormatHandler = require("../handler/jsonObjectFormatHandler");
 
-function EthereumTransactionFormater() {
+function EthereumTransactionFormater(chainId) {
   const ethereumTransactionFormater = {
     formatForDB(transaction) {
       const transactionTemplate = new Map();
@@ -43,8 +44,8 @@ function EthereumTransactionFormater() {
     },
   };
 
-  Object.defineProperty(ethereumTransactionFormater, "chainname", {
-    value: "ethereum",
+  Object.defineProperty(ethereumTransactionFormater, "chainId", {
+    value: chainId,
     writable: false,
     enumerable: true,
     configurable: true,

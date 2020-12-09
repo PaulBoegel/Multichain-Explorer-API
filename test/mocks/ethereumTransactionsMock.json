@@ -14,6 +14,6 @@
     "v": "0x2b",
     "r": "0x6217a3ed3379e98821117e66536aa59dc9f402eb1c998111e4e087bc5ec9b09e",
     "s": "0x92d3bccf7d31fd025ea79560583064a511a02a2001e31d91927e4b80c9ccaa7",
-    "chainname": "ethereum"
+    "chainId": 3
   }
 ]

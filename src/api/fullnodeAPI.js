@@ -1,17 +1,18 @@
 "use strict";
 
 const express = require("express");
+const graphServer = require("./services/graphql");
 const cors = require("cors");
 const TransactionRouter = require("./routes/transactionRouter");
 const TransactionController = require("./controllers/transactionController");
 
-function FullnodeRestApi(queryBuilderManager) {
+function FullnodeApi(queryBuilderManager) {
   const app = express();
   const port = process.env.PORT || 3000;
 
-  app.use(cors({ origin: true }));
-
   function start() {
+    graphServer({ queryBuilderManager }).applyMiddleware({ app });
+    app.use(cors({ origin: true }));
     initAPI();
     app.listen(port, () => {
       console.log(`Fullnode REST API runnning on port ${port}`);
@@ -33,4 +34,4 @@ function FullnodeRestApi(queryBuilderManager) {
   return { start };
 }
 
-module.exports = FullnodeRestApi;
+module.exports = FullnodeApi;

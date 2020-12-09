@@ -1,9 +1,10 @@
 "use strict";
+const { config } = require("winston");
 const BitcoinTransactionFormater = require("./bitcoinTransactionFormater");
 
-function LitecoinTransactionFormater() {
+function LitecoinTransactionFormater(chainId) {
   return Object.setPrototypeOf(
-    Object.assign(BitcoinTransactionFormater(), { chainname: "litecoin" }),
+    Object.assign(BitcoinTransactionFormater(), { chainId }),
     BitcoinTransactionFormater
   );
 }

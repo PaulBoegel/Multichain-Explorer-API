@@ -15,9 +15,9 @@ function BitcoinSync({
   function _endSync(fireEvent) {
     BlockLogger.info({
       message: "blockchain synchronized",
-      data: { chainname: `${this.chainname}` },
+      data: { chainId: `${this.chainId}` },
     });
-    if (fireEvent) this.events.emit("blockchainSynchronized", this.chainname);
+    if (fireEvent) this.events.emit("blockchainSynchronized", this.chainId);
   }
 
   async function _checkblockCach() {
@@ -30,7 +30,7 @@ function BitcoinSync({
     BlockLogger.info({
       message: "cached block saved",
       data: {
-        chainname: block.chainname,
+        chainId: block.chainId,
         height: block.height,
         transactions: block.tx.length,
       },
@@ -53,7 +53,7 @@ function BitcoinSync({
         });
         const eFormatTime = Date.now();
 
-        blockData.chainname = service.chainname;
+        blockData.chainId = service.chainId;
 
         const requestTime = _calculateSaveTimeInSeconds(
           sRequestTime,
@@ -73,7 +73,7 @@ function BitcoinSync({
           BlockLogger.info({
             message: "block saved",
             data: {
-              chainname: blockData.chainname,
+              chainId: blockData.chainId,
               height: blockData.height,
               transactions: blockData.tx.length,
               requestTime,
@@ -115,7 +115,7 @@ function BitcoinSync({
 
   return {
     events: new EventEmitter(),
-    chainname: "bitcoin",
+    chainId: service.chainId,
     setSyncHeight(height) {
       syncHeight = height;
     },

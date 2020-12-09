@@ -17,10 +17,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "apollo-server-express": "^2.19.0",
     "app-root-path": "^3.0.0",
     "bitcoind-rpc": "^0.8.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "graphql": "^15.4.0",
+    "graphql-tools": "^7.0.2",
     "mongodb": "^3.6.3",
     "rpc-bitcoin": "^2.0.0",
     "web3": "^1.3.0",

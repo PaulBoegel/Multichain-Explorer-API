@@ -1,6 +1,6 @@
 "use strict";
 
-function EthereumNodeService(web3, chainname) {
+function EthereumNodeService(web3, chainId) {
   async function decodeTransaction(byteArray) {}
 
   async function getBlockHash({ height }) {
@@ -42,7 +42,7 @@ function EthereumNodeService(web3, chainname) {
     getBlockchainInfo,
     getBlock,
     getBlockHash,
-    chainname,
+    chainId,
   };
 }
 

@@ -3,10 +3,10 @@
 function TransactionController(queryBuilderManager) {
   async function getByTxId(req, res) {
     try {
-      const chainname = req.params.chainname;
+      const chainId = req.params.chainId;
       const txid = req.params.txid;
 
-      let result = await transactionRepo.getByIds(txid, chainname);
+      let result = await transactionRepo.getByIds(txid, chainId);
 
       if (result) {
         res.setHeader("Content-Type", "application/json");
@@ -22,12 +22,12 @@ function TransactionController(queryBuilderManager) {
 
   async function addressSearch(req, res) {
     try {
-      const chainname = req.param("chainname");
+      const chainId = req.param("chainId");
       const from = req.param("from") === "" ? undefined : req.param("from");
       const to = req.param("to") === "" ? undefined : req.param("to");
       const limit = parseInt(req.param("limit"));
 
-      const queryBuilder = queryBuilderManager.getQueryBuilder(chainname);
+      const queryBuilder = queryBuilderManager.getQueryBuilder(chainId);
       const transactions = await queryBuilder.addressSearchQuery(
         from,
         to,
@@ -49,9 +49,9 @@ function TransactionController(queryBuilderManager) {
 
   async function getOutput(req, res) {
     try {
-      const chainname = req.params.chainname;
+      const chainId = req.params.chainId;
       const txid = req.params.txid;
-      const transaction = await transactionRepo.getByIds(txid, chainname);
+      const transaction = await transactionRepo.getByIds(txid, chainId);
 
       res.setHeader("Conent-Type", "application/json");
       res.send(JSON.stringify(transaction, null, 4));

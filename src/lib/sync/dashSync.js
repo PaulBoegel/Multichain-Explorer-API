@@ -17,7 +17,7 @@ function DashSync({
         syncHeightActive,
       }),
       {
-        chainname: "dash",
+        chainId: service.chainId,
       }
     ),
     BitcoinSync

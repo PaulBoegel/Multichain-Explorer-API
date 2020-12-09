@@ -9,10 +9,10 @@ describe("EthereumNotifyer subscribeToBlocks", () => {
   notifyer.subscribeToBlocks().then();
   it.only("should send the block header if the blockchain creates a new block", (done) => {
     let isDone = false;
-    notifyer.events.addListener("onNewBlock", (block, chainname) => {
+    notifyer.events.addListener("onNewBlock", (block, chainId) => {
       if (isDone == false) {
         console.log(block);
-        assert.strictEqual(chainname, "ethereum");
+        assert.strictEqual(chainId, "ethereum");
         done();
         isDone = true;
       }

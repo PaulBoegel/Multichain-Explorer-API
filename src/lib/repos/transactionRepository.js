@@ -26,7 +26,7 @@ function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
   function createIndex() {
     _checkConnection();
     db.collection("transactions").createIndex("txid");
-    db.collection("transactions").createIndex("chainname");
+    db.collection("transactions").createIndex("chainId");
     db.collection("transactions").createIndex("vin.txid");
     db.collection("transactions").createIndex("vout.addresses");
     db.collection("transactions").createIndex("from");
@@ -57,12 +57,12 @@ function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
     }
   }
 
-  async function getByIds(txid, chainname) {
+  async function getByIds(txid, chainId) {
     try {
       _checkConnection();
       const transaction = await db
         .collection("transactions")
-        .find({ txid, chainname })
+        .find({ txid, chainId })
         .project({ _id: 0 })
         .limit(1);
 
@@ -76,8 +76,8 @@ function TransactionRepository({ host, port, dbName, poolSize = 10 }) {
   async function add(newTransaction) {
     try {
       _checkConnection();
-      const { txid, chainname, ...data } = newTransaction;
-      const keys = { txid, chainname };
+      const { txid, chainId, ...data } = newTransaction;
+      const keys = { txid, chainId };
       data.timestamp = Date.now();
       return await db
         .collection("transactions")

@@ -34,7 +34,7 @@
         "addresses": ["12higDjoCCNXSA95xZMWUdPvXNmkAduhWv"]
       }
     ],
-    "chainname": "litecoin"
+    "chainId": 0
   },
   {
     "txid": "0b086abe2602f870a2d93ed496b0558d5fc349c4504eb0d474cc4ca99b4b1308",
@@ -51,7 +51,7 @@
         "addresses": ["123klkj1e2lk3jlkj1dl2k3jlkjlkkjkj"]
       }
     ],
-    "chainname": "litecoin"
+    "chainId": 0
   },
   {
     "txid": "a32363cff5c5663ee7625ec038d78fedd2060a25782f67d0608b9558dce43963",
@@ -66,7 +66,7 @@
         "n": 0
       }
     ],
-    "chainname": "litecoin"
+    "chainId": 0
   },
   {
     "txid": "3f5d810e62022ae5c3cd46131a2bc64cf92a5a9b3b9ac316a814bb47507616dc",
@@ -83,6 +83,6 @@
         "addresses": ["asdddfasddasdfasdfddfasdf"]
       }
     ],
-    "chainname": "litecoin"
+    "chainId": 0
   }
 ]

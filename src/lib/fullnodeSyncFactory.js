@@ -9,39 +9,43 @@ function FullnodeSyncFactory({
   transactionHandler,
   config,
 }) {
-  function create(chainname) {
-    switch (chainname) {
-      case "litecoin":
-        formater = transactionFormaterManager.getFormater("litecoin");
+  function create(chainId) {
+    switch (chainId) {
+      case config.litecoin.chainId:
+        formater = transactionFormaterManager.getFormater(
+          config.litecoin.chainId
+        );
         return new LitecoinSync({
-          service: fullnodeServiceManager.getService(chainname),
+          service: fullnodeServiceManager.getService(config.litecoin.chainId),
           transactionHandler,
           formater,
           syncHeight: config.litecoin.syncHeight,
           syncHeightActive: config.litecoin.syncHeightActive,
         });
-      case "bitcoin":
-        formater = transactionFormaterManager.getFormater("bitcoin");
+      case config.bitcoin.chainId:
+        formater = transactionFormaterManager.getFormater(
+          config.bitcoin.chainId
+        );
         return new BitcoinSync({
-          service: fullnodeServiceManager.getService(chainname),
+          service: fullnodeServiceManager.getService(config.bitcoin.chainId),
           transactionHandler,
           formater,
           syncHeight: config.bitcoin.syncHeight,
           syncHeightActive: config.bitcoin.syncHeightActive,
         });
-      case "dash":
-        formater = transactionFormaterManager.getFormater("dash");
+      case config.dash.chainId:
+        formater = transactionFormaterManager.getFormater(config.dash.chainId);
         return new DashSync({
-          service: fullnodeServiceManager.getService(chainname),
+          service: fullnodeServiceManager.getService(config.dash.chainId),
           transactionHandler,
           formater,
           syncHeight: config.dash.syncHeight,
           syncHeightActive: config.dash.syncHeightActive,
         });
-      case "ethereum":
-        formater = transactionFormaterManager.getFormater("ethereum");
+      case config.ethereum.chainId:
+        formater = transactionFormaterManager.getFormater(config.dash.chainId);
         return new EthereumSync({
-          service: fullnodeServiceManager.getService(chainname),
+          service: fullnodeServiceManager.getService(config.dash.chainId),
           transactionHandler,
           formater,
           syncHeight: config.ethereum.syncHeight,

@@ -21,7 +21,7 @@ function EthereumSync({
     BlockLogger.info({
       message: "cached block saved",
       data: {
-        chainname: block.chainname,
+        chainId: block.chainId,
         height: block.height,
         transactions: block.tx.length,
       },
@@ -32,9 +32,9 @@ function EthereumSync({
   function _endSync(fireEvent) {
     BlockLogger.info({
       message: "blockchain synchronized",
-      data: { chainname: `${this.chainname}` },
+      data: { chainId: `${this.chainId}` },
     });
-    if (fireEvent) this.events.emit("blockchainSynchronized", this.chainname);
+    if (fireEvent) this.events.emit("blockchainSynchronized", this.chainId);
   }
 
   function _calculateSaveTimeInSeconds(sTime, eTime) {
@@ -59,7 +59,7 @@ function EthereumSync({
 
         const eFormatTime = Date.now();
 
-        blockData.chainname = service.chainname;
+        blockData.chainId = service.chainId;
 
         const requestTime = _calculateSaveTimeInSeconds(
           sRequestTime,
@@ -79,7 +79,7 @@ function EthereumSync({
           BlockLogger.info({
             message: "block saved",
             data: {
-              chainname: blockData.chainname,
+              chainId: blockData.chainId,
               height: blockData.height,
               transactions: blockData.tx.length,
               requestTime,
@@ -114,7 +114,7 @@ function EthereumSync({
   }
 
   return {
-    chainname: "ethereum",
+    chainId: service.chainId,
     events: new EventEmitter(),
     setSyncHeight({ height, active }) {
       syncHeight = height;

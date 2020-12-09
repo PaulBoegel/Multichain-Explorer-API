@@ -27,14 +27,14 @@ describe("TransactionController getOutput", () => {
 
   it("should return output transactions with address as vin value", async () => {
     const req = RequestMockFactory({
-      chainname: "dash",
+      chainId: 0,
       txid: "8f3254b44fea26b85a9e563c944f164f7e855527711eaa2eede26d7df0e4df07",
     });
     const resp = ResponseMockFactory();
     const resultSpy = sinon.spy(resp, "send");
     const result = await transactionRepository.getByIds(
       "c5ff4f777dc5a8306c12cc20bb555a4279d9e49572f42eeabec40663fab3a876",
-      "dash"
+      0
     );
     result.address = "XmAQzotAmP25xnhrjN6hsnKqWw89Pdsn3T";
     await transactionController.getOutput(req, resp);

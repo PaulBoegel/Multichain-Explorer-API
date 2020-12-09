@@ -1,9 +1,9 @@
 "use strict";
 const BitcoinNodeService = require("./bitcoinNodeService");
 
-function LitecoinNodeService(rpc, chainname) {
+function LitecoinNodeService(rpc, chainId) {
   return Object.setPrototypeOf(
-    Object.assign(BitcoinNodeService(rpc, chainname), {}),
+    Object.assign(BitcoinNodeService(rpc, chainId), {}),
     BitcoinNodeService
   );
 }
