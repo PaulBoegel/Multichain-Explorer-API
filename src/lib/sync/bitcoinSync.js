@@ -47,13 +47,13 @@ function BitcoinSync({
     const formatingTime = _calculateSaveTimeInSeconds(sTime, eTime);
     lastHeightSaved = Math.max(...saveBlocks.map((block) => block.height));
     console.log("speichern beendet in: " + formatingTime);
-    BlockLogger.info({
-      message: "cached blocks saved",
-      data: {
-        blockHeight: lastHeightSaved,
-        count: saveBlocks.length,
-      },
-    });
+    // BlockLogger.info({
+    //   message: "cached blocks saved",
+    //   data: {
+    //     blockHeight: lastHeightSaved,
+    //     count: saveBlocks.length,
+    //   },
+    // });
     await _checkblockcache();
   }
 
@@ -88,33 +88,34 @@ function BitcoinSync({
 
         if (blockData.height - 1 === lastHeightSaved || lastHeightSaved === 0) {
           const saveTime = await transactionHandler.saveBlockData(blockData);
+          console.log("gespeichert ohne cache");
           lastHeightSaved = blockData.height;
-          BlockLogger.info({
-            message: "block saved",
-            data: {
-              chainId: blockData.chainId,
-              height: lastHeightSaved,
-              transactions: blockData.tx.length,
-              requestTime,
-              formatingTime,
-              saveTime,
-            },
-          });
+          // BlockLogger.info({
+          //   message: "block saved",
+          //   data: {
+          //     chainId: blockData.chainId,
+          //     height: lastHeightSaved,
+          //     transactions: blockData.tx.length,
+          //     requestTime,
+          //     formatingTime,
+          //     saveTime,
+          //   },
+          // });
           return;
         }
 
         if (blockcache.has(blockData.height)) return;
         blockcache.set(blockData.height, blockData);
-        BlockLogger.info({
-          message: "block saved in cache",
-          data: {
-            chainId: blockData.chainId,
-            height: blockData.height,
-            transactions: blockData.tx.length,
-            cacheCount: blockcache.size,
-            blockHeight: lastHeightSaved,
-          },
-        });
+        // BlockLogger.info({
+        //   message: "block saved in cache",
+        //   data: {
+        //     chainId: blockData.chainId,
+        //     height: blockData.height,
+        //     transactions: blockData.tx.length,
+        //     cacheCount: blockcache.size,
+        //     blockHeight: lastHeightSaved,
+        //   },
+        // });
       });
   }
 
