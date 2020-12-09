@@ -110,7 +110,7 @@ function BitcoinSync({
             cacheCount: blockcache.size,
           },
         });
-        if (blockcache.size > 20000) {
+        if (blockcache.size > 10000) {
           const blockhash = await service.getBlockHash({
             height: lastHeightSaved,
           });
