@@ -41,11 +41,11 @@ function BitcoinSync({
       break;
     }
     if (saveBlocks.length === 0) return;
-    lastHeightSaved = Math.max(...saveBlocks.map((block) => block.height));
     const sTime = Date.now();
     await transactionHandler.saveBlockDataMany(saveBlocks);
     const eTime = Date.now();
     const formatingTime = _calculateSaveTimeInSeconds(sTime, eTime);
+    lastHeightSaved = Math.max(...saveBlocks.map((block) => block.height));
     console.log("speichern beendet in: " + formatingTime);
     BlockLogger.info({
       message: "cached blocks saved",
@@ -87,8 +87,8 @@ function BitcoinSync({
           await _checkblockcache(blockcache, lastHeightSaved);
 
         if (blockData.height - 1 === lastHeightSaved || lastHeightSaved === 0) {
-          lastHeightSaved = blockData.height;
           const saveTime = await transactionHandler.saveBlockData(blockData);
+          lastHeightSaved = blockData.height;
           BlockLogger.info({
             message: "block saved",
             data: {
