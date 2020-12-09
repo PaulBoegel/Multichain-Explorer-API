@@ -1,7 +1,14 @@
 const { gql } = require("apollo-server-express");
 const typeDefinitions = gql`
+  type AddressRelation {
+    address: [String]
+    value: Float
+  }
+
   type Transaction {
     txid: String
+    from: [AddressRelation]
+    to: [AddressRelation]
   }
 
   type Block {

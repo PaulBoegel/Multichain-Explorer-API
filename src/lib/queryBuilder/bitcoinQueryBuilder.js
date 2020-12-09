@@ -1,4 +1,21 @@
 function BitcoinQueryBuilder(formater, repo, chainId) {
+  async function _searchForBlockRelations(outputs, inputs) {
+    return await this.repo.get({
+      query: {
+        $or: [
+          {
+            chainId: this.chainId,
+            "tx.vin.txid": { $in: outputs },
+          },
+          {
+            chainId: this.chainId,
+            "tx.txid": { $in: inputs },
+          },
+        ],
+      },
+    });
+  }
+
   const queryBuilder = {
     async blockSearch({ height, projection = {} }) {
       const query = { chainId: this.chainId, height };
@@ -13,18 +30,20 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       });
 
       transactions.forEach((transaction) => {
-        inputs.push(...transaction.vin);
+        inputs.push(...transaction.vin.map((input) => input.txid));
         outputs.push(transaction.txid);
       });
 
       blocks.push(
-        ...(await this.repo.get({
-          $and: {
-            chainId: this.chainId,
-            "tx.vin.txid": { $in: outputs },
-          },
-        }))
+        ...(await _searchForBlockRelations.call(this, outputs, inputs))
       );
+
+      const transactionPool = [];
+      blocks.forEach((block) => transactionPool.push(...block.tx));
+
+      transactionPool.forEach((transaction) => {
+        this.formater.formatAccountStructure(transaction, transactionPool);
+      });
 
       return blocks;
     },

@@ -61,30 +61,30 @@ function BitcoinTransactionFormater(chainId) {
 
       return formatedTransaction;
     },
-    async formatAccountStructure(transaction, repository) {
-      await repository.connect();
+    formatAccountStructure(transaction, transactionPool) {
       const transactionTemplate = new Map();
       const fromAddresses = [];
 
       for (input of transaction.vin) {
         if (input.coinbase) {
           fromAddresses.push({
-            address: input.coinbase,
+            address: [input.coinbase],
             coinbase: true,
             value: 0,
           });
           continue;
         }
-        const query = { txid: input.txid, chainId: this.chainId };
-        const projection = { _id: 0, _chainId: 0 };
-        const [inputTransaction] = await repository.get(query, projection);
+
+        const inputTransaction = transactionPool.find(
+          (input) => input.txid === transaction.txid
+        );
         if (!inputTransaction) continue;
         let output = inputTransaction.vout.find(
           (entry) => entry.n === input.vout
         );
         if (!output) output = { addresses: [] };
         if (output.addresses) {
-          let [address] = output.addresses;
+          let address = output.addresses;
           fromAddresses.push({
             address,
             value: output.value,
