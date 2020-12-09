@@ -46,6 +46,7 @@ function BitcoinSync({
     BlockLogger.info({
       message: "cached blocks saved",
       data: {
+        blockHeight: lastHeightSaved,
         count: saveBlocks.length,
       },
     });
@@ -88,7 +89,7 @@ function BitcoinSync({
             message: "block saved",
             data: {
               chainId: blockData.chainId,
-              height: blockData.height,
+              height: lastHeightSaved,
               transactions: blockData.tx.length,
               requestTime,
               formatingTime,
