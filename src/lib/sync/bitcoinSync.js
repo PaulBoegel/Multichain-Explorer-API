@@ -87,8 +87,8 @@ function BitcoinSync({
           await _checkblockcache(blockcache, lastHeightSaved);
 
         if (blockData.height - 1 === lastHeightSaved || lastHeightSaved === 0) {
-          const saveTime = await transactionHandler.saveBlockData(blockData);
           lastHeightSaved = blockData.height;
+          const saveTime = await transactionHandler.saveBlockData(blockData);
 
           BlockLogger.info({
             message: "block saved",
@@ -134,6 +134,7 @@ function BitcoinSync({
       _saveBlockData.call(this, blockhash);
 
       if (blockcache.size > cacheSize) {
+        console.log(lastHeightSaved);
         const blockhash = await service.getBlockHash({
           height: lastHeightSaved,
         });
