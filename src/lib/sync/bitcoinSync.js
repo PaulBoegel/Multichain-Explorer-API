@@ -100,7 +100,7 @@ function BitcoinSync({
             chainId: blockData.chainId,
             height: blockData.height,
             transactions: blockData.tx.length,
-            cacheCount: blockcache.length,
+            cacheCount: blockcache.size,
           },
         });
       });
