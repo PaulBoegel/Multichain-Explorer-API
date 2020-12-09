@@ -2,8 +2,6 @@ const { gql } = require("apollo-server-express");
 const typeDefinitions = gql`
   type Transaction {
     txid: String
-    from: [String]
-    to: [String]
   }
 
   type Block {
@@ -14,7 +12,7 @@ const typeDefinitions = gql`
   }
 
   type RootQuery {
-    blocks(height: Int, chainId: String): [Block]
+    blocks(height: Int, chainId: Int): [Block]
   }
 
   schema {

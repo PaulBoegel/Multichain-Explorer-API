@@ -25,11 +25,7 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
     db.collection("blocks").createIndex({ chainId: 1, hash: 1 });
     db.collection("blocks").createIndex({ chainId: 1, height: 1 });
     db.collection("blocks").createIndex({ chainId: 1, "tx.txid": 1 });
-    db.collection("blocks").createIndex({ chainId: 1, "tx.txid": 1 });
-    db.collection("blocks").createIndex({
-      chainId: 1,
-      "tx.vout.addresses": 1,
-    });
+    db.collection("blocks").createIndex({ chainId: 1, "tx.vin.txid": 1 });
     db.collection("blocks").createIndex({ chainId: 1, "tx.from": 1 });
     db.collection("blocks").createIndex({ chainId: 1, "tx.to": 1 });
   }

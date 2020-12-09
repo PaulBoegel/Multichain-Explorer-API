@@ -10,22 +10,26 @@ function QueryBuilderFactory(formaterManager, blockRepo, conf) {
         case conf.bitcoin.chainId:
           return BitcoinQueryBuilder(
             formaterManager.getFormater(conf.bitcoin.chainId),
-            blockRepo
+            blockRepo,
+            conf.bitcoin.chainId
           );
-        case conf.bitcoin.chainId:
+        case conf.litecoin.chainId:
           return LitecoinQueryBuilder(
-            formaterManager.getFormater(conf.bitcoin.chainId),
-            blockRepo
+            formaterManager.getFormater(conf.litecoin.chainId),
+            blockRepo,
+            conf.litecoin.chainId
           );
-        case conf.bitcoin.chainId:
+        case conf.dash.chainId:
           return DashQueryBuilder(
-            formaterManager.getFormater(conf.bitcoin.chainId),
-            blockRepo
+            formaterManager.getFormater(conf.litecoin.chainId),
+            blockRepo,
+            conf.dash.chainId
           );
-        case conf.bitcoin.chainId:
+        case conf.ethereum.chainId:
           return EthereumQueryBuilder(
-            formaterManager.getFormater(conf.bitcoin.chainId),
-            blockRepo
+            formaterManager.getFormater(conf.ethereum.chainId),
+            blockRepo,
+            conf.ethereum.chainId
           );
       }
     },

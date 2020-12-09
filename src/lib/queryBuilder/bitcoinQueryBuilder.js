@@ -5,7 +5,8 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       await this.repo.connect();
       const blocks = await this.repo.get({ query, projection });
       const transactions = [];
-      const inputs = [];
+      let inputs = [];
+      let outputs = [];
 
       blocks.forEach((block) => {
         transactions.push(...block.tx);
@@ -13,17 +14,16 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
 
       transactions.forEach((transaction) => {
         inputs.push(...transaction.vin);
-      });
-
-      inputs.map((input) => {
-        return input.txid;
+        outputs.push(transaction.txid);
       });
 
       blocks.push(
-        await this.repo.get({
-          chainId: this.chainId,
-          "tx.txid": { $in: inputs },
-        })
+        ...(await this.repo.get({
+          $and: {
+            chainId: this.chainId,
+            "tx.vin.txid": { $in: outputs },
+          },
+        }))
       );
 
       return blocks;
