@@ -47,7 +47,6 @@ function BitcoinSync({
       message: "cached blocks saved",
       data: {
         count: saveBlocks.length,
-        blockHeight: lastHeightSaved,
       },
     });
     await _checkblockcache();
@@ -108,6 +107,7 @@ function BitcoinSync({
             height: blockData.height,
             transactions: blockData.tx.length,
             cacheCount: blockcache.size,
+            blockHeight: lastHeightSaved,
           },
         });
         if (blockcache.size > 10000) {
