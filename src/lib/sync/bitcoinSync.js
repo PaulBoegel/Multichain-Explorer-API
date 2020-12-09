@@ -89,7 +89,7 @@ function BitcoinSync({
 
         if (blockData.height - 1 === lastHeightSaved || lastHeightSaved === 0) {
           const saveTime = await transactionHandler.saveBlockData(blockData);
-          console.log("gespeichert ohne cache");
+          console.log(chainId + "gespeichert ohne cache");
           console.log("neue Höhe: " + lastHeightSaved);
           lastHeightSaved = blockData.height;
           // BlockLogger.info({
