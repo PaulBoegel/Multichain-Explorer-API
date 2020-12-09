@@ -11,6 +11,7 @@ function BitcoinSync({
 }) {
   const blockcache = new Map();
   let lastHeightSaved = 0;
+  let cacheSize = 10000;
 
   function _endSync(fireEvent) {
     BlockLogger.info({
@@ -110,12 +111,6 @@ function BitcoinSync({
             blockHeight: lastHeightSaved,
           },
         });
-        if (blockcache.size > 10000) {
-          const blockhash = await service.getBlockHash({
-            height: lastHeightSaved,
-          });
-          _saveBlockData.call(this, blockhash);
-        }
       });
   }
 
@@ -133,6 +128,13 @@ function BitcoinSync({
 
       _saveBlockData.call(this, blockhash);
 
+      if (blockcache.size > cacheSize) {
+        const blockhash = await service.getBlockHash({
+          height: lastHeightSaved,
+        });
+        _saveBlockData.call(this, blockhash);
+        return;
+      }
       height += 1;
     }
 
