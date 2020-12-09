@@ -5,8 +5,8 @@ function QueryBuilderManager() {
     setQueryBuilder(queryBuilder) {
       queryBuilderArray.push(queryBuilder);
     },
-    getQueryBuilder(chainname) {
-      return queryBuilderArray.find((entry) => entry.chainname == chainname);
+    getQueryBuilder(chainId) {
+      return queryBuilderArray.find((entry) => entry.chainId == chainId);
     },
   };
 }

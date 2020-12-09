@@ -8,13 +8,13 @@ function TransactionFormaterFactory(conf) {
     create(chainId) {
       switch (chainId) {
         case conf.bitcoin.chainId:
-          return BitcoinTransactionFormater();
+          return BitcoinTransactionFormater(conf.bitcoin.chainId);
         case conf.litecoin.chainId:
-          return LitecoinTransactionFormater();
+          return LitecoinTransactionFormater(conf.litecoin.chainId);
         case conf.dash.chainId:
-          return DashTransactionFormater();
+          return DashTransactionFormater(conf.dash.chainId);
         case conf.ethereum.chainId:
-          return EthereumTransactionFormater();
+          return EthereumTransactionFormater(conf.ethereum.chainId);
       }
     },
   };

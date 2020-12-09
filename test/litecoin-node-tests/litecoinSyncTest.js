@@ -11,7 +11,7 @@ describe("LitecoinSync Blockrange", () => {
   sinon.stub(BlockLogger, "info");
   beforeEach(() => {
     service = {
-      chainname: "litecoin",
+      chainId: 0,
       getBlockchainInfo: function () {
         return 1;
       },
@@ -63,8 +63,8 @@ describe("LitecoinSync Blockrange", () => {
   });
 
   it.only("should fire blockchainSynchronized event, after end height was reached", (done) => {
-    sync.events.addListener("blockchainSynchronized", (chainname) => {
-      assert(chainname, "litecoin");
+    sync.events.addListener("blockchainSynchronized", (chainId) => {
+      assert(chainId, "litecoin");
       done();
     });
     sync.blockrange().then((result) => {});

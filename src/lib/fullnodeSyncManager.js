@@ -17,8 +17,8 @@ function FullnodeSyncManager(notifyManager) {
     await Promise.all(blockrangePromises);
   }
 
-  function _onBlockchainSynchronized(chainname) {
-    notifyManager.activateNotifyer(chainname).then();
+  function _onBlockchainSynchronized(chainId) {
+    notifyManager.activateNotifyer(chainId).then();
   }
 
   return { setSynchronizer, activateAllSynchronizer };

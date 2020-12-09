@@ -36,7 +36,9 @@ async function main() {
     await transactionRepo.createIndex();
     await blockRepo.createIndex();
 
-    const transactionFormaterFactory = TransactionFormaterFactory();
+    const transactionFormaterFactory = TransactionFormaterFactory(
+      config.blockchainConfig
+    );
     const transactionFormaterManager = TransactionFormaterManager();
 
     transactionFormaterManager.setFormater(
@@ -72,16 +74,16 @@ async function main() {
       fullnodeServiceFactory.create(config.blockchainConfig.bitcoin.chainId)
     );
 
-    fullnodeServiceManager.setService(fullnodeServiceFactory.create("dash"));
+    fullnodeServiceManager.setService(
+      fullnodeServiceFactory.create(config.blockchainConfig.dash.chainId)
+    );
 
     fullnodeServiceManager.setService(
       fullnodeServiceFactory.create(config.blockchainConfig.litecoin.chainId)
     );
 
     fullnodeServiceManager.setService(
-      fullnodeServiceFactory.create(
-        config.blockchainConfig.blockchainConfig.ethereum.chainId
-      )
+      fullnodeServiceFactory.create(config.blockchainConfig.ethereum.chainId)
     );
 
     fullnodeNotifyerManager.setNotifyer(
@@ -93,7 +95,7 @@ async function main() {
     );
 
     fullnodeNotifyerManager.setNotifyer(
-      fullnodeNotifyerFactory.create(config.blockchainConfiglitecoin.chainId)
+      fullnodeNotifyerFactory.create(config.blockchainConfig.litecoin.chainId)
     );
 
     fullnodeNotifyerManager.setNotifyer(

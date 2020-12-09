@@ -26,7 +26,7 @@ describe("LitecoinNodeService getBlock", () => {
 describe("LitecoinNodeService getTransaction", () => {
   const config = configJSON.blockchainConfig.litecoin.rpc;
   const rpc = new RPCClient(config);
-  const service = new LitecoinNodeService(rpc, "litecoin");
+  const service = new LitecoinNodeService(rpc, configJSON.li);
   it("should return a decoded transaction", async () => {
     const blockhash =
       "80ca095ed10b02e53d769eb6eaf92cd04e9e0759e5be4a8477b42911ba49c78f";

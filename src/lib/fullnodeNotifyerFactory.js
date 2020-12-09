@@ -7,32 +7,40 @@ const DashNotifyer = require("./notifyer/dashNotifyer");
 const EthereumNotifyer = require("./notifyer/ethereumNotifyer");
 
 function FullnodeNotifyerFactory(config) {
-  function create(blockchainName) {
-    switch (blockchainName) {
-      case config.litecoin.chainname:
+  function create(blockchainId) {
+    switch (blockchainId) {
+      case config.litecoin.chainId:
         return createLitecoinNotifyer();
-      case config.bitcoin.chainname:
+      case config.bitcoin.chainId:
         return createBitcoinNotifyer();
-      case config.dash.chainname:
+      case config.dash.chainId:
         return createDashNotifyer();
-      case config.ethereum.chainname:
+      case config.ethereum.chainId:
         return createEthereumNotifyer();
     }
   }
 
   function createLitecoinNotifyer() {
     const litecoinSock = new zmq.Subscriber();
-    return new LitecoinNotifyer(config.litecoin, litecoinSock);
+    return new LitecoinNotifyer(
+      config.litecoin,
+      litecoinSock,
+      config.litecoin.chainId
+    );
   }
 
   function createBitcoinNotifyer() {
     const bitcoinSock = new zmq.Subscriber();
-    return new BitcoinNotifyer(config.bitcoin, bitcoinSock);
+    return new BitcoinNotifyer(
+      config.bitcoin,
+      bitcoinSock,
+      config.bitcoin.chainId
+    );
   }
 
   function createDashNotifyer() {
     const dashSock = new zmq.Subscriber();
-    return new DashNotifyer(config.dash, dashSock);
+    return new DashNotifyer(config.dash, dashSock, config.dash.chainId);
   }
 
   function createEthereumNotifyer() {

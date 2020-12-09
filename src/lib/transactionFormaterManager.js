@@ -5,8 +5,8 @@ function TransactionFormaterManager() {
     setFormater(formater) {
       formaterArray.push(formater);
     },
-    getFormater(chainname) {
-      return formaterArray.find((entry) => entry.chainname == chainname);
+    getFormater(chainId) {
+      return formaterArray.find((entry) => entry.chainId == chainId);
     },
   };
 }

@@ -1,10 +1,10 @@
 "use strict";
 const EventEmitter = require("events");
-function BitcoinNotifyer(conf, sock) {
+function BitcoinNotifyer(conf, sock, chainId) {
   const relationDepth = conf.transactions.notifyerRelationDepth;
   return {
     events: new EventEmitter(),
-    blockchain: "bitcoin",
+    chainId,
     async connectToSocket() {
       await sock.connect(`tcp://${conf.worker.host}:${conf.worker.port}`);
       console.log(
@@ -17,18 +17,13 @@ function BitcoinNotifyer(conf, sock) {
     async subscribeToBlocks() {
       sock.subscribe("hashblock");
       for await (const [topic, msg] of sock) {
-        this.events.emit("onNewBlock", msg.toString("hex"), conf.chainname);
+        this.events.emit("onNewBlock", msg.toString("hex"), conf.chainId);
       }
     },
     async subscribeToTransactions() {
       sock.subscribe("rawtx");
       for await (const [topic, msg] of sock) {
-        this.events.emit(
-          "onNewTransaction",
-          msg,
-          relationDepth,
-          conf.chainname
-        );
+        this.events.emit("onNewTransaction", msg, relationDepth, conf.chainId);
       }
     },
   };

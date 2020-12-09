@@ -18,12 +18,10 @@ function FullnodeNotifyerManager() {
     await Promise.all(initPromiseArray);
   }
 
-  async function activateNotifyer(blockchainName) {
+  async function activateNotifyer(chainId) {
     if (notifyerArray.length == 0) throw "Notifyer array is empty.";
 
-    const notifyer = notifyerArray.find(
-      (item) => item.blockchain == blockchainName
-    );
+    const notifyer = notifyerArray.find((item) => item.chainId == chainId);
     await initNotifyer(notifyer);
   }
 
@@ -33,8 +31,8 @@ function FullnodeNotifyerManager() {
     await notifyer.subscribeToBlocks();
   }
 
-  function onNewBlock(blockHash, chainname) {
-    events.emit("onNewBlock", blockHash, chainname);
+  function onNewBlock(blockHash, chainId) {
+    events.emit("onNewBlock", blockHash, chainId);
   }
 
   return { activateAllNotifyers, activateNotifyer, setNotifyer, events };

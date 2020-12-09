@@ -9,8 +9,8 @@ function FullnodeServiceManager() {
     serviceArray.push(service);
   }
 
-  function getService(chainname) {
-    return serviceArray.find((item) => item.chainname == chainname);
+  function getService(chainId) {
+    return serviceArray.find((item) => item.chainId == chainId);
   }
 
   return {

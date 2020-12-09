@@ -43,9 +43,11 @@ function FullnodeSyncFactory({
           syncHeightActive: config.dash.syncHeightActive,
         });
       case config.ethereum.chainId:
-        formater = transactionFormaterManager.getFormater(config.dash.chainId);
+        formater = transactionFormaterManager.getFormater(
+          config.ethereum.chainId
+        );
         return new EthereumSync({
-          service: fullnodeServiceManager.getService(config.dash.chainId),
+          service: fullnodeServiceManager.getService(config.ethereum.chainId),
           transactionHandler,
           formater,
           syncHeight: config.ethereum.syncHeight,

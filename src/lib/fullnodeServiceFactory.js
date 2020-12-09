@@ -8,32 +8,32 @@ const EthereumNodeService = require("./services/ethereumNodeService");
 const Web3 = require("web3");
 
 function FullnodeServiceFactory(config) {
-  function create(blockchainName) {
-    switch (blockchainName) {
-      case config.litecoin.chainname:
+  function create(blockchainId) {
+    switch (blockchainId) {
+      case config.litecoin.chainId:
         return createLitecoinService();
-      case config.bitcoin.chainname:
+      case config.bitcoin.chainId:
         return createBitcoinService();
-      case config.dash.chainname:
+      case config.dash.chainId:
         return createDashService();
-      case config.ethereum.chainname:
+      case config.ethereum.chainId:
         return createEthereumService();
     }
   }
 
   function createLitecoinService() {
     const conf = config.litecoin.rpc;
-    return new LitecoinNodeService(conf, config.litecoin.chainname);
+    return new LitecoinNodeService(conf, config.litecoin.chainId);
   }
 
   function createBitcoinService() {
     const conf = config.bitcoin.rpc;
-    return new BitcoinNodeService(conf, config.bitcoin.chainname);
+    return new BitcoinNodeService(conf, config.bitcoin.chainId);
   }
 
   function createDashService() {
     const conf = config.dash.rpc;
-    return new DashNodeService(conf, config.dash.chainname);
+    return new DashNodeService(conf, config.dash.chainId);
   }
 
   function createEthereumService() {
@@ -42,7 +42,7 @@ function FullnodeServiceFactory(config) {
       `${conf.url}:${conf.port}`
     );
     const web3 = new Web3(provider);
-    return new EthereumNodeService(web3, config.ethereum.chainname);
+    return new EthereumNodeService(web3, config.ethereum.chainId);
   }
 
   return { create };

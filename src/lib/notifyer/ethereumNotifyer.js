@@ -5,7 +5,7 @@ const EventEmitter = require("events");
 function EthereumNotifyer(conf) {
   let web3;
   const events = new EventEmitter();
-  const blockchain = "ethereum";
+  const chainId = conf.chainId;
 
   async function connectToSocket() {
     const url = `${conf.worker.url}:${conf.worker.port}`;
@@ -22,7 +22,7 @@ function EthereumNotifyer(conf) {
     web3.eth
       .subscribe("newBlockHeaders")
       .on("data", (blockHeader) => {
-        events.emit("onNewBlock", blockHeader.hash, conf.chainname);
+        events.emit("onNewBlock", blockHeader.hash, conf.chainId);
       })
       .on("error", (error) => {
         throw new Error(error);
@@ -36,7 +36,7 @@ function EthereumNotifyer(conf) {
     closeConnection,
     subscribeToTransactions,
     subscribeToBlocks,
-    blockchain,
+    chainId,
     events,
   };
 }
