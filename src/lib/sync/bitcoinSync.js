@@ -21,7 +21,7 @@ function BitcoinSync({
     if (fireEvent) this.events.emit("blockchainSynchronized", this.chainId);
   }
 
-  async function _checkblockcache() {
+  function _checkblockcache() {
     let height = lastHeightSaved + 1;
     const saveBlocks = [];
     let block;
@@ -42,19 +42,20 @@ function BitcoinSync({
     }
     if (saveBlocks.length === 0) return;
     const sTime = Date.now();
-    await transactionHandler.saveBlockDataMany(saveBlocks);
-    const eTime = Date.now();
-    const formatingTime = _calculateSaveTimeInSeconds(sTime, eTime);
-    lastHeightSaved = Math.max(...saveBlocks.map((block) => block.height));
-    BlockLogger.info({
-      message: "cached blocks saved",
-      data: {
-        blockHeight: lastHeightSaved,
-        count: saveBlocks.length,
-        saveTime: formatingTime,
-      },
+    transactionHandler.saveBlockDataMany(saveBlocks).then(async (result) => {
+      const eTime = Date.now();
+      const formatingTime = _calculateSaveTimeInSeconds(sTime, eTime);
+      lastHeightSaved = Math.max(...saveBlocks.map((block) => block.height));
+      BlockLogger.info({
+        message: "cached blocks saved",
+        data: {
+          blockHeight: lastHeightSaved,
+          count: saveBlocks.length,
+          saveTime: formatingTime,
+        },
+      });
+      await _checkblockcache();
     });
-    await _checkblockcache();
   }
 
   function _saveBlockData(blockhash) {
