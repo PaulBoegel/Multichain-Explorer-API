@@ -32,7 +32,7 @@ function BitcoinSync({
         saveBlocks.push(block);
         transactionsSaved += block.tx.length;
         blockcache.delete(height);
-        if (transactionsSaved > 5000) break;
+        if (transactionsSaved > 100000) break;
         height++;
         continue;
       }
