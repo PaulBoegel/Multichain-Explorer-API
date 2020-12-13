@@ -11,7 +11,7 @@ function BitcoinSync({
 }) {
   const blockcache = new Map();
   let lastHeightSaved = 0;
-  let cacheSize = 10000;
+  let transactionsCached = 0;
 
   function _endSync(fireEvent) {
     BlockLogger.info({
@@ -23,13 +23,16 @@ function BitcoinSync({
 
   async function _checkblockcache() {
     let height = lastHeightSaved + 1;
+    let transactionsSaved = 0;
     const saveBlocks = [];
     let block;
     while (true) {
       block = blockcache.get(height);
       if (block) {
         saveBlocks.push(block);
+        transactionsSaved += block.tx.length;
         blockcache.delete(height);
+        if (transactionsSaved > 5000) break;
         height++;
         continue;
       }
@@ -38,6 +41,7 @@ function BitcoinSync({
     if (saveBlocks.length === 0) return;
     const sTime = Date.now();
     await transactionHandler.saveBlockDataMany(saveBlocks);
+    transactionsCached -= transactionsSaved;
     const eTime = Date.now();
     const formatingTime = _calculateSaveTimeInSeconds(sTime, eTime);
     lastHeightSaved = saveBlocks.slice(-1)[0].height;
@@ -46,6 +50,7 @@ function BitcoinSync({
       data: {
         blockHeight: lastHeightSaved,
         count: saveBlocks.length,
+        transactionsSaved: transactionsSaved,
         saveTime: formatingTime,
       },
     });
@@ -98,7 +103,12 @@ function BitcoinSync({
           return;
         }
 
-        if (blockcache.has(blockData.height)) return;
+        if (
+          blockcache.has(blockData.height) ||
+          blockData.height <= lastHeightSaved
+        )
+          return;
+        transactionsCached += blockData.tx.length;
         blockcache.set(blockData.height, blockData);
         BlockLogger.info({
           message: "block saved in cache",
@@ -110,6 +120,9 @@ function BitcoinSync({
             blockHeight: lastHeightSaved,
           },
         });
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 
@@ -125,16 +138,16 @@ function BitcoinSync({
       const blockhash = await service.getBlockHash({ height });
       if (!blockhash) break;
 
-      _saveBlockData.call(this, blockhash);
-
-      if (process.memoryUsage().heapUsed > 1500000000) {
-        console.log(lastHeightSaved);
-        const blockhash = await service.getBlockHash({
-          height: lastHeightSaved,
-        });
-        _saveBlockData.call(this, blockhash);
-        return;
+      if (transactionsCached > 20000) {
+        // const blockhash = await service.getBlockHash({
+        //   height: lastHeightSaved + 1,
+        // });
+        // _saveBlockData.call(this, blockhash);
+        await _checkblockcache();
+        continue;
       }
+
+      _saveBlockData.call(this, blockhash);
       height += 1;
     }
 
