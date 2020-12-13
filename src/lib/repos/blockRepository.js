@@ -66,6 +66,7 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
     const result = await db
       .collection("blocks")
       .insertMany(newBlocks, { ordered: false });
+    console.log(result.insertedCount);
     return result.insertedCount;
   }
 
