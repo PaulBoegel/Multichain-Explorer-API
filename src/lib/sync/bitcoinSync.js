@@ -24,7 +24,7 @@ function BitcoinSync({
   async function _checkblockcache() {
     let height = lastHeightSaved + 1;
     const saveBlocks = [];
-    const heighestCachedBlock;
+    let heighestCachedBlock;
     let block;
     while (true) {
       block = blockcache.get(height);
