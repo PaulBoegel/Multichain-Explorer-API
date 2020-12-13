@@ -127,6 +127,7 @@ function BitcoinSync({
 
       _saveBlockData.call(this, blockhash);
 
+      console.log("heapSize: ", process.memoryUsage().heapUsed);
       if (blockcache.size > cacheSize) {
         console.log(lastHeightSaved);
         const blockhash = await service.getBlockHash({
