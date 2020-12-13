@@ -52,7 +52,7 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
 
   async function add(newBlock) {
     _checkConnection();
-    await db.collection("blocks").insertMany(newBlock);
+    await db.collection("blocks").insert(newBlock);
     return true;
     // const { height, hash, ...data } = newBlock;
     // const keys = { height, hash };
