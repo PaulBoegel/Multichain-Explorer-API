@@ -52,13 +52,15 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
 
   async function add(newBlock) {
     _checkConnection();
-    const { height, hash, ...data } = newBlock;
-    const keys = { height, hash };
-    data.timestamp = Date.now();
-    await db
-      .collection("blocks")
-      .updateOne(keys, { $set: { ...data } }, { upsert: true });
+    await db.collection("blocks").insertMany(newBlock);
     return true;
+    // const { height, hash, ...data } = newBlock;
+    // const keys = { height, hash };
+    // data.timestamp = Date.now();
+    // await db
+    //   .collection("blocks")
+    //   .updateOne(keys, { $set: { ...data } }, { upsert: true });
+    // return true;
   }
 
   async function addMany(newBlocks) {
