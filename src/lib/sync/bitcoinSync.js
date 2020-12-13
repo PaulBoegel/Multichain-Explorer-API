@@ -37,9 +37,8 @@ function BitcoinSync({
     }
     if (saveBlocks.length === 0) return;
     const sTime = Date.now();
-    const result = await transactionHandler.saveBlockData(saveBlocks);
+    await transactionHandler.saveBlockData(saveBlocks);
     const eTime = Date.now();
-    console.log(result);
     const formatingTime = _calculateSaveTimeInSeconds(sTime, eTime);
     lastHeightSaved = saveBlocks.slice(-1)[0].height;
     BlockLogger.info({
