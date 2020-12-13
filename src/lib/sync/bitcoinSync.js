@@ -40,7 +40,7 @@ function BitcoinSync({
     await transactionHandler.saveBlockData(saveBlocks);
     const eTime = Date.now();
     const formatingTime = _calculateSaveTimeInSeconds(sTime, eTime);
-    lastHeightSaved = [array.slice(-1)].height;
+    lastHeightSaved = [saveBlocks.slice(-1)].height;
     BlockLogger.info({
       message: "cached blocks saved",
       data: {
