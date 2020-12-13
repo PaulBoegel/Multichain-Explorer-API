@@ -21,7 +21,7 @@ function BitcoinSync({
     if (fireEvent) this.events.emit("blockchainSynchronized", this.chainId);
   }
 
-  function _checkblockcache() {
+  async function _checkblockcache() {
     let height = lastHeightSaved + 1;
     const saveBlocks = [];
     let block;
