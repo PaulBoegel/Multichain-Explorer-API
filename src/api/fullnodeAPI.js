@@ -1,7 +1,7 @@
 "use strict";
 
 const express = require("express");
-const graphServer = require("./services/graphql");
+const graphServer = require("./graphql");
 const cors = require("cors");
 const TransactionRouter = require("./routes/transactionRouter");
 const TransactionController = require("./controllers/transactionController");

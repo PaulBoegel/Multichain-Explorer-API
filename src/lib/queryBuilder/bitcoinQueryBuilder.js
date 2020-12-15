@@ -1,5 +1,5 @@
 function BitcoinQueryBuilder(formater, repo, chainId) {
-  async function _searchForBlockRelations(outputs, inputs) {
+  async function _searchForBlockRelations(outputs, inputs, blockHeights) {
     return await this.repo.get({
       query: {
         $or: [
@@ -16,84 +16,140 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
     });
   }
 
+  async function _getBlockRelations({ transactions, blockHeights }) {
+    let inputs = new Set();
+    let outputs = [];
+    let blocks = [];
+    let vin = [];
+
+    transactions.forEach((transaction) => {
+      if (transaction.txid) outputs.push(transaction.txid);
+      vin.push(...transaction.vin);
+    });
+
+    vin.forEach((input) => {
+      if (input.txid) inputs.add(input.txid);
+    });
+
+    blocks.push(
+      ...(await _searchForBlockRelations.call(
+        this,
+        outputs,
+        Array.from(inputs),
+        blockHeights
+      ))
+    );
+    return blocks;
+  }
+
+  function _fillTransactionPool({ blocks }) {
+    const transactionPool = [];
+    blocks.forEach((block) => transactionPool.push(...block.tx));
+    return transactionPool;
+  }
+
+  function _formatTransactionWithPoolData({ transactionPool }) {
+    this.formater.formatAccountStructure({ transactionPool });
+  }
+
+  function _formatBlocks(blocks) {
+    return blocks.map((block) => {
+      const { time, previousblockhash, ...data } = block;
+      return {
+        mined: new Date(time).toDateString(),
+        parent: previousblockhash,
+        ...data,
+      };
+    });
+  }
+
   const queryBuilder = {
-    async blockSearch({ height, projection = {} }) {
-      const query = { chainId: this.chainId, height };
+    async blockSearch({
+      height = { $exists: true },
+      hash = { $exists: true },
+      projection = {},
+    }) {
+      const query = { chainId: this.chainId, height, hash };
       await this.repo.connect();
-      const blocks = await this.repo.get({ query, projection });
-      const transactions = [];
-      let inputs = [];
-      let outputs = [];
-
-      blocks.forEach((block) => {
-        transactions.push(...block.tx);
+      let blocks = await this.repo.get({ query, projection });
+      const blockHeights = blocks.map((block) => {
+        return block.height;
+      });
+      let transactionPool = _fillTransactionPool.call(this, { blocks });
+      blocks = await _getBlockRelations.call(this, {
+        transactions: transactionPool,
+        blockHeights,
       });
 
-      transactions.forEach((transaction) => {
-        inputs.push(...transaction.vin.map((input) => input.txid));
-        outputs.push(transaction.txid);
-      });
-
-      blocks.push(
-        ...(await _searchForBlockRelations.call(this, outputs, inputs))
-      );
-
-      const transactionPool = [];
       blocks.forEach((block) => transactionPool.push(...block.tx));
 
-      transactionPool.forEach((transaction) => {
-        this.formater.formatAccountStructure(transaction, transactionPool);
-      });
+      transactionPool = _fillTransactionPool.call(this, { blocks });
 
+      _formatTransactionWithPoolData.call(this, { transactionPool });
+
+      blocks = _formatBlocks(blocks);
       return blocks;
     },
-    async addressSearchQuery(from, to = undefined, limit = 0) {
-      try {
-        const fromQuery = { "vout.addresses": from };
-        const projection = { _id: 0 };
-        const transactions = [];
-        let transactionPromises = [];
-        let result = [];
+    async transactionSearch({ txid, projection = {} }) {
+      const query = { chainId: this.chainId, "tx.txid": txid };
+      await this.repo.connect();
+      let blocks = await this.repo.get({ query, projection });
+      const blockHeights = blocks.map((block) => {
+        return block.height;
+      });
 
-        await this.repo.connect();
+      let transactionPool = _fillTransactionPool.call(this, { blocks });
+      blocks = await _getBlockRelations.call(this, {
+        transactions: transactionPool,
+        blockHeights,
+      });
 
-        for (let transaction of await this.repo.get(fromQuery, projection)) {
-          transactions.push(transaction);
-          const outputQuery = { "vin.txid": transaction.txid };
-          transactionPromises.push(this.repo.get(outputQuery, projection));
-        }
+      transactionPool = _fillTransactionPool.call(this, { blocks });
+      _formatTransactionWithPoolData.call(this, { transactionPool });
 
-        result = await Promise.all(transactionPromises);
-        result.forEach((item) => {
-          if (item instanceof Array) {
-            transactions.push(...item);
-            return;
-          }
-          transactions.push(item);
-        });
+      blocks = _formatBlocks(blocks);
+      return blocks;
+    },
+    async addressSearchQuery({ address, projection }) {
+      const query = { chainId: this.chainId, "tx.vout.addresses": address };
+      const transactions = [];
+      let transactionPool = [];
+      await this.repo.connect();
+      let blocks = await this.repo.get({ query, projection });
 
-        transactionPromises.length = 0;
-        for (let transaction of transactions) {
-          transactionPromises.push(
-            this.formater.formatAccountStructure(transaction, this.repo)
-          );
-        }
+      blocks.forEach((block) => transactionPool.push(...block.tx));
 
-        result.length = 0;
-        result = await Promise.all(transactionPromises);
-        result.forEach((item) => {
-          if (item instanceof Array) {
-            transactions.push(...item);
-            return;
-          }
-          transactions.push(item);
-        });
+      const outputs = [];
+      transactionPool.forEach((transaction) => {
+        outputs.push(
+          ...transaction.vout.map((output) => {
+            return {
+              address: output.addresses,
+              txid: transaction.txid,
+              vin: transaction.vin,
+            };
+          })
+        );
+      });
 
-        if (limit > 0) transactions.length = limit - 1;
-        return transactions;
-      } catch (err) {
-        console.log(err);
-      }
+      outputs.forEach((output) => {
+        if (!output.address) return;
+        if (output.address.includes(address)) transactions.push(output);
+      });
+
+      const blockHeights = blocks.map((block) => {
+        return block.height;
+      });
+      blocks.push(
+        ...(await _getBlockRelations.call(this, { transactions, blockHeights }))
+      );
+
+      transactionPool = _fillTransactionPool.call(this, { blocks });
+
+      _formatTransactionWithPoolData.call(this, { transactionPool });
+
+      blocks = _formatBlocks(blocks);
+      return blocks;
     },
   };
 

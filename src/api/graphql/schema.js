@@ -15,11 +15,15 @@ const typeDefinitions = gql`
     hash: String
     height: Int
     chainId: Int
+    parent: String
+    mined: String
     tx: [Transaction]
   }
 
   type RootQuery {
-    blocks(height: Int, chainId: Int): [Block]
+    blocks(height: Int, hash: String, chainId: Int): [Block]
+    transactions(txid: String, chainId: Int): [Block]
+    address(address: String, chainId: Int): [Block]
   }
 
   schema {

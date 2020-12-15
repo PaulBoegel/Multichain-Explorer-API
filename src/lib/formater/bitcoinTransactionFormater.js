@@ -61,53 +61,79 @@ function BitcoinTransactionFormater(chainId) {
 
       return formatedTransaction;
     },
-    formatAccountStructure(transaction, transactionPool) {
+    formatAccountStructure({ transactionPool }) {
       const transactionTemplate = new Map();
-      const fromAddresses = [];
+      const vinPool = [];
 
-      for (input of transaction.vin) {
+      transactionPool.forEach((transaction) => {
+        transaction.from = [];
+        transaction.to = [];
+        vinPool.push(
+          ...transaction.vin.map((input) => {
+            return { txid: transaction.txid, ...input };
+          })
+        );
+      });
+
+      let transaction = {};
+      let inputTransactions = [];
+
+      vinPool.forEach((input) => {
+        if (!transaction || transaction.txid !== input.txid) {
+          transaction = transactionPool.find(
+            (transaction) => transaction.txid === input.txid
+          );
+        }
+        if (!transaction) return;
         if (input.coinbase) {
-          fromAddresses.push({
+          transaction.from.push({
             address: [input.coinbase],
             coinbase: true,
             value: 0,
           });
-          continue;
+          return;
         }
 
-        const inputTransaction = transactionPool.find(
-          (input) => input.txid === transaction.txid
+        let inputTransaction = inputTransactions.find(
+          (transaction) => transaction.txid === input.txid
         );
-        if (!inputTransaction) continue;
+
+        if (!inputTransaction) {
+          inputTransaction = transactionPool.find((poolTx, key) => {
+            return poolTx.txid === input.txid;
+          });
+        }
+
+        if (!inputTransaction) return;
+        inputTransactions.push(inputTransaction);
         let output = inputTransaction.vout.find(
           (entry) => entry.n === input.vout
         );
+
         if (!output) output = { addresses: [] };
         if (output.addresses) {
           let address = output.addresses;
-          fromAddresses.push({
+          transaction.from.push({
             address,
             value: output.value,
           });
         }
-      }
+      });
 
-      transaction.from = fromAddresses;
-
-      transactionTemplate.set("vin", false);
-      transactionTemplate.set("vout.n", false);
       transactionTemplate.set("vout", "to");
 
-      transaction = this.formater.format({
-        obj: transaction,
-        templateMap: transactionTemplate,
+      transactionPool.forEach((transaction) => {
+        transaction = this.formater.format({
+          obj: transaction,
+          templateMap: transactionTemplate,
+        });
+
+        transaction.to = transaction.to.map((to) => {
+          return { value: to.value, address: to.addresses };
+        });
       });
 
-      transaction.to = transaction.to.map((to) => {
-        return { value: to.value, address: to.addresses };
-      });
-
-      return transaction;
+      return transactionPool;
     },
   };
 
