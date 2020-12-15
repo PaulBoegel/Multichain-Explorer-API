@@ -4,10 +4,12 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       query: {
         $or: [
           {
+            height: { $nin: blockHeights },
             chainId: this.chainId,
             "tx.vin.txid": { $in: outputs },
           },
           {
+            height: { $nin: blockHeights },
             chainId: this.chainId,
             "tx.txid": { $in: inputs },
           },
@@ -16,20 +18,22 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
     });
   }
 
-  async function _getBlockRelations({ transactions, blockHeights }) {
+  async function _getBlockRelations({ transactions, blockHeights, searchVIN }) {
     let inputs = new Set();
     let outputs = [];
     let blocks = [];
     let vin = [];
 
-    transactions.forEach((transaction) => {
-      if (transaction.txid) outputs.push(transaction.txid);
-      vin.push(...transaction.vin);
-    });
+    if (searchVIN) {
+      transactions.forEach((transaction) => {
+        if (transaction.txid) outputs.push(transaction.txid);
+        vin.push(...transaction.vin);
+      });
 
-    vin.forEach((input) => {
-      if (input.txid) inputs.add(input.txid);
-    });
+      vin.forEach((input) => {
+        if (input.txid) inputs.add(input.txid);
+      });
+    }
 
     blocks.push(
       ...(await _searchForBlockRelations.call(
@@ -76,10 +80,13 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
         return block.height;
       });
       let transactionPool = _fillTransactionPool.call(this, { blocks });
-      blocks = await _getBlockRelations.call(this, {
-        transactions: transactionPool,
-        blockHeights,
-      });
+      blocks.push(
+        ...(await _getBlockRelations.call(this, {
+          transactions: transactionPool,
+          blockHeights,
+          searchVIN: false,
+        }))
+      );
 
       blocks.forEach((block) => transactionPool.push(...block.tx));
 
@@ -94,15 +101,22 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       const query = { chainId: this.chainId, "tx.txid": txid };
       await this.repo.connect();
       let blocks = await this.repo.get({ query, projection });
+      if (blocks.length === 0) return;
       const blockHeights = blocks.map((block) => {
         return block.height;
       });
 
       let transactionPool = _fillTransactionPool.call(this, { blocks });
-      blocks = await _getBlockRelations.call(this, {
-        transactions: transactionPool,
-        blockHeights,
-      });
+      const transactions = [
+        transactionPool.find((transaction) => transaction.txid === txid),
+      ];
+      blocks.push(
+        ...(await _getBlockRelations.call(this, {
+          transactions,
+          blockHeights,
+          searchVIN: true,
+        }))
+      );
 
       transactionPool = _fillTransactionPool.call(this, { blocks });
       _formatTransactionWithPoolData.call(this, { transactionPool });
@@ -141,7 +155,11 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
         return block.height;
       });
       blocks.push(
-        ...(await _getBlockRelations.call(this, { transactions, blockHeights }))
+        ...(await _getBlockRelations.call(this, {
+          transactions,
+          blockHeights,
+          searchVIN: true,
+        }))
       );
 
       transactionPool = _fillTransactionPool.call(this, { blocks });
