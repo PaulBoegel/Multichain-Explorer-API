@@ -139,10 +139,6 @@ function BitcoinSync({
       if (!blockhash) break;
 
       if (transactionsCached > 20000) {
-        // const blockhash = await service.getBlockHash({
-        //   height: lastHeightSaved + 1,
-        // });
-        // _saveBlockData.call(this, blockhash);
         await _checkblockcache();
         continue;
       }

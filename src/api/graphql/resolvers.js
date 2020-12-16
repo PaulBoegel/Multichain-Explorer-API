@@ -20,6 +20,11 @@ function Resolvers({ queryBuilderManager }) {
         });
         return result;
       },
+      async searchEntity(root, { searchString, chainId }, context) {
+        const queryBuilder = queryBuilderManager.getQueryBuilder(chainId);
+        const id = await queryBuilder.searchEntityId({ searchString });
+        return id;
+      },
     },
   };
 }

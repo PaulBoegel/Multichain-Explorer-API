@@ -167,7 +167,20 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       _formatTransactionWithPoolData.call(this, { transactionPool });
 
       blocks = _formatBlocks(blocks);
+
+      transactionPool.forEach({});
+
       return blocks;
+    },
+
+    async searchEntityId({ searchString }) {
+      if (!isNaN(searchString) && !isNaN(parseInt(searchString))) {
+        return 0;
+      }
+      if (searchString.length === 64) {
+        return 1;
+      }
+      return 2;
     },
   };
 
