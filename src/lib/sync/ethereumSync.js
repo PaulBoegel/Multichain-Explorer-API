@@ -8,25 +8,45 @@ function EthereumSync({
   syncHeight = null,
   syncHeightActive = false,
 }) {
-  const blockCach = new Map();
+  const blockcache = new Map();
   let lastHeightSaved = 0;
+  let transactionsCached = 0;
 
-  async function _checkblockCach() {
-    const height = lastHeightSaved + 1;
-    const block = blockCach.get(height);
-    if (!block) return;
-    blockCach.delete(height);
-    await transactionHandler.saveBlockData(block);
-    lastHeightSaved++;
+  async function _checkblockCache() {
+    const saveBlocks = [];
+    let height = lastHeightSaved + 1;
+    let transactionsSaved = 0;
+    let block;
+
+    while (true) {
+      block = blockcache.get(height);
+      if (block) {
+        saveBlocks.push(block);
+        transactionsSaved += block.tx.length;
+        blockcache.delete(height);
+        if (transactionsSaved > 100000) break;
+        height++;
+        continue;
+      }
+      break;
+    }
+    if (saveBlocks.length === 0) return;
+    const sTime = Date.now();
+    await transactionHandler.saveBlockDataMany(saveBlocks);
+    transactionsCached -= transactionsSaved;
+    const eTime = Date.now();
+    const formatingTime = _calculateSaveTimeInSeconds(sTime, eTime);
+    lastHeightSaved = saveBlocks.slice(-1)[0].height;
     BlockLogger.info({
-      message: "cached block saved",
+      message: "cached blocks saved",
       data: {
-        chainId: block.chainId,
-        height: block.height,
-        transactions: block.tx.length,
+        blockHeight: lastHeightSaved,
+        count: saveBlocks.length,
+        transactionsSaved: transactionsSaved,
+        saveTime: formatingTime,
       },
     });
-    await _checkblockCach();
+    await _checkblockCache();
   }
 
   function _endSync(fireEvent) {
@@ -70,11 +90,11 @@ function EthereumSync({
           eFormatTime
         );
 
-        if (blockCach.size > 0)
-          await _checkblockCach(blockCach, lastHeightSaved);
+        if (blockcache.size > 0) await _checkblockCache();
 
         if (blockData.height - 1 === lastHeightSaved || lastHeightSaved === 0) {
           const saveTime = await transactionHandler.saveBlockData(blockData);
+          lastHeightSaved = blockData.height;
 
           BlockLogger.info({
             message: "block saved",
@@ -89,7 +109,29 @@ function EthereumSync({
           });
           return;
         }
-        blockCach.set(blockData.height, blockData);
+
+        if (
+          blockcache.has(blockData.height) ||
+          blockData.height <= lastHeightSaved
+        )
+          return;
+
+        transactionsCached += blockData.tx.length;
+        blockcache.set(blockData.height, blockData);
+        blockcache.set(blockData.height, blockData);
+        BlockLogger.info({
+          message: "block saved in cache",
+          data: {
+            chainId: blockData.chainId,
+            height: blockData.height,
+            transactions: blockData.tx.length,
+            cacheCount: blockcache.size,
+            blockHeight: lastHeightSaved,
+          },
+        });
+      })
+      .catch((error) => {
+        console.log(error);
       });
   }
 
@@ -100,6 +142,11 @@ function EthereumSync({
 
       if (!blockhash) break;
       if (endHeight & (height === endHeight)) break;
+
+      if (transactionsCached > 20000) {
+        await _checkblockCach();
+        continue;
+      }
 
       _saveBlockData.call(this, blockhash);
 
