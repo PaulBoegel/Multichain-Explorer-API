@@ -144,7 +144,7 @@ function EthereumSync({
       if (endHeight & (height === endHeight)) break;
 
       if (transactionsCached > 20000) {
-        await _checkblockCach();
+        await _checkblockCache();
         continue;
       }
 
