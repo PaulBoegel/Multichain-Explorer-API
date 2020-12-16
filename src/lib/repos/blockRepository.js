@@ -35,14 +35,25 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
       throw new Error("no database connection established");
   }
 
-  async function get({ query = {}, projection = {}, sort = {}, limit = 0 }) {
+  async function get({
+    query = {},
+    projection = {},
+    sort = {},
+    limit = 0,
+    skip = 0,
+  }) {
     _checkConnection();
     let blocks = await db
       .collection("blocks")
       .find(query, { projection })
       .sort(sort);
+
     if (limit > 0) {
       blocks = blocks.limit(limit);
+    }
+
+    if (skip > 0) {
+      blocks = blocks.skip(skip);
     }
 
     blocks = await blocks.toArray();
@@ -63,7 +74,14 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
     return result.insertedCount;
   }
 
-  return { connect, createIndex, add, addMany, get };
+  async function aggregate(pipeline) {
+    _checkConnection();
+    let result = await db.collection("blocks").aggregate(pipeline);
+    result = await result.toArray();
+    return result;
+  }
+
+  return { connect, createIndex, add, addMany, get, aggregate };
 }
 
 module.exports = BlockRepository;

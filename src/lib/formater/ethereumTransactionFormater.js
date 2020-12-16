@@ -5,13 +5,11 @@ function EthereumTransactionFormater(chainId) {
   const ethereumTransactionFormater = {
     formatForDB(transaction) {
       const transactionTemplate = new Map();
-      let formatedTransaction;
 
       transactionTemplate.set("blockHash", false);
       transactionTemplate.set("gasPrice", false);
       transactionTemplate.set("nonce", false);
       transactionTemplate.set("transactionIndex", false);
-      // transactionTemplate.set("value", false);
       transactionTemplate.set("v", false);
       transactionTemplate.set("r", false);
       transactionTemplate.set("s", false);
@@ -23,7 +21,7 @@ function EthereumTransactionFormater(chainId) {
 
       return transaction;
     },
-    formatAccountStructure(transaction) {
+    formatAccountStructure({ transaction }) {
       const to = transaction.to;
       const from = transaction.from;
 

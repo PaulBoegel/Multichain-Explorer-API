@@ -1,4 +1,53 @@
 function BitcoinQueryBuilder(formater, repo, chainId) {
+  function _getInputArrayQuery(txids) {
+    return [
+      { $match: { chainId: this.chainId, "tx.txid": { $in: txids } } },
+      { $unwind: "$tx" },
+      { $match: { "tx.txid": { $in: txids } } },
+      { $project: { _id: 0 } },
+    ];
+  }
+
+  function _getOutputArrayQuery(txids, blockHeights) {
+    return [
+      {
+        $match: {
+          chainId: this.chainId,
+          "tx.vin.txid": { $in: txids },
+          height: { $nin: blockHeights },
+        },
+      },
+      { $unwind: "$tx" },
+      { $match: { "tx.vin.txid": { $in: txids } } },
+      { $project: { _id: 0 } },
+    ];
+  }
+
+  function _getTransactionQuery(txid) {
+    return [
+      { $match: { chainId: this.chainId, "tx.txid": txid } },
+      { $unwind: "$tx" },
+      { $match: { "tx.txid": txid } },
+      { $project: { _id: 0 } },
+    ];
+  }
+
+  function _getInputQuery(txid) {
+    return [
+      { $match: { chainId: this.chainId, "tx.vin.txid": txid } },
+      { $unwind: "$tx" },
+      { $match: { "tx.vin.txid": txid } },
+      { $project: { _id: 0 } },
+    ];
+  }
+  function _getAddressQuery(address) {
+    return [
+      { $match: { chainId: this.chainId, "tx.vout.addresses": address } },
+      { $unwind: "$tx" },
+      { $match: { "tx.vout.addresses": address } },
+    ];
+  }
+
   async function _searchForBlockRelations(outputs, inputs, blockHeights) {
     return await this.repo.get({
       query: {
@@ -18,48 +67,15 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
     });
   }
 
-  async function _getBlockRelations({ transactions, blockHeights, searchVIN }) {
-    let inputs = new Set();
-    let outputs = [];
-    let blocks = [];
-    let vin = [];
-
-    if (searchVIN) {
-      transactions.forEach((transaction) => {
-        if (transaction.txid) outputs.push(transaction.txid);
-        vin.push(...transaction.vin);
-      });
-
-      vin.forEach((input) => {
-        if (input.txid) inputs.add(input.txid);
-      });
-    }
-
-    blocks.push(
-      ...(await _searchForBlockRelations.call(
-        this,
-        outputs,
-        Array.from(inputs),
-        blockHeights
-      ))
-    );
-    return blocks;
-  }
-
-  function _fillTransactionPool({ blocks }) {
-    const transactionPool = [];
-    blocks.forEach((block) => transactionPool.push(...block.tx));
-    return transactionPool;
-  }
-
-  function _formatTransactionWithPoolData({ transactionPool }) {
-    this.formater.formatAccountStructure({ transactionPool });
+  function _formatTransactionWithPoolData({ transactions, txRelationPool }) {
+    this.formater.formatAccountStructure({ transactions, txRelationPool });
   }
 
   function _formatBlocks(blocks) {
     return blocks.map((block) => {
-      const { time, previousblockhash, ...data } = block;
+      const { time, previousblockhash, tx, ...data } = block;
       return {
+        tx: tx instanceof Array ? tx : [tx],
         mined: new Date(time).toDateString(),
         parent: previousblockhash,
         ...data,
@@ -73,102 +89,71 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       hash = { $exists: true },
       projection = {},
     }) {
-      const query = { chainId: this.chainId, height, hash };
+      let query = { chainId: this.chainId, height, hash };
       await this.repo.connect();
-      let blocks = await this.repo.get({ query, projection });
-      const blockHeights = blocks.map((block) => {
-        return block.height;
+      let [block] = await this.repo.get({ query, projection });
+      const relationBlocks = [];
+      const transactions = [];
+      const inputIds = [];
+      block.tx.forEach((transaction) => {
+        inputIds.push(...transaction.vin.map((input) => input.txid));
+        transactions.push(transaction);
       });
-      let transactionPool = _fillTransactionPool.call(this, { blocks });
-      blocks.push(
-        ...(await _getBlockRelations.call(this, {
-          transactions: transactionPool,
-          blockHeights,
-          searchVIN: false,
-        }))
-      );
+      query = _getInputArrayQuery.call(this, inputIds);
 
-      blocks.forEach((block) => transactionPool.push(...block.tx));
+      relationBlocks.push(...(await this.repo.aggregate(query)));
 
-      transactionPool = _fillTransactionPool.call(this, { blocks });
+      txRelationPool = relationBlocks.map((block) => block.tx);
+      _formatTransactionWithPoolData.call(this, {
+        transactions,
+        txRelationPool,
+      });
 
-      _formatTransactionWithPoolData.call(this, { transactionPool });
-
-      blocks = _formatBlocks(blocks);
-      return blocks;
+      block = _formatBlocks([block]);
+      return block;
     },
     async transactionSearch({ txid, projection = {} }) {
-      const query = { chainId: this.chainId, "tx.txid": txid };
+      let query = _getTransactionQuery.call(this, txid);
+      const relationBlocks = [];
       await this.repo.connect();
-      let blocks = await this.repo.get({ query, projection });
-      if (blocks.length === 0) return;
-      const blockHeights = blocks.map((block) => {
-        return block.height;
+      let [block] = await this.repo.aggregate(query);
+      if (block.length === 0) return [];
+
+      let inputIds = block.tx.vin.map((input) => input.txid);
+      query = _getInputArrayQuery.call(this, inputIds);
+      relationBlocks.push(...(await this.repo.aggregate(query)));
+
+      const txRelationPool = relationBlocks.map((block) => block.tx);
+
+      _formatTransactionWithPoolData.call(this, {
+        transactions: [block.tx],
+        txRelationPool,
       });
 
-      let transactionPool = _fillTransactionPool.call(this, { blocks });
-      const transactions = [
-        transactionPool.find((transaction) => transaction.txid === txid),
-      ];
-      blocks.push(
-        ...(await _getBlockRelations.call(this, {
-          transactions,
-          blockHeights,
-          searchVIN: true,
-        }))
-      );
-
-      transactionPool = _fillTransactionPool.call(this, { blocks });
-      _formatTransactionWithPoolData.call(this, { transactionPool });
-
-      blocks = _formatBlocks(blocks);
-      return blocks;
+      block = _formatBlocks([block]);
+      return block;
     },
     async addressSearchQuery({ address, projection }) {
-      const query = { chainId: this.chainId, "tx.vout.addresses": address };
-      const transactions = [];
-      let transactionPool = [];
+      let query = _getAddressQuery.call(this, address);
+      const outputIds = [];
       await this.repo.connect();
-      let blocks = await this.repo.get({ query, projection });
-
-      blocks.forEach((block) => transactionPool.push(...block.tx));
-
-      const outputs = [];
-      transactionPool.forEach((transaction) => {
-        outputs.push(
-          ...transaction.vout.map((output) => {
-            return {
-              address: output.addresses,
-              txid: transaction.txid,
-              vin: transaction.vin,
-            };
-          })
-        );
+      let blocks = await this.repo.aggregate(query);
+      let blockHeights = [];
+      blocks.forEach((block) => {
+        blockHeights.push(block.height);
+        outputIds.push(block.tx.txid);
       });
 
-      outputs.forEach((output) => {
-        if (!output.address) return;
-        if (output.address.includes(address)) transactions.push(output);
+      query = _getOutputArrayQuery.call(this, outputIds, blockHeights);
+
+      blocks.push(...(await this.repo.aggregate(query)));
+      const txRelationPool = blocks.map((block) => block.tx);
+      _formatTransactionWithPoolData.call(this, {
+        transactions: txRelationPool,
+        txRelationPool,
       });
-
-      const blockHeights = blocks.map((block) => {
-        return block.height;
-      });
-      blocks.push(
-        ...(await _getBlockRelations.call(this, {
-          transactions,
-          blockHeights,
-          searchVIN: true,
-        }))
-      );
-
-      transactionPool = _fillTransactionPool.call(this, { blocks });
-
-      _formatTransactionWithPoolData.call(this, { transactionPool });
 
       blocks = _formatBlocks(blocks);
-
-      transactionPool.forEach({});
 
       return blocks;
     },

@@ -1,38 +1,70 @@
 function EthereumQueryBuilder(formater, repo, chainId) {
+  function _formatTransactionWithPoolData({ transactionPool }) {
+    transactionPool.forEach((transaction) => {
+      this.formater.formatAccountStructure({ transaction });
+    });
+  }
+
+  function _fillTransactionPool({ blocks }) {
+    const transactionPool = [];
+    blocks.forEach((block) => transactionPool.push(...block.tx));
+    return transactionPool;
+  }
+
+  function _formatBlocks(blocks) {
+    return blocks.map((block) => {
+      const { time, parentHash, ...data } = block;
+      return {
+        parent: parentHash,
+        ...data,
+      };
+    });
+  }
+
+  function _prepareBlocks(blocks) {
+    let transactionPool = _fillTransactionPool.call(this, { blocks });
+    _formatTransactionWithPoolData.call(this, { transactionPool });
+
+    blocks = _formatBlocks(blocks);
+    return blocks;
+  }
+
   const queryBuilder = {
-    async blockSearch({ height, projection = {} }) {
-      const query = { chainId: this.chainId, height };
+    async blockSearch({
+      height = { $exists: true },
+      hash = { $exists: true },
+      projection = {},
+      pageSize = 0,
+      page = 0,
+    }) {
+      const limit = pageSize;
+      const skip = pageSize * page;
+      const query = { chainId: this.chainId, height, hash, pageSize };
       await this.repo.connect();
-      const result = await this.repo.get({ query, projection });
-      return result;
+      let blocks = await this.repo.get({ query, projection, limit, skip });
+      return _prepareBlocks.call(this, blocks);
     },
-    async addressSearchQuery(
-      from = { $exists: true },
-      to = { $exists: true },
-      limit = 0
-    ) {
-      const projection = { _id: 0 };
-      let promises = [];
-      const transactions = [];
-
+    async transactionSearch({ txid, projection = {}, pageSize, page }) {
+      const limit = pageSize;
+      const skip = pageSize * page;
+      const query = { chainId: this.chainId, "tx.txid": txid };
       await this.repo.connect();
+      let blocks = await this.repo.get({ query, projection, limit, skip });
+      return _prepareBlocks.call(this, blocks);
+    },
 
-      promises.push(this.repo.get({ from, to }, projection, limit));
-
-      let results = await Promise.all(promises);
-      for (result of results) {
-        if (result instanceof Array) {
-          transactions.push(...result);
-          continue;
-        }
-        transaction.push(result);
-      }
-
-      for (let transaction of transactions) {
-        this.formater.formatAccountStructure(transaction);
-      }
-
-      return transactions;
+    async addressSearchQuery({ address, projection, pageSize, page }) {
+      const limit = pageSize;
+      const skip = pageSize * page;
+      const query = {
+        $or: [
+          { chainId: this.chainId, "tx.from": address },
+          { chainId: this.chainId, "tx.to": address },
+        ],
+      };
+      await this.repo.connect();
+      let blocks = await this.repo.get({ query, projection, limit, skip });
+      return _prepareBlocks.call(this, blocks);
     },
   };
 

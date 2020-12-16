@@ -22,9 +22,15 @@ const typeDefinitions = gql`
   }
 
   type RootQuery {
-    blocks(height: Int, hash: String, chainId: Int): [Block]
-    transactions(txid: String, chainId: Int): [Block]
-    address(address: String, chainId: Int): [Block]
+    blocks(
+      height: Int
+      hash: String
+      chainId: Int
+      pageSize: Int
+      page: Int
+    ): [Block]
+    transactions(txid: String, chainId: Int, pageSize: Int, page: Int): [Block]
+    address(address: String, chainId: Int, pageSize: Int, page: Int): [Block]
     searchEntity(searchString: String, chainId: Int): Int
   }
 

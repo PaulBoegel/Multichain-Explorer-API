@@ -61,13 +61,16 @@ function BitcoinTransactionFormater(chainId) {
 
       return formatedTransaction;
     },
-    formatAccountStructure({ transactionPool }) {
-      transactionPool.forEach((transaction) => {
+    formatAccountStructure({ transactions, txRelationPool }) {
+      transactions.forEach((transaction) => {
         transaction.from = [];
         transaction.to = [];
         transaction.vin.forEach((input) => {
           transaction.to = transaction.vout.map((out) => {
-            return { value: out.value, address: out.addresses };
+            return {
+              value: parseFloat(out.value.toFixed(8)),
+              address: out.addresses,
+            };
           });
 
           if (input.coinbase) {
@@ -79,7 +82,7 @@ function BitcoinTransactionFormater(chainId) {
             return;
           }
 
-          let inputTransaction = transactionPool.find(
+          let inputTransaction = txRelationPool.find(
             (transaction) => transaction.txid === input.txid
           );
 
@@ -93,13 +96,13 @@ function BitcoinTransactionFormater(chainId) {
             let address = output.addresses;
             transaction.from.push({
               address,
-              value: output.value,
+              value: parseFloat(output.value.toFixed(8)),
             });
           }
         });
       });
 
-      return transactionPool;
+      return txRelationPool;
     },
   };
 
