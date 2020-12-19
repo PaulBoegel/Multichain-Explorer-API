@@ -34,6 +34,11 @@ function Resolvers({ queryBuilderManager }) {
         const id = await queryBuilder.searchEntityId({ searchString });
         return id;
       },
+      async getHeight(root, { chainId }, context) {
+        const queryBuilder = queryBuilderManager.getQueryBuilder(chainId);
+        const height = await queryBuilder.getHeight();
+        return height;
+      },
     },
   };
 }

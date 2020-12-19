@@ -32,6 +32,7 @@ const typeDefinitions = gql`
     transactions(txid: String, chainId: Int, pageSize: Int, page: Int): [Block]
     address(address: String, chainId: Int, pageSize: Int, page: Int): [Block]
     searchEntity(searchString: String, chainId: Int): Int
+    getHeight(chainId: Int): Int
   }
 
   schema {

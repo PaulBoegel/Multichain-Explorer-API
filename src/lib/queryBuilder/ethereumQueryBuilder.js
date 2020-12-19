@@ -34,14 +34,13 @@ function EthereumQueryBuilder(formater, repo, chainId) {
       height = { $exists: true },
       hash = { $exists: true },
       projection = {},
-      pageSize = 0,
-      page = 0,
     }) {
-      const limit = pageSize;
-      const skip = pageSize * page;
-      const query = { chainId: this.chainId, height, hash, pageSize };
+      const query = { chainId: this.chainId, height, hash };
       await this.repo.connect();
-      let blocks = await this.repo.get({ query, projection, limit, skip });
+      let blocks = await this.repo.get({
+        query,
+        projection,
+      });
       return _prepareBlocks.call(this, blocks);
     },
     async transactionSearch({ txid, projection = {}, pageSize, page }) {
@@ -65,6 +64,28 @@ function EthereumQueryBuilder(formater, repo, chainId) {
       await this.repo.connect();
       let blocks = await this.repo.get({ query, projection, limit, skip });
       return _prepareBlocks.call(this, blocks);
+    },
+
+    async searchEntityId({ searchString }) {
+      if (searchString.slice(0, 2) === "0x" && searchString.length === 66) {
+        return 1;
+      }
+      if (searchString.slice(0, 2) === "0x") {
+        return 2;
+      }
+      if (!isNaN(searchString) && !isNaN(parseInt(searchString))) {
+        return 0;
+      }
+    },
+
+    async getHeight() {
+      await this.repo.connect();
+      let [block] = await this.repo.get({
+        query: { chainId: this.chainId },
+        sort: { height: -1 },
+        limit: 1,
+      });
+      return block.height;
     },
   };
 

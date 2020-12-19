@@ -167,6 +167,16 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       }
       return 2;
     },
+
+    async getHeight() {
+      await this.repo.connect();
+      let [block] = await this.repo.get({
+        query: { chainId: this.chainId },
+        sort: { height: -1 },
+        limit: 1,
+      });
+      return block.height;
+    },
   };
 
   Object.defineProperty(queryBuilder, "chainId", {
