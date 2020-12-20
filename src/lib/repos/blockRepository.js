@@ -41,12 +41,16 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
     sort = {},
     limit = 0,
     skip = 0,
+    countOn = false,
   }) {
     _checkConnection();
     let blocks = await db
       .collection("blocks")
       .find(query, { projection })
       .sort(sort);
+
+    let count = 0;
+    if (countOn) count = await blocks.count();
 
     if (limit > 0) {
       blocks = blocks.limit(limit);
@@ -57,7 +61,7 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
     }
 
     blocks = await blocks.toArray();
-    return blocks;
+    return { blocks, count };
   }
 
   async function add(newBlock) {

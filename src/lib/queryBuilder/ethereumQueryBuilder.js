@@ -37,19 +37,26 @@ function EthereumQueryBuilder(formater, repo, chainId) {
     }) {
       const query = { chainId: this.chainId, height, hash };
       await this.repo.connect();
-      let blocks = await this.repo.get({
+      let { blocks, count } = await this.repo.get({
         query,
         projection,
+        countOn: true,
       });
-      return _prepareBlocks.call(this, blocks);
+      return { size: count, blocks: _prepareBlocks.call(this, blocks) };
     },
     async transactionSearch({ txid, projection = {}, pageSize, page }) {
       const limit = pageSize;
       const skip = pageSize * page;
       const query = { chainId: this.chainId, "tx.txid": txid };
       await this.repo.connect();
-      let blocks = await this.repo.get({ query, projection, limit, skip });
-      return _prepareBlocks.call(this, blocks);
+      let { blocks, count } = await this.repo.get({
+        query,
+        projection,
+        limit,
+        skip,
+        countOn: true,
+      });
+      return { size: count, blocks: _prepareBlocks.call(this, blocks) };
     },
 
     async addressSearchQuery({ address, projection, pageSize, page }) {
@@ -62,8 +69,14 @@ function EthereumQueryBuilder(formater, repo, chainId) {
         ],
       };
       await this.repo.connect();
-      let blocks = await this.repo.get({ query, projection, limit, skip });
-      return _prepareBlocks.call(this, blocks);
+      let { blocks, count } = await this.repo.get({
+        query,
+        projection,
+        limit,
+        skip,
+        countOn: true,
+      });
+      return { size: count, blocks: _prepareBlocks.call(this, blocks) };
     },
 
     async searchEntityId({ searchString }) {
@@ -80,12 +93,12 @@ function EthereumQueryBuilder(formater, repo, chainId) {
 
     async getHeight() {
       await this.repo.connect();
-      let [block] = await this.repo.get({
+      let { blocks } = await this.repo.get({
         query: { chainId: this.chainId },
         sort: { height: -1 },
         limit: 1,
       });
-      return block.height;
+      return blocks[0].height;
     },
   };
 

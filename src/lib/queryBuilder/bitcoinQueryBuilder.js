@@ -89,9 +89,11 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       hash = { $exists: true },
       projection = {},
     }) {
+      let size = 0;
       let query = { chainId: this.chainId, height, hash };
       await this.repo.connect();
-      let [block] = await this.repo.get({ query, projection });
+      let { blocks, count } = await this.repo.get({ query, projection });
+      let [block] = blocks;
       const relationBlocks = [];
       const transactions = [];
       const inputIds = [];
@@ -110,9 +112,10 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       });
 
       block = _formatBlocks([block]);
-      return block;
+      return { size, blocks: block };
     },
     async transactionSearch({ txid, projection = {} }) {
+      let size = 0;
       let query = _getTransactionQuery.call(this, txid);
       const relationBlocks = [];
       await this.repo.connect();
@@ -130,10 +133,11 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
         txRelationPool,
       });
 
-      block = _formatBlocks([block]);
-      return block;
+      let blocks = _formatBlocks([block]);
+      return { size, blocks };
     },
     async addressSearchQuery({ address, projection }) {
+      let size = 0;
       let query = _getAddressQuery.call(this, address);
       const outputIds = [];
       await this.repo.connect();
@@ -155,7 +159,7 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
 
       blocks = _formatBlocks(blocks);
 
-      return blocks;
+      return { size, blocks };
     },
 
     async searchEntityId({ searchString }) {
@@ -170,12 +174,12 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
 
     async getHeight() {
       await this.repo.connect();
-      let [block] = await this.repo.get({
+      let { blocks, count } = await this.repo.get({
         query: { chainId: this.chainId },
         sort: { height: -1 },
         limit: 1,
       });
-      return block.height;
+      return blocks[0].height;
     },
   };
 

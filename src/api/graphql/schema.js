@@ -21,6 +21,11 @@ const typeDefinitions = gql`
     tx: [Transaction]
   }
 
+  type BlockResult {
+    size: Int
+    blocks: [Block]
+  }
+
   type RootQuery {
     blocks(
       height: Int
@@ -28,9 +33,19 @@ const typeDefinitions = gql`
       chainId: Int
       pageSize: Int
       page: Int
-    ): [Block]
-    transactions(txid: String, chainId: Int, pageSize: Int, page: Int): [Block]
-    address(address: String, chainId: Int, pageSize: Int, page: Int): [Block]
+    ): BlockResult
+    transactions(
+      txid: String
+      chainId: Int
+      pageSize: Int
+      page: Int
+    ): BlockResult
+    address(
+      address: String
+      chainId: Int
+      pageSize: Int
+      page: Int
+    ): BlockResult
     searchEntity(searchString: String, chainId: Int): Int
     getHeight(chainId: Int): Int
   }
