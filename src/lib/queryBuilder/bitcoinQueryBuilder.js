@@ -8,13 +8,12 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
     ];
   }
 
-  function _getOutputArrayQuery(txids, blockHeights) {
+  function _getOutputArrayQuery(txids) {
     return [
       {
         $match: {
           chainId: this.chainId,
           "tx.vin.txid": { $in: txids },
-          height: { $nin: blockHeights },
         },
       },
       { $unwind: "$tx" },
@@ -88,11 +87,21 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       height = { $exists: true },
       hash = { $exists: true },
       projection = {},
+      page = 0,
+      pageSize = 0,
     }) {
-      let size = 0;
+      let limit = pageSize;
+      const skip = pageSize * page;
       let query = { chainId: this.chainId, height, hash };
       await this.repo.connect();
-      let { blocks, count } = await this.repo.get({ query, projection });
+      let { blocks, count } = await this.repo.get({
+        query,
+        projection,
+        limit,
+        skip,
+        countOn: true,
+      });
+      let currentCount = blocks.length;
       let [block] = blocks;
       const relationBlocks = [];
       const transactions = [];
@@ -142,13 +151,11 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       const outputIds = [];
       await this.repo.connect();
       let blocks = await this.repo.aggregate(query);
-      let blockHeights = [];
       blocks.forEach((block) => {
-        blockHeights.push(block.height);
         outputIds.push(block.tx.txid);
       });
 
-      query = _getOutputArrayQuery.call(this, outputIds, blockHeights);
+      query = _getOutputArrayQuery.call(this, outputIds);
 
       blocks.push(...(await this.repo.aggregate(query)));
       const txRelationPool = blocks.map((block) => block.tx);
@@ -158,6 +165,13 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       });
 
       blocks = _formatBlocks(blocks);
+
+      blocksSeen = new Set();
+      blocks = blocks.filter((block) => {
+        const dupblicated = blocksSeen.has(block.tx.txid);
+        blocksSeen.add(block.tx.txid);
+        return !dupblicated;
+      });
 
       return { size, blocks };
     },
