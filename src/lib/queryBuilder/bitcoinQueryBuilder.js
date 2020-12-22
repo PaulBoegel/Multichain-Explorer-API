@@ -30,15 +30,6 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       { $project: { _id: 0 } },
     ];
   }
-
-  function _getInputQuery(txid) {
-    return [
-      { $match: { chainId: this.chainId, "tx.vin.txid": txid } },
-      { $unwind: "$tx" },
-      { $match: { "tx.vin.txid": txid } },
-      { $project: { _id: 0 } },
-    ];
-  }
   function _getAddressQuery(address) {
     return [
       { $match: { chainId: this.chainId, "tx.vout.addresses": address } },

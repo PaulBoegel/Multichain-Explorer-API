@@ -1,4 +1,13 @@
 function EthereumQueryBuilder(formater, repo, chainId) {
+  function _getTransactionQuery({ txid }) {
+    return [
+      { $match: { chainId: this.chainId, "tx.txid": txid } },
+      { $unwind: "$tx" },
+      { $match: { "tx.txid": txid } },
+      { $project: { _id: 0 } },
+    ];
+  }
+
   function _formatTransactionWithPoolData({ transactionPool }) {
     transactionPool.forEach((transaction) => {
       this.formater.formatAccountStructure({ transaction });
@@ -13,19 +22,22 @@ function EthereumQueryBuilder(formater, repo, chainId) {
 
   function _formatBlocks(blocks) {
     return blocks.map((block) => {
-      const { time, parentHash, ...data } = block;
+      const { time, parentHash, tx, ...data } = block;
+      let txAsArray = false;
+      if (tx instanceof Array === false) txAsArray = true;
       return {
         parent: parentHash,
+        tx: txAsArray ? [tx] : tx,
         ...data,
       };
     });
   }
 
   function _prepareBlocks(blocks) {
+    blocks = _formatBlocks(blocks);
     let transactionPool = _fillTransactionPool.call(this, { blocks });
     _formatTransactionWithPoolData.call(this, { transactionPool });
 
-    blocks = _formatBlocks(blocks);
     return blocks;
   }
 
@@ -45,18 +57,10 @@ function EthereumQueryBuilder(formater, repo, chainId) {
       return { size: count, blocks: _prepareBlocks.call(this, blocks) };
     },
     async transactionSearch({ txid, projection = {}, pageSize, page }) {
-      const limit = pageSize;
-      const skip = pageSize * page;
-      const query = { chainId: this.chainId, "tx.txid": txid };
+      const pipeline = _getTransactionQuery.call(this, { txid });
       await this.repo.connect();
-      let { blocks, count } = await this.repo.get({
-        query,
-        projection,
-        limit,
-        skip,
-        countOn: true,
-      });
-      return { size: count, blocks: _prepareBlocks.call(this, blocks) };
+      let blocks = await this.repo.aggregate({ pipeline });
+      return { size: 0, blocks: _prepareBlocks.call(this, blocks) };
     },
 
     async addressSearchQuery({ address, projection, pageSize, page }) {
