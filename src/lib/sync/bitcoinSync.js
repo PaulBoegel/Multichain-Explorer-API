@@ -22,19 +22,20 @@ function BitcoinSync({
   }
 
   async function _checkblockcache() {
+    const saveBlocks = [];
     let height = lastHeightSaved + 1;
     let transactionsSaved = 0;
     let saveHeight = 0;
-    const saveBlocks = [];
     let block;
+
     while (true) {
       block = blockcache.get(height);
       if (block) {
         saveBlocks.push(block);
         saveHeight = block.height;
         blockcache.delete(height);
-        if (transactionsSaved > 1000) break;
-        if (block.tx.length) transactionsSaved += block.tx.length;
+        if (block.tx) transactionsSaved += block.tx.length;
+        if (transactionsCached > 10000) break;
         height++;
         continue;
       }
@@ -42,6 +43,7 @@ function BitcoinSync({
     }
     if (saveBlocks.length === 0) return;
     await transactionHandler.saveBlockDataMany(saveBlocks);
+    transactionsCached -= transactionsSaved;
     lastHeightSaved = saveHeight;
     await _checkblockcache();
   }
@@ -68,6 +70,7 @@ function BitcoinSync({
           blockData.height <= lastHeightSaved
         )
           return;
+        transactionsCached += blockData.tx.length;
         blockcache.set(blockData.height, blockData);
       })
       .catch((error) => {

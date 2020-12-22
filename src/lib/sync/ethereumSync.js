@@ -16,13 +16,15 @@ function EthereumSync({
     const saveBlocks = [];
     let height = lastHeightSaved + 1;
     let transactionsSaved = 0;
+    let saveHeight = 0;
     let block;
 
     while (true) {
       block = blockcache.get(height);
       if (block) {
         saveBlocks.push(block);
-        transactionsSaved += block.tx.length;
+        saveHeight = block.height;
+        if (block.tx) transactionsSaved += block.tx.length;
         blockcache.delete(height);
         if (transactionsSaved > 100000) break;
         height++;
@@ -33,15 +35,7 @@ function EthereumSync({
     if (saveBlocks.length === 0) return;
     await transactionHandler.saveBlockDataMany(saveBlocks);
     transactionsCached -= transactionsSaved;
-    lastHeightSaved = saveBlocks.slice(-1)[0].height;
-    BlockLogger.info({
-      message: "cached blocks saved",
-      data: {
-        blockHeight: lastHeightSaved,
-        count: saveBlocks.length,
-        transactionsSaved: transactionsSaved,
-      },
-    });
+    lastHeightSaved = saveHeight;
     await _checkblockCache();
   }
 
@@ -62,19 +56,11 @@ function EthereumSync({
       .then(async (blockData) => {
         blockData.chainId = service.chainId;
 
-        if (blockcache.size > 0) await _checkblockCache();
+        if (blockcache.size > 0) _checkblockCache();
 
         if (blockData.height - 1 === lastHeightSaved || lastHeightSaved === 0) {
+          const saveTime = await transactionHandler.saveBlockData(blockData);
           lastHeightSaved = blockData.height;
-
-          BlockLogger.info({
-            message: "block saved",
-            data: {
-              chainId: blockData.chainId,
-              height: blockData.height,
-              transactions: blockData.tx.length,
-            },
-          });
           return;
         }
 
@@ -86,17 +72,6 @@ function EthereumSync({
 
         transactionsCached += blockData.tx.length;
         blockcache.set(blockData.height, blockData);
-        blockcache.set(blockData.height, blockData);
-        BlockLogger.info({
-          message: "block saved in cache",
-          data: {
-            chainId: blockData.chainId,
-            height: blockData.height,
-            transactions: blockData.tx.length,
-            cacheCount: blockcache.size,
-            blockHeight: lastHeightSaved,
-          },
-        });
       })
       .catch((error) => {
         console.log(error);
