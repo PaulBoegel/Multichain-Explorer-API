@@ -59,17 +59,12 @@ function EthereumSync({
   }
 
   function _saveBlockData(blockhash) {
-    const sRequestTime = Date.now();
     service
       .getBlock({
         blockhash,
         verbose: true,
       })
       .then(async (blockData) => {
-        // blockData.tx.forEach((transaction) => {
-        //   formater.formatForDB(transaction);
-        // })
-
         blockData.chainId = service.chainId;
 
         if (blockcache.size > 0) await _checkblockCache();
@@ -113,7 +108,7 @@ function EthereumSync({
       });
   }
 
-  async function _syncData({ startHeight, endHeight }) {
+  async function _syncData({ startHeight, endHeight, startNotifyer }) {
     height = startHeight;
     while (endHeight === undefined || height <= endHeight) {
       const blockhash = await service.getBlockHash({ height, verbose: true });
@@ -130,7 +125,7 @@ function EthereumSync({
 
       height += 1;
     }
-    _endSync.call(this, true);
+    _endSync.call(this, startNotifyer);
   }
 
   async function _checkHeight(endHeight) {
@@ -151,9 +146,10 @@ function EthereumSync({
         return await _syncData.call(this, {
           startHeight: height,
           endHeight: syncHeight,
+          startNotifyer: false,
         });
       }
-      return _syncData.call(this, { startHeight: height });
+      return _syncData.call(this, { startHeight: height, startNotifyer: true });
     },
   };
 }

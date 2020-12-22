@@ -41,14 +41,6 @@ function BitcoinSync({
     if (saveBlocks.length === 0) return;
     transactionsCached -= transactionsSaved;
     lastHeightSaved = saveBlocks.slice(-1)[0].height;
-    BlockLogger.info({
-      message: "cached blocks saved",
-      data: {
-        blockHeight: lastHeightSaved,
-        count: saveBlocks.length,
-        transactionsSaved: transactionsSaved,
-      },
-    });
     await _checkblockcache();
   }
 
@@ -60,10 +52,6 @@ function BitcoinSync({
         verbose: true,
       })
       .then(async (blockData) => {
-        // blockData.tx.forEach((transaction) => {
-        //   formater.formatForDB(transaction);
-        // });
-
         blockData.chainId = service.chainId;
 
         if (blockcache.size > 0) await _checkblockcache();
@@ -71,15 +59,6 @@ function BitcoinSync({
         if (blockData.height - 1 === lastHeightSaved || lastHeightSaved === 0) {
           const saveTime = await transactionHandler.saveBlockData(blockData);
           lastHeightSaved = blockData.height;
-
-          BlockLogger.info({
-            message: "block saved",
-            data: {
-              chainId: blockData.chainId,
-              height: lastHeightSaved,
-              transactions: blockData.tx.length,
-            },
-          });
           return;
         }
 
@@ -90,28 +69,13 @@ function BitcoinSync({
           return;
         transactionsCached += blockData.tx.length;
         blockcache.set(blockData.height, blockData);
-        BlockLogger.info({
-          message: "block saved in cache",
-          data: {
-            chainId: blockData.chainId,
-            height: blockData.height,
-            transactions: blockData.tx.length,
-            cacheCount: blockcache.size,
-            blockHeight: lastHeightSaved,
-          },
-        });
       })
       .catch((error) => {
         console.log(error);
       });
   }
 
-  function _calculateSaveTimeInSeconds(sTime, eTime) {
-    const timeElapsed = eTime - sTime;
-    return timeElapsed ? (timeElapsed * 0.001).toFixed(2) : 0;
-  }
-
-  async function _syncData({ startHeight, endHeight }) {
+  async function _syncData({ startHeight, endHeight, startNotifyer }) {
     let height = startHeight;
     lastHeightSaved = startHeight;
     while (endHeight === undefined || height <= endHeight) {
@@ -126,8 +90,7 @@ function BitcoinSync({
       _saveBlockData.call(this, blockhash);
       height += 1;
     }
-
-    _endSync.call(this, true);
+    _endSync.call(this, startNotifyer);
   }
 
   function _checkHeight(endHeight) {
@@ -147,9 +110,10 @@ function BitcoinSync({
         return await _syncData.call(this, {
           startHeight: height,
           endHeight: syncHeight,
+          startNotifyer: false,
         });
       }
-      return _syncData.call(this, { startHeight: height });
+      return _syncData.call(this, { startHeight: height, startNotifyer: true });
     },
   };
 }

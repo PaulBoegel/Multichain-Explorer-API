@@ -8,15 +8,14 @@ function TransactionHandler(blockRepo) {
 
   async function saveBlockDataWithHash({ blockhash, service }) {
     const blockData = await service.getBlock({ blockhash, verbose: true });
-    saveBlockData({ blockData, service });
+    blockData.chainId = service.chainId;
+    saveBlockData(blockData);
   }
 
   async function saveBlockData(blockData) {
-    const sTime = Date.now();
     await blockRepo.add(blockData);
-    const eTime = Date.now();
 
-    return _calculateSaveTimeInSeconds(sTime, eTime);
+    return true;
   }
 
   async function saveBlockDataMany(blockData) {

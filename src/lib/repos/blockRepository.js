@@ -1,4 +1,5 @@
 const { MongoClient } = require("mongodb");
+const BlockLogger = require("../logger/blockLogger");
 function BlockRepository({ host, port, dbName, poolSize = 10 }) {
   const url = `mongodb://${host}:${port}`;
   let db = {};
@@ -69,9 +70,20 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
     const { height, hash, ...data } = newBlock;
     const keys = { height, hash };
     data.timestamp = Date.now();
-    await db
+    const insert = await db
       .collection("blocks")
       .updateOne(keys, { $set: { ...data } }, { upsert: true });
+
+    const length = newBlock.tx ? newBlock.tx.length : 0;
+    BlockLogger.info({
+      message: "block saved",
+      data: {
+        chainId: newBlock.chainId,
+        height: newBlock.height,
+        transactions: length,
+      },
+    });
+
     return true;
   }
 
@@ -80,6 +92,11 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
     const result = await db
       .collection("blocks")
       .insertMany(newBlocks, { ordered: false });
+
+    for await (insert of result) {
+      console.log(insert);
+    }
+
     return result.insertedCount;
   }
 
