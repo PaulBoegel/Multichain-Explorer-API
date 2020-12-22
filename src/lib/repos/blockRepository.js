@@ -1,6 +1,7 @@
 const { MongoClient } = require("mongodb");
 const { forEach } = require("../../api/graphql/schema");
 const BlockLogger = require("../logger/blockLogger");
+const ErrorLogger = require("./lib/logger/errorLogger");
 function BlockRepository({ host, port, dbName, poolSize = 10 }) {
   const url = `mongodb://${host}:${port}`;
   let db = {};
@@ -67,46 +68,64 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
   }
 
   async function add(newBlock) {
-    _checkConnection();
-    const { height, hash, ...data } = newBlock;
-    const keys = { height, hash };
-    data.timestamp = Date.now();
-    const insert = await db
-      .collection("blocks")
-      .updateOne(keys, { $set: { ...data } }, { upsert: true });
+    try {
+      _checkConnection();
+      const { height, hash, ...data } = newBlock;
+      const keys = { height, hash };
+      data.timestamp = Date.now();
+      const insert = await db
+        .collection("blocks")
+        .updateOne(keys, { $set: { ...data } }, { upsert: true });
 
-    const length = newBlock.tx ? newBlock.tx.length : 0;
-    BlockLogger.info({
-      message: "block saved",
-      data: {
-        chainId: newBlock.chainId,
-        height: newBlock.height,
-        transactions: length,
-      },
-    });
-
-    return true;
-  }
-
-  async function addMany(newBlocks) {
-    _checkConnection();
-    const result = await db
-      .collection("blocks")
-      .insertMany(newBlocks, { ordered: false });
-
-    newBlocks.forEach((block) => {
-      const length = block.tx ? block.tx.length : 0;
+      const length = newBlock.tx ? newBlock.tx.length : 0;
       BlockLogger.info({
-        message: "blocks saved as many",
+        message: "block saved",
         data: {
-          chainId: block.chainId,
-          height: block.height,
+          chainId: newBlock.chainId,
+          height: newBlock.height,
           transactions: length,
         },
       });
-    });
 
-    return result.insertedCount;
+      return true;
+    } catch (error) {
+      ErrorLogger.info({
+        message: "save error",
+        data: {
+          error: error.message,
+        },
+      });
+    }
+  }
+
+  async function addMany(newBlocks) {
+    try {
+      _checkConnection();
+      const result = await db
+        .collection("blocks")
+        .insertMany(newBlocks, { ordered: false });
+
+      newBlocks.forEach((block) => {
+        const length = block.tx ? block.tx.length : 0;
+        BlockLogger.info({
+          message: "blocks saved as many",
+          data: {
+            chainId: block.chainId,
+            height: block.height,
+            transactions: length,
+          },
+        });
+      });
+
+      return result.insertedCount;
+    } catch (error) {
+      ErrorLogger.info({
+        message: "save error",
+        data: {
+          error: error.message,
+        },
+      });
+    }
   }
 
   async function aggregate({ pipeline }) {
