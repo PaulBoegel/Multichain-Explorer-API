@@ -19,11 +19,7 @@ function TransactionHandler(blockRepo) {
   }
 
   async function saveBlockDataMany(blockData) {
-    const sTime = Date.now();
     await blockRepo.addMany(blockData);
-    const eTime = Date.now();
-
-    return _calculateSaveTimeInSeconds(sTime, eTime);
   }
 
   async function getAllBlockHeights(chainId) {

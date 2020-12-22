@@ -1,4 +1,5 @@
 const { MongoClient } = require("mongodb");
+const { forEach } = require("../../api/graphql/schema");
 const BlockLogger = require("../logger/blockLogger");
 function BlockRepository({ host, port, dbName, poolSize = 10 }) {
   const url = `mongodb://${host}:${port}`;
@@ -93,9 +94,17 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
       .collection("blocks")
       .insertMany(newBlocks, { ordered: false });
 
-    for await (insert of result) {
-      console.log(insert);
-    }
+    newBlocks.forEach((block) => {
+      const length = block.tx ? block.tx.length : 0;
+      BlockLogger.info({
+        message: "blocks saved as many",
+        data: {
+          chainId: block.chainId,
+          height: block.height,
+          transactions: length,
+        },
+      });
+    });
 
     return result.insertedCount;
   }
@@ -108,7 +117,14 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
     return result;
   }
 
-  return { connect, createIndex, add, addMany, get, aggregate };
+  return {
+    connect,
+    createIndex,
+    add,
+    addMany,
+    get,
+    aggregate,
+  };
 }
 
 module.exports = BlockRepository;

@@ -53,11 +53,6 @@ function EthereumSync({
     if (fireEvent) this.events.emit("blockchainSynchronized", this.chainId);
   }
 
-  function _calculateSaveTimeInSeconds(sTime, eTime) {
-    const timeElapsed = eTime - sTime;
-    return timeElapsed ? (timeElapsed * 0.001).toFixed(2) : 0;
-  }
-
   function _saveBlockData(blockhash) {
     service
       .getBlock({

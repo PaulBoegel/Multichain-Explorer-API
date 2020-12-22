@@ -39,7 +39,7 @@ function BitcoinSync({
       break;
     }
     if (saveBlocks.length === 0) return;
-    transactionsCached -= transactionsSaved;
+    await transactionHandler.saveBlockDataMany(saveBlocks);
     lastHeightSaved = saveBlocks.slice(-1)[0].height;
     await _checkblockcache();
   }
