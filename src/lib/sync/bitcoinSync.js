@@ -23,16 +23,16 @@ function BitcoinSync({
 
   async function _checkblockcache() {
     let height = lastHeightSaved + 1;
-    let transactionsSaved = 0;
+    let saveHeight = 0;
     const saveBlocks = [];
     let block;
     while (true) {
       block = blockcache.get(height);
       if (block) {
         saveBlocks.push(block);
-        transactionsSaved += block.tx.length;
+        saveHeight = block.height;
         blockcache.delete(height);
-        if (transactionsSaved > 100000) break;
+        if (transactionsSaved > 1000) break;
         height++;
         continue;
       }
@@ -40,12 +40,11 @@ function BitcoinSync({
     }
     if (saveBlocks.length === 0) return;
     await transactionHandler.saveBlockDataMany(saveBlocks);
-    lastHeightSaved = saveBlocks.slice(-1)[0].height;
+    lastHeightSaved = saveHeight;
     await _checkblockcache();
   }
 
   function _saveBlockData(blockhash) {
-    const sRequestTime = Date.now();
     service
       .getBlock({
         blockhash,
@@ -54,7 +53,7 @@ function BitcoinSync({
       .then(async (blockData) => {
         blockData.chainId = service.chainId;
 
-        if (blockcache.size > 0) await _checkblockcache();
+        if (blockcache.size > 0) _checkblockcache();
 
         if (blockData.height - 1 === lastHeightSaved || lastHeightSaved === 0) {
           const saveTime = await transactionHandler.saveBlockData(blockData);
@@ -67,7 +66,6 @@ function BitcoinSync({
           blockData.height <= lastHeightSaved
         )
           return;
-        transactionsCached += blockData.tx.length;
         blockcache.set(blockData.height, blockData);
       })
       .catch((error) => {
