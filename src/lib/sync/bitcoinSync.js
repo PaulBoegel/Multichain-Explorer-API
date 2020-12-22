@@ -67,9 +67,9 @@ function BitcoinSync({
       .then(async (blockData) => {
         const eRequestTime = Date.now();
         const sFormatTime = Date.now();
-        blockData.tx.forEach((transaction) => {
-          formater.formatForDB(transaction);
-        });
+        // blockData.tx.forEach((transaction) => {
+        //   formater.formatForDB(transaction);
+        // });
         const eFormatTime = Date.now();
 
         blockData.chainId = service.chainId;
