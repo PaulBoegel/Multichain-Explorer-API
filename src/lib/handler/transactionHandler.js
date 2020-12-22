@@ -42,11 +42,12 @@ function TransactionHandler(blockRepo) {
   }
 
   async function getHighestBlock(service) {
-    let [block] = await blockRepo.get({
+    const { blocks } = await blockRepo.get({
       query: { chainId: service.chainId },
       sort: { height: -1 },
       limit: 1,
     });
+    let block = blocks[0];
     if (!block) {
       const blockhash = await service.getBlockHash({
         height: 0,
