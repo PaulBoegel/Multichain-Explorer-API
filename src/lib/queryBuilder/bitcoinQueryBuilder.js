@@ -112,7 +112,7 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       });
       query = _getInputArrayQuery.call(this, inputIds);
 
-      relationBlocks.push(...(await this.repo.aggregate(query)));
+      relationBlocks.push(...(await this.repo.aggregate({ pipeline: query })));
 
       txRelationPool = relationBlocks.map((block) => block.tx);
       _formatTransactionWithPoolData.call(this, {
@@ -121,19 +121,19 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       });
 
       block = _formatBlocks([block]);
-      return { size, blocks: block };
+      return { size: 0, blocks: block };
     },
     async transactionSearch({ txid, projection = {} }) {
       let size = 0;
       let query = _getTransactionQuery.call(this, txid);
       const relationBlocks = [];
       await this.repo.connect();
-      let [block] = await this.repo.aggregate(query);
+      let [block] = await this.repo.aggregate({ pipeline: query });
       if (block.length === 0) return [];
 
       let inputIds = block.tx.vin.map((input) => input.txid);
       query = _getInputArrayQuery.call(this, inputIds);
-      relationBlocks.push(...(await this.repo.aggregate(query)));
+      relationBlocks.push(...(await this.repo.aggregate({ pipeline: query })));
 
       const txRelationPool = relationBlocks.map((block) => block.tx);
 
@@ -150,14 +150,14 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       let query = _getAddressQuery.call(this, address);
       const outputIds = [];
       await this.repo.connect();
-      let blocks = await this.repo.aggregate(query);
+      let blocks = await this.repo.aggregate({ pipeline: query });
       blocks.forEach((block) => {
         outputIds.push(block.tx.txid);
       });
 
       query = _getOutputArrayQuery.call(this, outputIds);
 
-      blocks.push(...(await this.repo.aggregate(query)));
+      blocks.push(...(await this.repo.aggregate({ pipeline: query })));
       const txRelationPool = blocks.map((block) => block.tx);
       _formatTransactionWithPoolData.call(this, {
         transactions: txRelationPool,

@@ -88,7 +88,7 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
     let result = await db.collection("blocks").aggregate(pipeline);
 
     result = await result.toArray();
-    return { result, count };
+    return result;
   }
 
   return { connect, createIndex, add, addMany, get, aggregate };
