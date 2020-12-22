@@ -39,11 +39,7 @@ function BitcoinSync({
       break;
     }
     if (saveBlocks.length === 0) return;
-    const sTime = Date.now();
-    await transactionHandler.saveBlockDataMany(saveBlocks);
     transactionsCached -= transactionsSaved;
-    const eTime = Date.now();
-    const formatingTime = _calculateSaveTimeInSeconds(sTime, eTime);
     lastHeightSaved = saveBlocks.slice(-1)[0].height;
     BlockLogger.info({
       message: "cached blocks saved",
@@ -51,7 +47,6 @@ function BitcoinSync({
         blockHeight: lastHeightSaved,
         count: saveBlocks.length,
         transactionsSaved: transactionsSaved,
-        saveTime: formatingTime,
       },
     });
     await _checkblockcache();
@@ -65,23 +60,11 @@ function BitcoinSync({
         verbose: true,
       })
       .then(async (blockData) => {
-        const eRequestTime = Date.now();
-        const sFormatTime = Date.now();
         // blockData.tx.forEach((transaction) => {
         //   formater.formatForDB(transaction);
         // });
-        const eFormatTime = Date.now();
 
         blockData.chainId = service.chainId;
-
-        const requestTime = _calculateSaveTimeInSeconds(
-          sRequestTime,
-          eRequestTime
-        );
-        const formatingTime = _calculateSaveTimeInSeconds(
-          sFormatTime,
-          eFormatTime
-        );
 
         if (blockcache.size > 0) await _checkblockcache();
 
@@ -95,9 +78,6 @@ function BitcoinSync({
               chainId: blockData.chainId,
               height: lastHeightSaved,
               transactions: blockData.tx.length,
-              requestTime,
-              formatingTime,
-              saveTime,
             },
           });
           return;

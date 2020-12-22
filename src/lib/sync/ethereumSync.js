@@ -31,11 +31,8 @@ function EthereumSync({
       break;
     }
     if (saveBlocks.length === 0) return;
-    const sTime = Date.now();
     await transactionHandler.saveBlockDataMany(saveBlocks);
     transactionsCached -= transactionsSaved;
-    const eTime = Date.now();
-    const formatingTime = _calculateSaveTimeInSeconds(sTime, eTime);
     lastHeightSaved = saveBlocks.slice(-1)[0].height;
     BlockLogger.info({
       message: "cached blocks saved",
@@ -43,7 +40,6 @@ function EthereumSync({
         blockHeight: lastHeightSaved,
         count: saveBlocks.length,
         transactionsSaved: transactionsSaved,
-        saveTime: formatingTime,
       },
     });
     await _checkblockCache();
@@ -70,30 +66,15 @@ function EthereumSync({
         verbose: true,
       })
       .then(async (blockData) => {
-        const eRequestTime = Date.now();
-        const sFormatTime = Date.now();
-
         // blockData.tx.forEach((transaction) => {
         //   formater.formatForDB(transaction);
-        // });
-
-        const eFormatTime = Date.now();
+        // })
 
         blockData.chainId = service.chainId;
-
-        const requestTime = _calculateSaveTimeInSeconds(
-          sRequestTime,
-          eRequestTime
-        );
-        const formatingTime = _calculateSaveTimeInSeconds(
-          sFormatTime,
-          eFormatTime
-        );
 
         if (blockcache.size > 0) await _checkblockCache();
 
         if (blockData.height - 1 === lastHeightSaved || lastHeightSaved === 0) {
-          const saveTime = await transactionHandler.saveBlockData(blockData);
           lastHeightSaved = blockData.height;
 
           BlockLogger.info({
@@ -102,9 +83,6 @@ function EthereumSync({
               chainId: blockData.chainId,
               height: blockData.height,
               transactions: blockData.tx.length,
-              requestTime,
-              formatingTime,
-              saveTime,
             },
           });
           return;
