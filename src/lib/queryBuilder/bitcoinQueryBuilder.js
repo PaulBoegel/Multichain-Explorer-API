@@ -66,8 +66,12 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
     });
   }
 
-  function _formatTransactionWithPoolData({ transactions, txRelationPool }) {
-    this.formater.formatAccountStructure({ transactions, txRelationPool });
+  function _formatTransactionWithPoolData({
+    transactions,
+    txRelationPool,
+    out,
+  }) {
+    this.formater.formatAccountStructure({ transactions, txRelationPool, out });
   }
 
   function _formatBlocks(blocks) {
@@ -108,7 +112,7 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       const inputIds = [];
       block.tx.forEach((transaction) => {
         inputIds.push(...transaction.vin.map((input) => input.txid));
-        transactions.push(transaction);
+        transactions.push(...block.tx);
       });
       query = _getInputArrayQuery.call(this, inputIds);
 
@@ -148,6 +152,7 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
     async addressSearchQuery({ address, projection }) {
       let size = 0;
       let query = _getAddressQuery.call(this, address);
+      const transactions = [];
       const outputIds = [];
       await this.repo.connect();
       let blocks = await this.repo.aggregate({ pipeline: query });
@@ -158,17 +163,20 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       query = _getOutputArrayQuery.call(this, outputIds);
 
       blocks.push(...(await this.repo.aggregate({ pipeline: query })));
-      const txRelationPool = blocks.map((block) => block.tx);
+
+      blocks.forEach((block) => {
+        transactions.push(block.tx);
+      });
       _formatTransactionWithPoolData.call(this, {
-        transactions: txRelationPool,
-        txRelationPool,
+        transactions,
+        out: true,
       });
 
       blocks = _formatBlocks(blocks);
 
       blocksSeen = new Set();
       blocks = blocks.filter((block) => {
-        const dupblicated = blocksSeen.has(block.tx.txid);
+        const dupblicated = blocksSeen.has(block.tx[0].txid);
         blocksSeen.add(block.tx.txid);
         return !dupblicated;
       });
