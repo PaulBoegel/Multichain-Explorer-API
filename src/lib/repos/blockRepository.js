@@ -1,7 +1,7 @@
 const { MongoClient } = require("mongodb");
 const { forEach } = require("../../api/graphql/schema");
 const BlockLogger = require("../logger/blockLogger");
-const ErrorLogger = require("./lib/logger/errorLogger");
+const ErrorLogger = require("../logger/errorLogger");
 function BlockRepository({ host, port, dbName, poolSize = 10 }) {
   const url = `mongodb://${host}:${port}`;
   let db = {};

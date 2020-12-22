@@ -23,6 +23,7 @@ function BitcoinSync({
 
   async function _checkblockcache() {
     let height = lastHeightSaved + 1;
+    let transactionsSaved = 0;
     let saveHeight = 0;
     const saveBlocks = [];
     let block;
@@ -33,6 +34,7 @@ function BitcoinSync({
         saveHeight = block.height;
         blockcache.delete(height);
         if (transactionsSaved > 1000) break;
+        if (block.tx.length) transactionsSaved += block.tx.length;
         height++;
         continue;
       }
