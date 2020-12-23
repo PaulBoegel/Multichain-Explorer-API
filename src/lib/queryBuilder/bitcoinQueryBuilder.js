@@ -199,6 +199,7 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       await this.repo.connect();
       let { blocks, count } = await this.repo.get({
         query: { chainId: this.chainId },
+        projection: { _id: 0, height: 1 },
         sort: { height: -1 },
         limit: 1,
       });
