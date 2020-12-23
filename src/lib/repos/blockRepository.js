@@ -25,6 +25,7 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
 
   function createIndex() {
     _checkConnection();
+    db.collection("blocks").createIndex({ height: 1 });
     db.collection("blocks").createIndex({ chainId: 1, height: -1 });
     db.collection("blocks").createIndex({ chainId: 1, "tx.txid": 1 });
     db.collection("blocks").createIndex({ chainId: 1, "tx.vin.txid": 1 });
