@@ -73,7 +73,7 @@ function BitcoinTransactionFormater(chainId) {
         transaction.to = transaction.vout.map((out) => {
           return {
             value: parseFloat(out.value.toFixed(8)),
-            address: out.addresses,
+            address: out.scriptPubKey.addresses,
           };
         });
         transaction.vin.forEach((input) => {
@@ -97,8 +97,8 @@ function BitcoinTransactionFormater(chainId) {
             output = { address: [], value: 0 };
             return;
           }
-          if (output.addresses) {
-            let address = output.addresses;
+          if (output.scriptPubKey.addresses) {
+            let address = output.scriptPubKey.addresses;
             transaction.from.push({
               address,
               value: parseFloat(output.value.toFixed(8)),
