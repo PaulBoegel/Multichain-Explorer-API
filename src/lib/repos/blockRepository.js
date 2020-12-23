@@ -25,15 +25,15 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
 
   function createIndex() {
     _checkConnection();
-    db.collection("blocks").createIndex({ chainId: 1 });
-    db.collection("blocks").createIndex({ height: -1 });
-    db.collection("blocks").createIndex({ "tx.txid": 1 });
-    db.collection("blocks").createIndex({ "tx.vin.txid": 1 });
+    db.collection("blocks").createIndex({ chainId: 1, height: -1 });
+    db.collection("blocks").createIndex({ chainId: 1, "tx.txid": 1 });
+    db.collection("blocks").createIndex({ chainId: 1, "tx.vin.txid": 1 });
     db.collection("blocks").createIndex({
+      chainId: 1,
       "tx.vout.scriptPubKey.addresses": 1,
     });
-    db.collection("blocks").createIndex({ "tx.from": 1 });
-    db.collection("blocks").createIndex({ "tx.to": 1 });
+    db.collection("blocks").createIndex({ chainId: 1, "tx.from": 1 });
+    db.collection("blocks").createIndex({ chainId: 1, "tx.to": 1 });
   }
 
   function _checkConnection() {
