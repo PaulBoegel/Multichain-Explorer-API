@@ -8,6 +8,10 @@ function BitcoinNodeService(rpcConf, chainId) {
           resolve(data.result);
           return;
         }
+        if (response.statusCode === 500) {
+          const bodyJSON = JSON.parse(body);
+          reject(bodyJSON.error);
+        }
         reject(error);
       });
     });

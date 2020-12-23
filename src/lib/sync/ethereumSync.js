@@ -1,5 +1,6 @@
 const EventEmitter = require("events");
 const BlockLogger = require("../logger/blockLogger");
+const OUT_OF_RANGE = "Cannot destructure property 'hash'";
 
 function EthereumSync({
   service,
@@ -11,6 +12,7 @@ function EthereumSync({
   const blockcache = new Map();
   let lastHeightSaved = 0;
   let transactionsCached = 0;
+  let startNotifyer = false;
 
   async function _checkblockCache() {
     const saveBlocks = [];
@@ -78,24 +80,31 @@ function EthereumSync({
       });
   }
 
-  async function _syncData({ startHeight, endHeight, startNotifyer }) {
+  async function _syncData({ startHeight, endHeight }) {
     height = startHeight;
-    while (endHeight === undefined || height <= endHeight) {
-      const blockhash = await service.getBlockHash({ height, verbose: true });
+    try {
+      while (endHeight === undefined || height <= endHeight) {
+        const blockhash = await service.getBlockHash({ height, verbose: true });
 
-      if (!blockhash) break;
-      if (endHeight & (height === endHeight)) break;
+        if (!blockhash) break;
+        if (endHeight & (height === endHeight)) break;
 
-      if (transactionsCached > 20000) {
-        await _checkblockCache();
-        continue;
+        if (transactionsCached > 20000) {
+          await _checkblockCache();
+          continue;
+        }
+
+        _saveBlockData.call(this, blockhash);
+
+        height += 1;
       }
-
-      _saveBlockData.call(this, blockhash);
-
-      height += 1;
+      _endSync.call(this, startNotifyer);
+    } catch (error) {
+      const message = error.message.slice(0, 34);
+      if (message === OUT_OF_RANGE) {
+        _endSync.call(this, startNotifyer);
+      }
     }
-    _endSync.call(this, startNotifyer);
   }
 
   async function _checkHeight(endHeight) {
@@ -116,10 +125,10 @@ function EthereumSync({
         return await _syncData.call(this, {
           startHeight: height,
           endHeight: syncHeight,
-          startNotifyer: false,
         });
       }
-      return _syncData.call(this, { startHeight: height, startNotifyer: true });
+      startNotifyer = true;
+      return _syncData.call(this, { startHeight: height });
     },
   };
 }

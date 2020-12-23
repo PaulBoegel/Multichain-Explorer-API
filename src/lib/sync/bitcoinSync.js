@@ -1,6 +1,7 @@
 "use strict";
 const EventEmitter = require("events");
 const BlockLogger = require("../logger/blockLogger");
+const OUT_OF_RANGE = "Block height out of range";
 
 function BitcoinSync({
   service,
@@ -12,6 +13,7 @@ function BitcoinSync({
   const blockcache = new Map();
   let lastHeightSaved = 0;
   let transactionsCached = 0;
+  let startNotifyer = false;
 
   function _endSync(fireEvent) {
     BlockLogger.info({
@@ -78,22 +80,27 @@ function BitcoinSync({
       });
   }
 
-  async function _syncData({ startHeight, endHeight, startNotifyer }) {
-    let height = startHeight;
-    lastHeightSaved = startHeight;
-    while (endHeight === undefined || height <= endHeight) {
-      const blockhash = await service.getBlockHash({ height });
-      if (!blockhash) break;
+  async function _syncData({ startHeight, endHeight }) {
+    try {
+      let height = startHeight;
+      lastHeightSaved = startHeight;
+      while (endHeight === undefined || height <= endHeight) {
+        const blockhash = await service.getBlockHash({ height });
+        if (!blockhash) break;
 
-      if (transactionsCached > 20000) {
-        await _checkblockcache();
-        continue;
+        if (transactionsCached > 20000) {
+          await _checkblockcache();
+          continue;
+        }
+
+        _saveBlockData.call(this, blockhash);
+        height += 1;
       }
-
-      _saveBlockData.call(this, blockhash);
-      height += 1;
+    } catch (err) {
+      if (err.message === OUT_OF_RANGE) {
+        _endSync.call(this, startNotifyer);
+      }
     }
-    _endSync.call(this, startNotifyer);
   }
 
   function _checkHeight(endHeight) {
@@ -113,9 +120,9 @@ function BitcoinSync({
         return await _syncData.call(this, {
           startHeight: height,
           endHeight: syncHeight,
-          startNotifyer: false,
         });
       }
+      startNotifyer = true;
       return _syncData.call(this, { startHeight: height, startNotifyer: true });
     },
   };
