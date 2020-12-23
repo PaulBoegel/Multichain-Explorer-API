@@ -96,13 +96,16 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
         skip,
         countOn: true,
       });
-      let currentCount = blocks.length;
       let [block] = blocks;
       const relationBlocks = [];
       const transactions = [];
       const inputIds = [];
       block.tx.forEach((transaction) => {
-        inputIds.push(...transaction.vin.map((input) => input.txid));
+        inputIds.push(
+          ...transaction.vin.map((input) =>
+            input.coinbase ? "coinbase" : input.txid
+          )
+        );
         transactions.push(...block.tx);
       });
       query = _getInputArrayQuery.call(this, inputIds);
