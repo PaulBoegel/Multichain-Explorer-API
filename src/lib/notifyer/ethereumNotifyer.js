@@ -7,6 +7,13 @@ function EthereumNotifyer(conf) {
   const events = new EventEmitter();
   const chainId = conf.chainId;
 
+  function _logNotifyerStarted() {
+    BlockLogger.info({
+      message: "Notifyer started",
+      data: { chainId: `${this.chainId}` },
+    });
+  }
+
   async function connectToSocket() {
     const url = `${conf.worker.url}:${conf.worker.port}`;
     const provider = new Web3.providers.WebsocketProvider(url);
@@ -19,6 +26,7 @@ function EthereumNotifyer(conf) {
   }
 
   async function subscribeToBlocks() {
+    _logNotifyerStarted.call(this);
     web3.eth
       .subscribe("newBlockHeaders")
       .on("data", (blockHeader) => {
