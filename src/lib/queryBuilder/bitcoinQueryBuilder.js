@@ -32,9 +32,14 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
   }
   function _getAddressQuery(address) {
     return [
-      { $match: { chainId: this.chainId, "tx.vout.addresses": address } },
+      {
+        $match: {
+          chainId: this.chainId,
+          "tx.vout.scriptPubKey.addresses": address,
+        },
+      },
       { $unwind: "$tx" },
-      { $match: { "tx.vout.addresses": address } },
+      { $match: { "tx.vout.scriptPubKey.addresses": address } },
     ];
   }
 
@@ -129,7 +134,9 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
       let [block] = await this.repo.aggregate({ pipeline: query });
       if (block.length === 0) return [];
 
-      let inputIds = block.tx.vin.map((input) => input.txid);
+      let inputIds = block.tx.vin.map((input) =>
+        input.coinbase ? "coinbase" : input.txid
+      );
       query = _getInputArrayQuery.call(this, inputIds);
       relationBlocks.push(...(await this.repo.aggregate({ pipeline: query })));
 
