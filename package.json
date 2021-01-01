@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "npm-run-all --parallel start:fullnode start:rest",
-    "start:fullnode": "node --inspect src/server.js ",
-    "start:rest": "node src/api/server.js",
+    "start:sync": "node --inspect src/server.js ",
+    "start:web": "node src/api/server.js",
     "test": "mocha -w",
     "test:rest": "mocha -w --timeout 10000 ./test/rest-tests",
     "test:litecoin": "mocha -w --timeout 10000 ./test/litecoin-node-tests",
