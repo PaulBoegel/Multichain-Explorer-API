@@ -3,24 +3,18 @@ const EventEmitter = require("events");
 const BlockLogger = require("../logger/blockLogger");
 const OUT_OF_RANGE = "Block height out of range";
 
-function BitcoinSync({
-  service,
-  transactionHandler,
-  formater,
-  syncHeight = null,
-  syncHeightActive = false,
-}) {
+function BitcoinSync({ service, transactionHandler, syncHeight = null }) {
   const blockcache = new Map();
   let lastHeightSaved = 0;
   let transactionsCached = 0;
   let startNotifyer = false;
 
-  function _endSync(fireEvent) {
+  function _endSync() {
     BlockLogger.info({
       message: "blockchain synchronized",
       data: { chainId: `${this.chainId}` },
     });
-    if (fireEvent) this.events.emit("blockchainSynchronized", this.chainId);
+    if (startNotifyer) this.events.emit("blockchainSynchronized", this.chainId);
   }
 
   async function _checkblockcache() {
@@ -43,6 +37,7 @@ function BitcoinSync({
       }
       break;
     }
+
     if (saveBlocks.length === 0) return;
     await transactionHandler.saveBlockDataMany(saveBlocks);
     transactionsCached -= transactionsSaved;
@@ -96,16 +91,12 @@ function BitcoinSync({
         _saveBlockData.call(this, blockhash);
         height += 1;
       }
+      _endSync.call(this, startNotifyer);
     } catch (err) {
       if (err.message === OUT_OF_RANGE) {
         _endSync.call(this, startNotifyer);
       }
     }
-  }
-
-  function _checkHeight(endHeight) {
-    if (typeof endHeight === "number") return true;
-    return false;
   }
 
   return {
@@ -116,14 +107,14 @@ function BitcoinSync({
     },
     async blockrange() {
       const { height } = await transactionHandler.getHighestBlock(service);
-      if ((await _checkHeight.call(this, syncHeight)) && syncHeightActive) {
+      if (syncHeight) {
         return await _syncData.call(this, {
           startHeight: height,
           endHeight: syncHeight,
         });
       }
       startNotifyer = true;
-      return _syncData.call(this, { startHeight: height, startNotifyer: true });
+      return _syncData.call(this, { startHeight: height });
     },
   };
 }
