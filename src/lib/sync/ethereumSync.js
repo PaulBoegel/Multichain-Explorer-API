@@ -4,10 +4,10 @@ const OUT_OF_RANGE = "Cannot destructure property 'hash'";
 
 function EthereumSync({
   service,
-  transactionHandler,
+  dataHandler,
   formater,
-  syncHeight = null,
-  syncHeightActive = false,
+  endHeight = null,
+  runSync = false,
 }) {
   const blockcache = new Map();
   let lastHeightSaved = 0;
@@ -35,18 +35,18 @@ function EthereumSync({
       break;
     }
     if (saveBlocks.length === 0) return;
-    await transactionHandler.saveBlockDataMany(saveBlocks);
+    await dataHandler.saveBlockDataMany(saveBlocks);
     transactionsCached -= transactionsSaved;
     lastHeightSaved = saveHeight;
     await _checkblockCache();
   }
 
-  function _endSync(fireEvent) {
+  function _endSync() {
     BlockLogger.info({
       message: "blockchain synchronized",
       data: { chainId: `${this.chainId}` },
     });
-    if (fireEvent) this.events.emit("blockchainSynchronized", this.chainId);
+    if (startNotifyer) this.events.emit("blockchainSynchronized", this.chainId);
   }
 
   function _saveBlockData(blockhash) {
@@ -61,7 +61,7 @@ function EthereumSync({
         if (blockcache.size > 0) _checkblockCache();
 
         if (blockData.height - 1 === lastHeightSaved || lastHeightSaved === 0) {
-          const saveTime = await transactionHandler.saveBlockData(blockData);
+          const saveTime = await dataHandler.saveBlockData(blockData);
           lastHeightSaved = blockData.height;
           return;
         }
@@ -102,29 +102,24 @@ function EthereumSync({
     } catch (error) {
       const message = error.message.slice(0, 34);
       if (message === OUT_OF_RANGE) {
-        _endSync.call(this, startNotifyer);
+        _endSync.call(this);
       }
     }
-  }
-
-  async function _checkHeight(endHeight) {
-    if (typeof endHeight === "number") return true;
-    return false;
   }
 
   return {
     chainId: service.chainId,
     events: new EventEmitter(),
     setSyncHeight({ height, active }) {
-      syncHeight = height;
-      syncHeightActive = true;
+      endHeight = height;
     },
     async blockrange() {
-      const { height } = await transactionHandler.getHighestBlock(service);
-      if ((await _checkHeight.call(this, syncHeight)) && syncHeightActive) {
+      if (runSync === false) return;
+      const { height } = await dataHandler.getHighestBlock(service);
+      if (endHeight) {
         return await _syncData.call(this, {
           startHeight: height,
-          endHeight: syncHeight,
+          endHeight: endHeight,
         });
       }
       startNotifyer = true;

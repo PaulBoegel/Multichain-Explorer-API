@@ -25,8 +25,8 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
 
   function createIndex() {
     _checkConnection();
-    db.collection("blocks").createIndex({ height: 1 });
-    db.collection("blocks").createIndex({ chainId: 1, height: -1 });
+    //db.collection("blocks").createIndex({ height: 1 });
+    db.collection("blocks").createIndex({ height: -1, chainId: 1 });
     db.collection("blocks").createIndex({ chainId: 1, "tx.txid": 1 });
     db.collection("blocks").createIndex({ chainId: 1, "tx.vin.txid": 1 });
     db.collection("blocks").createIndex({
@@ -74,8 +74,8 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
   async function add(newBlock) {
     try {
       _checkConnection();
-      const { height, hash, ...data } = newBlock;
-      const keys = { height, hash };
+      const { height, chainId, ...data } = newBlock;
+      const keys = { height, chainId };
       data.timestamp = Date.now();
       const insert = await db
         .collection("blocks")
@@ -93,7 +93,7 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
 
       return true;
     } catch (error) {
-      ErrorLogger.info({
+      ErrorLogger.Error({
         message: "save error",
         data: {
           error: error.message,
@@ -123,7 +123,7 @@ function BlockRepository({ host, port, dbName, poolSize = 10 }) {
 
       return result.insertedCount;
     } catch (error) {
-      ErrorLogger.info({
+      ErrorLogger.Error({
         message: "save error",
         data: {
           error: error.message,

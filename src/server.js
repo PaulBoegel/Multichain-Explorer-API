@@ -10,7 +10,7 @@ const TransactionFormaterFactory = require("./lib/transactionFormaterFactory");
 const TransactionFormaterManager = require("./lib/transactionFormaterManager");
 
 const ConfigurationHandler = require("./lib/handler/configurationHandler");
-const TransactionHandler = require("./lib/handler/transactionHandler");
+const DataHandler = require("./lib/handler/dataHandler");
 const TransactionRepository = require("./lib/repos/transactionRepository");
 const BlockRepository = require("./lib/repos/blockRepository");
 
@@ -58,7 +58,7 @@ async function main() {
       )
     );
 
-    const transactionHandler = TransactionHandler(blockRepo);
+    const dataHandler = DataHandler(blockRepo);
 
     const fullnodeServiceFactory = FullnodeServiceFactory(
       config.blockchainConfig
@@ -105,7 +105,7 @@ async function main() {
     const fullnodeSyncFactory = FullnodeSyncFactory({
       fullnodeServiceManager,
       transactionFormaterManager,
-      transactionHandler,
+      dataHandler,
       config: config.blockchainConfig,
     });
 
@@ -128,7 +128,7 @@ async function main() {
       "onNewBlock",
       async (blockhash, chainId) => {
         try {
-          await transactionHandler.saveBlockDataWithHash({
+          await dataHandler.saveBlockDataWithHash({
             blockhash,
             service: fullnodeServiceManager.getService(chainId),
           });

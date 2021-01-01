@@ -4,8 +4,8 @@ function LitecoinSync({
   service,
   transactionHandler,
   formater,
-  syncHeight = null,
-  syncHeightActive = false,
+  endHeight = null,
+  runSync = false,
 }) {
   return Object.setPrototypeOf(
     Object.assign(
@@ -13,8 +13,8 @@ function LitecoinSync({
         service,
         transactionHandler,
         formater,
-        syncHeight,
-        syncHeightActive,
+        endHeight,
+        runSync,
       }),
       {
         chainId: service.chainId,

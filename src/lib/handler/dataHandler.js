@@ -1,11 +1,6 @@
 "use strict";
 
-function TransactionHandler(blockRepo) {
-  function _calculateSaveTimeInSeconds(sTime, eTime) {
-    const timeElapsed = eTime - sTime;
-    return timeElapsed ? (timeElapsed * 0.001).toFixed(2) : 0;
-  }
-
+function DataHandler(blockRepo) {
   async function saveBlockDataWithHash({ blockhash, service }) {
     const blockData = await service.getBlock({ blockhash, verbose: true });
     blockData.chainId = service.chainId;
@@ -63,4 +58,4 @@ function TransactionHandler(blockRepo) {
   };
 }
 
-module.exports = TransactionHandler;
+module.exports = DataHandler;

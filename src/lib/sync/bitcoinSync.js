@@ -3,7 +3,12 @@ const EventEmitter = require("events");
 const BlockLogger = require("../logger/blockLogger");
 const OUT_OF_RANGE = "Block height out of range";
 
-function BitcoinSync({ service, transactionHandler, syncHeight = null }) {
+function BitcoinSync({
+  service,
+  dataHandler,
+  endHeight = null,
+  runSync = false,
+}) {
   const blockcache = new Map();
   let lastHeightSaved = 0;
   let transactionsCached = 0;
@@ -39,7 +44,7 @@ function BitcoinSync({ service, transactionHandler, syncHeight = null }) {
     }
 
     if (saveBlocks.length === 0) return;
-    await transactionHandler.saveBlockDataMany(saveBlocks);
+    await dataHandler.saveBlockDataMany(saveBlocks);
     transactionsCached -= transactionsSaved;
     lastHeightSaved = saveHeight;
     await _checkblockcache();
@@ -57,7 +62,7 @@ function BitcoinSync({ service, transactionHandler, syncHeight = null }) {
         if (blockcache.size > 0) _checkblockcache();
 
         if (blockData.height - 1 === lastHeightSaved || lastHeightSaved === 0) {
-          const saveTime = await transactionHandler.saveBlockData(blockData);
+          const saveTime = await dataHandler.saveBlockData(blockData);
           lastHeightSaved = blockData.height;
           return;
         }
@@ -103,14 +108,15 @@ function BitcoinSync({ service, transactionHandler, syncHeight = null }) {
     events: new EventEmitter(),
     chainId: service.chainId,
     setSyncHeight(height) {
-      syncHeight = height;
+      endHeight = height;
     },
     async blockrange() {
-      const { height } = await transactionHandler.getHighestBlock(service);
-      if (syncHeight) {
+      if (runSync === false) return;
+      const { height } = await dataHandler.getHighestBlock(service);
+      if (endHeight) {
         return await _syncData.call(this, {
           startHeight: height,
-          endHeight: syncHeight,
+          endHeight: endHeight,
         });
       }
       startNotifyer = true;

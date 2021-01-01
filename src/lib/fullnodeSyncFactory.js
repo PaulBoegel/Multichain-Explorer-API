@@ -6,7 +6,7 @@ const EthereumSync = require("./sync/ethereumSync");
 function FullnodeSyncFactory({
   fullnodeServiceManager,
   transactionFormaterManager,
-  transactionHandler,
+  dataHandler,
   config,
 }) {
   function create(chainId) {
@@ -17,10 +17,10 @@ function FullnodeSyncFactory({
         );
         return new LitecoinSync({
           service: fullnodeServiceManager.getService(config.litecoin.chainId),
-          transactionHandler,
+          dataHandler,
           formater,
-          syncHeight: config.litecoin.syncHeight,
-          syncHeightActive: config.litecoin.syncHeightActive,
+          endHeight: config.litecoin.endHeight,
+          runSync: config.litecoin.runSync,
         });
       case config.bitcoin.chainId:
         formater = transactionFormaterManager.getFormater(
@@ -28,19 +28,19 @@ function FullnodeSyncFactory({
         );
         return new BitcoinSync({
           service: fullnodeServiceManager.getService(config.bitcoin.chainId),
-          transactionHandler,
+          dataHandler,
           formater,
-          syncHeight: config.bitcoin.syncHeight,
-          syncHeightActive: config.bitcoin.syncHeightActive,
+          endHeight: config.bitcoin.endHeight,
+          runSync: config.bitcoin.runSync,
         });
       case config.dash.chainId:
         formater = transactionFormaterManager.getFormater(config.dash.chainId);
         return new DashSync({
           service: fullnodeServiceManager.getService(config.dash.chainId),
-          transactionHandler,
+          dataHandler,
           formater,
-          syncHeight: config.dash.syncHeight,
-          syncHeightActive: config.dash.syncHeightActive,
+          endHeight: config.dash.endHeight,
+          runSync: config.dash.runSync,
         });
       case config.ethereum.chainId:
         formater = transactionFormaterManager.getFormater(
@@ -48,10 +48,10 @@ function FullnodeSyncFactory({
         );
         return new EthereumSync({
           service: fullnodeServiceManager.getService(config.ethereum.chainId),
-          transactionHandler,
+          dataHandler,
           formater,
-          syncHeight: config.ethereum.syncHeight,
-          syncHeightActive: config.ethereum.syncHeightActive,
+          endHeight: config.ethereum.endHeight,
+          runSync: config.ethereum.runSync,
         });
     }
   }
