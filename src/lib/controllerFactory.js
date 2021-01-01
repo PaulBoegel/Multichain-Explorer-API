@@ -21,7 +21,7 @@ function ControllerFactory(formaterManager, blockRepo, conf) {
           );
         case conf.dash.chainId:
           return DashController(
-            formaterManager.getFormater(conf.litecoin.chainId),
+            formaterManager.getFormater(conf.dash.chainId),
             blockRepo,
             conf.dash.chainId
           );

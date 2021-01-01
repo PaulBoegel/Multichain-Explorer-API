@@ -111,7 +111,7 @@ function BitcoinSync({
       endHeight = height;
     },
     async blockrange() {
-      if (runSync === false) return;
+      if (runSync === false) endHeight = 0;
       const { height } = await dataHandler.getHighestBlock(service);
       if (endHeight) {
         return await _syncData.call(this, {
