@@ -1,9 +1,9 @@
-function Resolvers({ queryBuilderManager }) {
+function Resolvers({ controllerManager }) {
   return {
     RootQuery: {
       async blocks(root, { height, hash, chainId, pageSize, page }, context) {
-        const queryBuilder = queryBuilderManager.getQueryBuilder(chainId);
-        const result = await queryBuilder.blockSearch({
+        const controller = controllerManager.getController(chainId);
+        const result = await controller.blockSearch({
           height,
           hash,
           pageSize,
@@ -12,8 +12,8 @@ function Resolvers({ queryBuilderManager }) {
         return result;
       },
       async transactions(root, { txid, chainId, pageSize, page }, context) {
-        const queryBuilder = queryBuilderManager.getQueryBuilder(chainId);
-        const result = await queryBuilder.transactionSearch({
+        const controller = controllerManager.getController(chainId);
+        const result = await controller.transactionSearch({
           txid,
           pageSize,
           page,
@@ -21,8 +21,8 @@ function Resolvers({ queryBuilderManager }) {
         return result;
       },
       async address(root, { address, chainId, pageSize, page }, context) {
-        const queryBuilder = queryBuilderManager.getQueryBuilder(chainId);
-        const result = await queryBuilder.addressSearchQuery({
+        const controller = controllerManager.getController(chainId);
+        const result = await controller.addressSearchQuery({
           address,
           pageSize,
           page,
@@ -30,13 +30,13 @@ function Resolvers({ queryBuilderManager }) {
         return result;
       },
       async searchEntity(root, { chainId, searchString }, context) {
-        const queryBuilder = queryBuilderManager.getQueryBuilder(chainId);
-        const id = await queryBuilder.searchEntityId({ searchString });
+        const controller = controllerManager.getController(chainId);
+        const id = await controller.searchEntityId({ searchString });
         return id;
       },
       async getHeight(root, { chainId }, context) {
-        const queryBuilder = queryBuilderManager.getQueryBuilder(chainId);
-        const height = await queryBuilder.getHeight();
+        const controller = controllerManager.getController(chainId);
+        const height = await controller.getHeight();
         return height;
       },
     },

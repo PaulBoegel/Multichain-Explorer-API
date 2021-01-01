@@ -1,4 +1,4 @@
-function EthereumQueryBuilder(formater, repo, chainId) {
+function EthereumController(formater, repo, chainId) {
   function _getTransactionQuery({ txid }) {
     return [
       { $match: { chainId: this.chainId, "tx.txid": txid } },
@@ -41,7 +41,7 @@ function EthereumQueryBuilder(formater, repo, chainId) {
     return blocks;
   }
 
-  const queryBuilder = {
+  const controller = {
     async blockSearch({
       height = { $exists: true },
       hash = { $exists: true },
@@ -106,28 +106,28 @@ function EthereumQueryBuilder(formater, repo, chainId) {
     },
   };
 
-  Object.defineProperty(queryBuilder, "chainId", {
+  Object.defineProperty(controller, "chainId", {
     value: chainId,
     writable: true,
     enumerable: true,
     configurable: true,
   });
 
-  Object.defineProperty(queryBuilder, "formater", {
+  Object.defineProperty(controller, "formater", {
     value: formater,
     writable: true,
     enumerable: true,
     configurable: true,
   });
 
-  Object.defineProperty(queryBuilder, "repo", {
+  Object.defineProperty(controller, "repo", {
     value: repo,
     writable: false,
     enumerable: true,
     configurable: true,
   });
 
-  return queryBuilder;
+  return controller;
 }
 
-module.exports = EthereumQueryBuilder;
+module.exports = EthereumController;

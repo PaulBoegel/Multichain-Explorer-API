@@ -1,4 +1,4 @@
-function BitcoinQueryBuilder(formater, repo, chainId) {
+function BitcoinController(formater, repo, chainId) {
   function _getInputArrayQuery(txids) {
     return [
       { $match: { chainId: this.chainId, "tx.txid": { $in: txids } } },
@@ -82,7 +82,7 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
     });
   }
 
-  const queryBuilder = {
+  const controller = {
     async blockSearch({
       height = { $exists: true },
       hash = { $exists: true },
@@ -207,28 +207,28 @@ function BitcoinQueryBuilder(formater, repo, chainId) {
     },
   };
 
-  Object.defineProperty(queryBuilder, "chainId", {
+  Object.defineProperty(controller, "chainId", {
     value: chainId,
     writable: true,
     enumerable: true,
     configurable: true,
   });
 
-  Object.defineProperty(queryBuilder, "formater", {
+  Object.defineProperty(controller, "formater", {
     value: formater,
     writable: true,
     enumerable: true,
     configurable: true,
   });
 
-  Object.defineProperty(queryBuilder, "repo", {
+  Object.defineProperty(controller, "repo", {
     value: repo,
     writable: false,
     enumerable: true,
     configurable: true,
   });
 
-  return queryBuilder;
+  return controller;
 }
 
-module.exports = BitcoinQueryBuilder;
+module.exports = BitcoinController;

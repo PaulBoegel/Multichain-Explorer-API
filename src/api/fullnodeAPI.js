@@ -6,12 +6,12 @@ const cors = require("cors");
 const TransactionRouter = require("./routes/transactionRouter");
 const TransactionController = require("./controllers/transactionController");
 
-function FullnodeApi(queryBuilderManager) {
+function FullnodeApi(controllerManager) {
   const app = express();
   const port = process.env.PORT || 3000;
 
   function start() {
-    graphServer({ queryBuilderManager }).applyMiddleware({ app });
+    graphServer({ controllerManager }).applyMiddleware({ app });
     app.use(cors({ origin: true }));
     initAPI();
     app.listen(port, () => {
@@ -20,9 +20,7 @@ function FullnodeApi(queryBuilderManager) {
   }
 
   async function initAPI() {
-    const transactionController = new TransactionController(
-      queryBuilderManager
-    );
+    const transactionController = new TransactionController(controllerManager);
     const transactionRouter = new TransactionRouter(
       express.Router(),
       transactionController

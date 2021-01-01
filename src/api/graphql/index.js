@@ -3,10 +3,10 @@ const { makeExecutableSchema } = require("graphql-tools");
 const Resolvers = require("./resolvers");
 const Schema = require("./schema");
 
-function Service({ queryBuilderManager }) {
+function Service({ controllerManager }) {
   const executebleSchema = makeExecutableSchema({
     typeDefs: Schema,
-    resolvers: Resolvers({ queryBuilderManager }),
+    resolvers: Resolvers({ controllerManager }),
   });
 
   return new ApolloServer({

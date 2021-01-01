@@ -6,8 +6,8 @@ const ConfigurationHandler = require("../lib/handler/configurationHandler");
 const BlockRepository = require("../lib/repos/blockRepository");
 const TransactionFormaterFactory = require("../lib/transactionFormaterFactory");
 const TransactionFormaterManager = require("../lib/transactionFormaterManager");
-const QueryBuilderFactory = require("../lib/queryBuilderFactory");
-const QueryBuilderManager = require("../lib/queryBuilderManager");
+const ControllerFactory = require("../lib/controllerFactory");
+const ControllerManager = require("../lib/controllerManager");
 
 const configHandler = new ConfigurationHandler(fs);
 const config = configHandler.readAndParseJsonFile("./explorer-config.json");
@@ -29,26 +29,26 @@ formaterManager.setFormater(
   formaterFactory.create(config.blockchainConfig.ethereum.chainId)
 );
 
-const queryBuilderFactory = QueryBuilderFactory(
+const controllerFactory = ControllerFactory(
   formaterManager,
   blockRepo,
   config.blockchainConfig
 );
-const queryBuilderManager = QueryBuilderManager();
+const controllerManager = ControllerManager();
 
-queryBuilderManager.setQueryBuilder(
-  queryBuilderFactory.create(config.blockchainConfig.bitcoin.chainId)
+controllerManager.setController(
+  controllerFactory.create(config.blockchainConfig.bitcoin.chainId)
 );
-queryBuilderManager.setQueryBuilder(
-  queryBuilderFactory.create(config.blockchainConfig.litecoin.chainId)
+controllerManager.setController(
+  controllerFactory.create(config.blockchainConfig.litecoin.chainId)
 );
-queryBuilderManager.setQueryBuilder(
-  queryBuilderFactory.create(config.blockchainConfig.dash.chainId)
+controllerManager.setController(
+  controllerFactory.create(config.blockchainConfig.dash.chainId)
 );
-queryBuilderManager.setQueryBuilder(
-  queryBuilderFactory.create(config.blockchainConfig.ethereum.chainId)
+controllerManager.setController(
+  controllerFactory.create(config.blockchainConfig.ethereum.chainId)
 );
 
-const fullnodeApi = FullnodeApi(queryBuilderManager);
+const fullnodeApi = FullnodeApi(controllerManager);
 
 fullnodeApi.start();
