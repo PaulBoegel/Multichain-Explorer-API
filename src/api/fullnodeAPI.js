@@ -1,5 +1,5 @@
 "use strict";
-
+require("dotenv").config();
 const express = require("express");
 const graphServer = require("./graphql");
 const cors = require("cors");
