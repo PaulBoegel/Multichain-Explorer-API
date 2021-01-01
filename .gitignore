@@ -5,3 +5,4 @@
 explorer-config.json
 /log/block*.log
 /log/error.log
+.env
