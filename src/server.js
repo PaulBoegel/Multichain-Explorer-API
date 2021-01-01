@@ -27,8 +27,8 @@ async function main() {
 
     const configHandler = ConfigurationHandler(fs);
     const config = configHandler.readAndParseJsonFile("./explorer-config.json");
-    const transactionRepo = TransactionRepository(config.dbConfig.test);
-    const blockRepo = BlockRepository(config.dbConfig.test);
+    const transactionRepo = TransactionRepository(config.dbConfig.prod);
+    const blockRepo = BlockRepository(config.dbConfig.prod);
 
     await transactionRepo.connect();
     await blockRepo.connect();
