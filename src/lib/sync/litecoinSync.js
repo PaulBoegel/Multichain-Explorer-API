@@ -2,7 +2,7 @@ const BitcoinSync = require("./bitcoinSync");
 
 function LitecoinSync({
   service,
-  transactionHandler,
+  dataHandler,
   formater,
   endHeight = null,
   runSync = false,
@@ -11,7 +11,7 @@ function LitecoinSync({
     Object.assign(
       BitcoinSync({
         service,
-        transactionHandler,
+        dataHandler,
         formater,
         endHeight,
         runSync,

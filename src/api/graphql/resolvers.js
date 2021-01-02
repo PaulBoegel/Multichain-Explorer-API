@@ -37,7 +37,7 @@ function Resolvers({ controllerManager }) {
       async getHeight(root, { chainId }, context) {
         const controller = controllerManager.getController(chainId);
         const height = await controller.getHeight();
-        return height;
+        return height ? height : 0;
       },
     },
   };
