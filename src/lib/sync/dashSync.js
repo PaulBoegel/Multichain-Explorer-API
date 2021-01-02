@@ -2,7 +2,7 @@ const BitcoinSync = require("./bitcoinSync");
 
 function DashSync({
   service,
-  transactionHandler,
+  dataHandler,
   formater,
   endHeight = null,
   runSync = false,
@@ -11,7 +11,7 @@ function DashSync({
     Object.assign(
       BitcoinSync({
         service,
-        transactionHandler,
+        dataHandler,
         formater,
         endHeight,
         runSync,
