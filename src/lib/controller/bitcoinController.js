@@ -75,7 +75,7 @@ function BitcoinController(formater, repo, chainId) {
       const { time, previousblockhash, tx, ...data } = block;
       return {
         tx: tx instanceof Array ? tx : [tx],
-        mined: new Date(time).toDateString(),
+        mined: new Date(time * 1000).toDateString(),
         parent: previousblockhash,
         ...data,
       };
